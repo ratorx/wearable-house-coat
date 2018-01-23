@@ -76,58 +76,56 @@
                     android:id="@+id/main_actionbuttons"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
                     android:columnCount="3">
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        android:text="clquebec.com.wearablehousecoat.components.DeviceControlButton"
-                        app:background="@color/white"/>
+                    <ImageButton
+                        android:id="@+id/tempbutton1"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton2"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        android:text="clquebec.com.wearablehousecoat.components.DeviceControlButton"
-                        app:background="@color/white" />
+                    <ImageButton
+                        android:id="@+id/tempbutton5"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton3"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        android:text="clquebec.com.wearablehousecoat.components.DeviceControlButton" />
+                    <ImageButton
+                        android:id="@+id/tempbutton4"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton6"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        android:text="clquebec.com.wearablehousecoat.components.DeviceControlButton" />
+                    <ImageButton
+                        android:id="@+id/tempbutton3"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton5"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        android:text="clquebec.com.wearablehousecoat.components.DeviceControlButton" />
+                    <ImageButton
+                        android:id="@+id/tempbutton2"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton4"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        android:text="clquebec.com.wearablehousecoat.components.DeviceControlButton" />
+                    <ImageButton
+                        android:id="@+id/tempbutton"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
                 </GridLayout>
 
                 <Space
