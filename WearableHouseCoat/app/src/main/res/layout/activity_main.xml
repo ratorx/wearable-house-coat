@@ -10,18 +10,133 @@
     tools:context="clquebec.com.wearablehousecoat.MainActivity"
     tools:deviceIds="wear">
 
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/inner_frame_layout_padding"
-        app:boxedEdges="all">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/hello_world" />
+        <android.support.wear.widget.BoxInsetLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    </FrameLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:boxedEdges="all">>
+
+                <TextView
+                    android:id="@+id/main_locationlabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_location_hint"
+                    android:textAlignment="center"
+                    android:textAllCaps="false" />
+
+                <TextView
+                    android:id="@+id/main_currentlocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/main_defaultlocation"
+                    android:textAlignment="center"
+                    android:textAllCaps="true"
+                    android:textSize="18sp"
+                    tools:text="Kitchen" />
+
+                <LinearLayout
+                    android:id="@+id/main_companionview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/main_companionlabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/main_companion_hint"
+                        android:textAlignment="viewEnd" />
+
+                    <TextView
+                        android:id="@+id/main_companions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingLeft="5dp"
+                        android:text="@string/main_companions_default"
+                        tools:text="1 other person" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:layout_weight="1" />
+
+                <GridLayout
+                    android:id="@+id/main_actionbuttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:columnCount="3">
+
+                    <ImageButton
+                        android:id="@+id/tempbutton1"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
+                    <ImageButton
+                        android:id="@+id/tempbutton5"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
+                    <ImageButton
+                        android:id="@+id/tempbutton4"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
+                    <ImageButton
+                        android:id="@+id/tempbutton3"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
+                    <ImageButton
+                        android:id="@+id/tempbutton2"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
+                    <ImageButton
+                        android:id="@+id/tempbutton"
+                        style="@android:style/Widget.Holo.ImageButton"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/circle"
+                        android:src="@drawable/action_item_icon_background" />
+
+                </GridLayout>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp" />
+            </LinearLayout>
+
+
+        </android.support.wear.widget.BoxInsetLayout>
+
+    </ScrollView>
+
 </android.support.wear.widget.BoxInsetLayout>
 
