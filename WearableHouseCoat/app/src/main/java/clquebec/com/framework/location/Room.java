@@ -8,6 +8,21 @@ import java.util.UUID;
  * Creation Date: 03/02/18
  */
 
-public interface Room extends Place {
+public class Room extends Place {
+    private String mName;
+    private UUID mUUID;
 
+    public Room(String name){
+        mName = name;
+        mUUID = UUID.randomUUID();
+    }
+    @Override
+    public String getName() {
+        return mName;
+    }
+
+    @Override
+    public UUID getID() {
+        return mUUID;
+    }
 }
