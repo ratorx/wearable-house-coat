@@ -133,6 +133,8 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
     public void onClick(View view) {
         //By default, toggle the Device.
 
+        Log.d("DeviceControlButton", "Device Control Button clicked");
+
         if(mDevice != null) {
             if (mDevice.isEnabled()) {
                 mDevice.disable();
