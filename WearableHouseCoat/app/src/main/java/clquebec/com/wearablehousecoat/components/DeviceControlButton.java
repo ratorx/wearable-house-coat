@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceTypes;
 import clquebec.com.wearablehousecoat.R;
 
@@ -26,13 +27,15 @@ import clquebec.com.wearablehousecoat.R;
  * logging and calls to our preference learner.
  */
 
-public class DeviceControlButton extends Button {
+public class DeviceControlButton extends Button implements View.OnClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     private static final float DEFAULT_PADDING = 5;
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
     private float mPadding = DEFAULT_PADDING;
     private int mDeviceType = 0;
+
+    private ControllableDevice mDevice;
 
     private Paint mBackgroundPaint;
     private Drawable mDeviceIcon = null;
@@ -72,6 +75,9 @@ public class DeviceControlButton extends Button {
 
         //Get rid of button background
         setBackgroundResource(0);
+
+        //Set on click listener to default toggle action
+        setOnClickListener(this);
     }
 
     @Override
@@ -116,6 +122,23 @@ public class DeviceControlButton extends Button {
             final float paddingY = (mSize - imageHeight) / 2;
 
             mDeviceIcon.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+        }
+    }
+
+    public void attachDevice(ControllableDevice device){
+        mDevice = device;
+    }
+
+    @Override
+    public void onClick(View view) {
+        //By default, toggle the Device.
+
+        if(mDevice != null) {
+            if (mDevice.isEnabled()) {
+                mDevice.disable();
+            } else {
+                mDevice.enable();
+            }
         }
     }
 }
