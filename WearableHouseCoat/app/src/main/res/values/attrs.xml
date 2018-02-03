@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Stylable attributes for DeviceControlButton -->
+    <declare-styleable name="DeviceControlButton">
+        <attr name="background" format="color" />
+        <attr name="padding" format="dimension" />
+        <attr name="type" format="enum">
+            <enum name="light" value="0" />
+            <enum name="sound" value="1" />
+            <enum name="thermostat" value="2" />
+            <enum name="curtains" value="3" />
+        </attr>
+    </declare-styleable>
+</resources>
