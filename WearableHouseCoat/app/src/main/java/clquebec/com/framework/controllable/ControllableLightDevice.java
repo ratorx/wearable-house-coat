@@ -11,9 +11,6 @@ import android.graphics.Color;
  */
 
 public interface ControllableLightDevice extends ControllableDevice {
-    //Returns current light state
-    boolean isLightOn();
-
     //Allows setting of colour
     void setLightColor(Color c) throws ActionNotSupported;
 }

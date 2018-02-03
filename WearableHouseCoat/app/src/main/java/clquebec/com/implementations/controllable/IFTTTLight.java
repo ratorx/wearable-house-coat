@@ -35,11 +35,6 @@ public class IFTTTLight implements ControllableLightDevice {
     }
 
     @Override
-    public boolean isLightOn() {
-        return mCurrentState;
-    }
-
-    @Override
     public void setLightColor(Color c) throws ActionNotSupported {
         if(mName != null && mCurrentState){
             List<String> params = new ArrayList<>();
@@ -82,6 +77,11 @@ public class IFTTTLight implements ControllableLightDevice {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return mCurrentState;
     }
 
     @Override
