@@ -6,5 +6,5 @@ package clquebec.com.framework.controllable;
  * Creation Date: 03/02/18
  */
 
-class ActionNotSupported extends Exception {
+public class ActionNotSupported extends Exception {
 }
