@@ -5,11 +5,14 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import clquebec.com.framework.controllable.ControllableDeviceTypes;
 import clquebec.com.wearablehousecoat.R;
 
 /**
@@ -29,9 +32,10 @@ public class DeviceControlButton extends Button {
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
     private float mPadding = DEFAULT_PADDING;
-    private int mDeviceType = 0; /* TODO: Change this to a DeviceType enum */
+    private int mDeviceType = 0;
 
     private Paint mBackgroundPaint;
+    private Drawable mDeviceIcon = null;
 
     //Fields for painting - these are members so they are cached between draws
     private int mSize; /* The side length of the view */
@@ -62,6 +66,10 @@ public class DeviceControlButton extends Button {
         mBackgroundPaint.setStyle(Paint.Style.FILL);
         mBackgroundPaint.setColor(mBackgroundColor);
 
+        if(ControllableDeviceTypes.getIcon(mDeviceType) != 0) {
+            mDeviceIcon = context.getDrawable(ControllableDeviceTypes.getIcon(mDeviceType));
+        }
+
         //Get rid of button background
         setBackgroundResource(0);
     }
@@ -70,6 +78,9 @@ public class DeviceControlButton extends Button {
     public void onDraw(Canvas canvas){
         /* Draw a circle, with an icon on top. */
         canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
+        if(mDeviceIcon != null) {
+            mDeviceIcon.draw(canvas);
+        }
     }
 
     @Override
@@ -88,5 +99,23 @@ public class DeviceControlButton extends Button {
         mCenter[0] = half; mCenter[1] = half;
         mRadius = half - mPadding;
 
+        //Fit icon into available space
+        final float imageAvailableSize = mSize - mPadding*4; //Padding on both sides
+        final int paddingBounds = (int) mPadding*2;
+
+        if(mDeviceIcon != null) {
+            final float scale = mDeviceIcon.getIntrinsicWidth() > mDeviceIcon.getIntrinsicHeight() ?
+                imageAvailableSize / mDeviceIcon.getIntrinsicWidth() :
+                imageAvailableSize / mDeviceIcon.getIntrinsicHeight();
+
+            //Calculate dimensions
+            //Casting to int at last moment to try and reduce rounding errors.
+            final float imageWidth = scale * mDeviceIcon.getIntrinsicWidth();
+            final float imageHeight = scale * mDeviceIcon.getIntrinsicHeight();
+            final float paddingX = (mSize - imageWidth) / 2;
+            final float paddingY = (mSize - imageHeight) / 2;
+
+            mDeviceIcon.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+        }
     }
 }

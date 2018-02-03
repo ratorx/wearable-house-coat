@@ -31,7 +31,24 @@ public class ControllableDeviceTypes {
             default:
                 return 0;
         }
+    }
 
+    public static String getName(int device) {
+        /* TODO: replace this with something proper with XML resources */
+        switch (device) {
+            case LIGHT:
+                return "Light";
+            case SOUND:
+                return "Sound";
+            case THERMOSTAT:
+                return "Thermostat";
+            case OVEN:
+                return "Oven";
+            case CURTAINS:
+                return "Curtains";
+            default:
+                return "";
+        }
 
     }
 }
