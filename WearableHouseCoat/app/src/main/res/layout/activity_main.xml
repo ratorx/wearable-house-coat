@@ -88,13 +88,12 @@
                         app:type="thermostat"/>
 
                     <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton2"
+                        android:id="@+id/lightButton"
                         android:layout_width="1dp"
                         android:layout_height="50dp"
                         android:layout_columnWeight="1"
                         android:layout_rowWeight="1"
-                        app:type="light"
-                        />
+                        app:type="light" />
 
                     <clquebec.com.wearablehousecoat.components.DeviceControlButton
                         android:id="@+id/deviceControlButton3"
