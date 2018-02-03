@@ -13,11 +13,6 @@ import clquebec.com.framework.controllable.ControllableLightDevice;
 
 public class PhillipsHue implements ControllableLightDevice {
     @Override
-    public boolean isLightOn() {
-        return false;
-    }
-
-    @Override
     public void setLightColor(Color c) throws ActionNotSupported {
 
     }
@@ -30,5 +25,20 @@ public class PhillipsHue implements ControllableLightDevice {
     @Override
     public boolean disable() {
         return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setName(String name) {
+
+    }
+
+    @Override
+    public String getName() {
+        return null;
     }
 }
