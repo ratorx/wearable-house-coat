@@ -8,7 +8,7 @@ import java.util.UUID;
  * Creation Date: 03/02/18
  */
 
-public class Room extends Place {
+public class Room implements Place {
     private String mName;
     private UUID mUUID;
 
