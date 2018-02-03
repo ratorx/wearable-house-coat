@@ -8,6 +8,8 @@ import java.util.UUID;
  * Creation Date: 03/02/18
  */
 
-interface Room extends Place {
+public interface Place {
+    String getName();
 
+    UUID getID();
 }

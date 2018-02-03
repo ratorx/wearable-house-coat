@@ -15,4 +15,8 @@ public interface ControllableDevice {
 
     //Turn device off - returns success or failure.
     boolean disable();
+
+    void setName(String name);
+
+    String getName();
 }
