@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
+import clquebec.com.framework.people.Person;
 
 /**
  * WearableHouseCoat
@@ -17,6 +18,8 @@ public abstract class Place {
     public abstract UUID getID();
 
     public abstract Set<ControllableDevice> getDevices();
+
+    public abstract Set<Person> getPeople();
 
     public boolean equals(Object other) {
         return other instanceof Place && ((Place) other).getID().equals(this.getID());

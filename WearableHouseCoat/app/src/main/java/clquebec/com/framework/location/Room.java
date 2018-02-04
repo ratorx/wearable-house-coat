@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableLightDevice;
+import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
 
 /**
@@ -49,5 +50,18 @@ public class Room extends Place {
         devices.add(myLight);
 
         return devices;
+    }
+
+    @Override
+    public Set<Person> getPeople() {
+        //TODO: Read this from somewhere
+
+        Set<Person> people = new HashSet<>();
+
+        UUID personId = UUID.randomUUID();
+        Person myPerson = new Person(personId);
+
+        people.add(myPerson);
+        return people;
     }
 }
