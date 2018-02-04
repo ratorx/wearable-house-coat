@@ -51,4 +51,16 @@ public abstract class Place implements ControllableDeviceGroup{
     public boolean isEnabled() {
         return getDevices().stream().allMatch(d -> isEnabled());
     }
+
+    @Override
+    public boolean quickAction(){
+        //Toggle all on or off
+        return isEnabled() ? disable() : enable();
+    }
+
+    @Override
+    public boolean extendedAction(){
+        //TODO: Implement something useful here, like displaying a list / sub-list of toggles.
+        return false;
+    }
 }
