@@ -31,6 +31,7 @@ public class MainActivity extends WearableActivity {
         //For now, for testing, it seems fine to work without this.
 
         myLight = new IFTTTLight(this, mRoom);
+        myLight.setName("IFTTT Test");
 
         mTestButton = findViewById(R.id.lightButton);
         mTestButton.attachDevice(myLight);
