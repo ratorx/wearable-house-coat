@@ -2,6 +2,8 @@ package clquebec.com.wearablehousecoat;
 
 import android.bluetooth.BluetoothClass;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.Button;
@@ -19,10 +21,12 @@ import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
 import clquebec.com.implementations.location.DummyLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceControlButton;
+import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity {
 
-    private DeviceControlButton mTestButton;
+    private RecyclerView mToggleButtons;
+    private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private TextView mPersonCountView;
 
@@ -35,28 +39,26 @@ public class MainActivity extends WearableActivity {
 
         mLocationNameView = findViewById(R.id.main_currentlocation);
         mPersonCountView = findViewById(R.id.main_companions);
-        mTestButton = findViewById(R.id.lightButton);
+        mToggleButtons = findViewById(R.id.main_togglebuttons);
+
+        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 3));
+
+        mToggleAdapter = new DeviceTogglesAdapter(null); //No Place provided yet
+        mToggleButtons.setAdapter(mToggleAdapter);
 
         mLocationProvider = new DummyLocationProvider(this);
         mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
                 mLocationNameView.setText(newLocation.getName());
 
                 Set<Person> people = newLocation.getPeople();
-                mPersonCountView.setText(
-                        getResources().getQuantityString( //Automatically varies based on number
+                mPersonCountView.setText(getResources().getQuantityString( //Automatically varies based on number
                                 R.plurals.companion_strings,
                                 people.size(),
                                 people.size()
                         ));
 
-
-                //TODO: Automatically generate buttons based on what's in room.
-                //For now, for testing, it seems fine to work without this.
-
-                //TODO: Attach each device to a different button - probably done in previous step.
-                for(ControllableDevice device: newLocation.getDevices()) {
-                    mTestButton.attachDevice(device);
-                }
+                //This automatically populates and attaches devices to buttons.
+                mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
             }
         );
 

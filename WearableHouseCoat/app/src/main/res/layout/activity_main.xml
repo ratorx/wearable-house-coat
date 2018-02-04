@@ -72,61 +72,12 @@
                     android:layout_height="10dp"
                     android:layout_weight="1" />
 
-                <GridLayout
-                    android:id="@+id/main_actionbuttons"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/main_togglebuttons"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:columnCount="3">
+                    android:layout_height="wrap_content">
 
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        app:type="thermostat"/>
-
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/lightButton"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        app:type="light" />
-
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton3"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        app:type="sound"/>
-
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton6"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        app:type="oven" />
-
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton5"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        app:type="curtains" />
-
-                    <clquebec.com.wearablehousecoat.components.DeviceControlButton
-                        android:id="@+id/deviceControlButton4"
-                        android:layout_width="1dp"
-                        android:layout_height="50dp"
-                        android:layout_columnWeight="1"
-                        android:layout_rowWeight="1"
-                        app:type="curtains"/>
-                </GridLayout>
+                </android.support.v7.widget.RecyclerView>
 
                 <Space
                     android:layout_width="match_parent"

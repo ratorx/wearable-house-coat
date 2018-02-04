@@ -1,6 +1,7 @@
 package clquebec.com.wearablehousecoat.components;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +22,7 @@ public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdap
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         DeviceControlButton button = new DeviceControlButton(parent.getContext());
+
         return new ViewHolder(button);
     }
 
@@ -36,9 +38,8 @@ public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdap
         return mDeviceGroup.getDevices().size();
     }
 
-    public void setDeviceGroup(ControllableDeviceGroup group){
+    public DeviceTogglesAdapter(ControllableDeviceGroup group){
         mDeviceGroup = group;
-        super.notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -52,6 +53,7 @@ public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdap
 
         public void attachDevice(ControllableDevice d){
             mButton.attachDevice(d);
+            Log.d("DeviceViewHolder", "ViewHolder attached to "+d.getName());
         }
 
         @Override

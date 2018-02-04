@@ -30,6 +30,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
+    private static final int DEFAULT_SIZE = 100;
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
     private float mPadding = DEFAULT_PADDING;
@@ -81,7 +82,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
         mBackgroundPaint.setStyle(Paint.Style.FILL);
         mBackgroundPaint.setColor(mBackgroundColor);
 
-        if(mDeviceType.getIcon() != 0) {
+        if(mDeviceType.getIcon() != 0){
             mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
         }
 
@@ -109,10 +110,34 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
 
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        mSize = width > height ? height : width;
+
+        if(height != 0) {
+            mSize = width > height ? height : width;
+        }else{
+            mSize = width;
+        }
+
+        if(mSize == 0){
+            if(getParent() != null){
+                mSize = ((View) getParent()).getMeasuredWidth()/3; //Automatically set to 1/3rd size
+            }else{
+                mSize = DEFAULT_SIZE; //If all else fails.
+            }
+        }
+
         setMeasuredDimension(mSize, mSize);
 
+        measure();
+    }
+
+    public void setSize(int size){
+        mSize = size;
+        measure();
+    }
+
+    private void measure(){
         //Calculate things for painting
+        //Called on both onMeasure and setSize();
         float half = mSize/2.0f;
         mCenter[0] = half; mCenter[1] = half;
         mRadius = half - mPadding;
@@ -122,12 +147,13 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
         final int paddingBounds = (int) mPadding*2;
 
         if(mDeviceIcon != null) {
-            final float scale = mDeviceIcon.getIntrinsicWidth() > mDeviceIcon.getIntrinsicHeight() ?
-                imageAvailableSize / mDeviceIcon.getIntrinsicWidth() :
-                imageAvailableSize / mDeviceIcon.getIntrinsicHeight();
-
             //Calculate dimensions
-            //Casting to int at last moment to try and reduce rounding errors.
+            //Casting to int at last moment to try and reduce rounding errors..
+            //TODO: Calculate such that the _diagonal_ is a minimum distance from the button edge
+            final float scale = mDeviceIcon.getIntrinsicWidth() > mDeviceIcon.getIntrinsicHeight() ?
+                    imageAvailableSize / mDeviceIcon.getIntrinsicWidth() :
+                    imageAvailableSize / mDeviceIcon.getIntrinsicHeight();
+
             final float imageWidth = scale * mDeviceIcon.getIntrinsicWidth();
             final float imageHeight = scale * mDeviceIcon.getIntrinsicHeight();
             final float paddingX = (mSize - imageWidth) / 2;
@@ -145,6 +171,9 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
         if(mDeviceType.getIcon() != 0) {
             mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
         }
+
+        //Redraw view
+        invalidate();
     }
 
     @Override
