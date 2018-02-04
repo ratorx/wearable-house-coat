@@ -22,4 +22,6 @@ public interface ControllableDevice {
     void setName(String name);
 
     String getName();
+
+    ControllableDeviceType getType();
 }

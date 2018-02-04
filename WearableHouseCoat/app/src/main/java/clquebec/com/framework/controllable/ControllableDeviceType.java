@@ -8,18 +8,18 @@ import clquebec.com.wearablehousecoat.R;
  * Creation Date: 03/02/18
  */
 
-public class ControllableDeviceTypes {
-
+public enum ControllableDeviceType {
     //These need to match up with the values in attrs.xml or there will be trouble
-    public static final int LIGHT = 0;
-    public static final int SOUND = 1;
-    public static final int THERMOSTAT = 2;
-    public static final int CURTAINS = 3;
-    public static final int OVEN = 4;
+    //As in, be the same order
+    LIGHT, SOUND, THERMOSTAT, CURTAINS, OVEN;
 
-    public static int getIcon(int device){
-        //Maps from ControllableDeviceTypes to drawable resources
-        switch (device) {
+    public static ControllableDeviceType getType(int typeNumber){
+        return ControllableDeviceType.values()[typeNumber];
+    }
+
+    public int getIcon(){
+        //Maps from ControllableDeviceType to drawable resources
+        switch (this) {
             case LIGHT:
                 return R.drawable.ic_lightbulb;
             case SOUND:
@@ -33,9 +33,9 @@ public class ControllableDeviceTypes {
         }
     }
 
-    public static String getName(int device) {
+    public String toString() {
         /* TODO: replace this with something proper with XML resources */
-        switch (device) {
+        switch (this) {
             case LIGHT:
                 return "Light";
             case SOUND:
