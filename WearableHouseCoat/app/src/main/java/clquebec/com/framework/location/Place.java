@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
+import clquebec.com.framework.controllable.ControllableDeviceGroup;
 import clquebec.com.framework.people.Person;
 
 /**
@@ -12,7 +13,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 03/02/18
  */
 
-public abstract class Place {
+public abstract class Place implements ControllableDeviceGroup{
     public abstract String getName();
 
     public abstract UUID getID();

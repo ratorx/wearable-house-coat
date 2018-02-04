@@ -49,6 +49,7 @@ public class MainActivity extends WearableActivity {
                                 people.size()
                         ));
 
+
                 //TODO: Automatically generate buttons based on what's in room.
                 //For now, for testing, it seems fine to work without this.
 
