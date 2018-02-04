@@ -42,7 +42,11 @@ public class Room implements Place {
         //TODO: Read this from somewhere
         //For now, return a set with just an IFTTT Light controller.
         Set<ControllableDevice> devices = new HashSet<>();
-        devices.add(new IFTTTLight(mContext, this));
+
+        ControllableDevice myLight = new IFTTTLight(mContext, this);
+        myLight.setName("IFTTT Test");
+
+        devices.add(myLight);
 
         return devices;
     }
