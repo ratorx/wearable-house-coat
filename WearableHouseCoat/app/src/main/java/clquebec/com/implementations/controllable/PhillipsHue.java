@@ -3,6 +3,7 @@ package clquebec.com.implementations.controllable;
 import android.graphics.Color;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
+import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 
 /**
@@ -40,5 +41,10 @@ public class PhillipsHue implements ControllableLightDevice {
     @Override
     public String getName() {
         return null;
+    }
+
+    @Override
+    public ControllableDeviceType getType() {
+        return ControllableDeviceType.LIGHT;
     }
 }

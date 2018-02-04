@@ -5,7 +5,7 @@
         <attr name="background" format="color" />
         <attr name="padding" format="dimension" />
         <attr name="type" format="enum">
-            <!-- These need to match up with framework.controllable.ControllableDeviceTypes -->
+            <!-- These need to match up with framework.controllaControllableDeviceTypeypes -->
             <enum name="light" value="0" />
             <enum name="sound" value="1" />
             <enum name="thermostat" value="2" />

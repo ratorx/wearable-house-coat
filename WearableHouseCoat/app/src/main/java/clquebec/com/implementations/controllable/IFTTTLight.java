@@ -8,6 +8,7 @@ import java.util.List;
 
 import clquebec.com.framework.IFTTT;
 import clquebec.com.framework.controllable.ActionNotSupported;
+import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.location.Place;
 
@@ -92,5 +93,10 @@ public class IFTTTLight implements ControllableLightDevice {
     @Override
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public ControllableDeviceType getType() {
+        return ControllableDeviceType.LIGHT;
     }
 }

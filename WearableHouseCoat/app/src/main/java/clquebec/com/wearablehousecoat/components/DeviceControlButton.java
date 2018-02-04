@@ -6,14 +6,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import clquebec.com.framework.controllable.ControllableDevice;
-import clquebec.com.framework.controllable.ControllableDeviceTypes;
+import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.wearablehousecoat.R;
 
 /**
@@ -33,7 +32,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
     private float mPadding = DEFAULT_PADDING;
-    private int mDeviceType = 0;
+    private ControllableDeviceType mDeviceType;
 
     private ControllableDevice mDevice;
 
@@ -59,7 +58,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
         try {
             mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_background, DEFAULT_BACKGROUND);
             mPadding = a.getDimension(R.styleable.DeviceControlButton_padding, DEFAULT_PADDING);
-            mDeviceType = a.getInt(R.styleable.DeviceControlButton_type, 0);
+            mDeviceType = ControllableDeviceType.getType(a.getInt(R.styleable.DeviceControlButton_type, 0));
         }finally{
             a.recycle(); //Recycle TypedArray
         }
@@ -69,8 +68,8 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
         mBackgroundPaint.setStyle(Paint.Style.FILL);
         mBackgroundPaint.setColor(mBackgroundColor);
 
-        if(ControllableDeviceTypes.getIcon(mDeviceType) != 0) {
-            mDeviceIcon = context.getDrawable(ControllableDeviceTypes.getIcon(mDeviceType));
+        if(mDeviceType.getIcon() != 0) {
+            mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
         }
 
         //Get rid of button background
@@ -127,6 +126,12 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
 
     public void attachDevice(ControllableDevice device){
         mDevice = device;
+
+        //Set the correct icon
+        mDeviceType = mDevice.getType();
+        if(mDeviceType.getIcon() != 0) {
+            mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
+        }
     }
 
     @Override
