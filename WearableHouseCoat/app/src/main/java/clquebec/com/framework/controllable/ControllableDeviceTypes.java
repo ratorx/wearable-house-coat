@@ -28,6 +28,8 @@ public class ControllableDeviceTypes {
                 return R.drawable.ic_thermo;
             case OVEN:
                 return R.drawable.ic_oven;
+			case CURTAINS:
+				return R.drawable.ic_curtains;
             default:
                 return 0;
         }
