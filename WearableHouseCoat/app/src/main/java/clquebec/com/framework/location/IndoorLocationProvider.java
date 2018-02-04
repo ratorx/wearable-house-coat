@@ -6,6 +6,27 @@ package clquebec.com.framework.location;
  * Creation Date: 03/02/18
  */
 
-public interface IndoorLocationProvider {
-    Room getRoom();
+public abstract class IndoorLocationProvider {
+    protected LocationChangeListener mListener;
+    protected Place mLocation = null;
+
+    public abstract Place getCurrentLocation();
+
+    public void setLocationChangeListener(LocationChangeListener listener){
+        mListener = listener;
+        changeLocation(getCurrentLocation());
+    }
+
+    protected void changeLocation(Place currentLocation) {
+        if(!mLocation.equals(currentLocation)){
+            callListener(mLocation, currentLocation);
+            mLocation = currentLocation;
+        }
+    }
+
+    protected void callListener(Place oldLocation, Place newLocation){
+        if(mListener != null){
+            mListener.onLocationChanged(oldLocation, newLocation);
+        }
+    }
 }
