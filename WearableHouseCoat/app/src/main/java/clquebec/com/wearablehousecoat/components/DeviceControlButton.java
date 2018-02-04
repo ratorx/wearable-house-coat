@@ -26,7 +26,7 @@ import clquebec.com.wearablehousecoat.R;
  * logging and calls to our preference learner.
  */
 
-public class DeviceControlButton extends Button implements View.OnClickListener {
+public class DeviceControlButton extends Button implements View.OnClickListener, View.OnLongClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
@@ -91,6 +91,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
 
         //Set on click listener to default toggle action
         setOnClickListener(this);
+        setOnLongClickListener(this);
     }
 
     @Override
@@ -178,16 +179,21 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
-        //By default, toggle the Device.
-
-        Log.d("DeviceControlButton", "Device Control Button clicked");
-
+        //Call quickAction in the attached device
         if(mDevice != null) {
-            if (mDevice.isEnabled()) {
-                mDevice.disable();
-            } else {
-                mDevice.enable();
-            }
+            mDevice.quickAction();
         }
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        //Call extendedAction in the attached device
+        if(mDevice != null){
+            mDevice.extendedAction();
+            return true;
+        }
+
+        //Did not capture event
+        return false;
     }
 }

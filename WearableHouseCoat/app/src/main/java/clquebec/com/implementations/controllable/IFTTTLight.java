@@ -104,14 +104,16 @@ public class IFTTTLight implements ControllableLightDevice {
     @Override
     public boolean quickAction() {
         //Toggle the light on and off.
-        return isEnabled() ? enable() : disable();
+        Log.d("IFTTTLight", "IFTTT quick action");
+        return isEnabled() ? disable() : enable();
     }
 
     @Override
     public boolean extendedAction() {
+        Log.d("IFTTTLight", "IFTTT extended action");
         //Change the light colour.
         //TODO: Implement a colour picker
-        String randColor = Integer.toHexString((int) (Math.random()*0xFFFFFF));
+        String randColor = "#"+Integer.toHexString((int) (Math.random()*0xFFFFFF)).toUpperCase();
 
         try {
             setLightColor(Color.parseColor(randColor));
