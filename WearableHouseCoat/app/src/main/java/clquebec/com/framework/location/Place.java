@@ -1,5 +1,6 @@
 package clquebec.com.framework.location;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public abstract class Place implements ControllableDeviceGroup{
 
     public abstract UUID getID();
 
-    public abstract Set<ControllableDevice> getDevices();
+    public abstract List<ControllableDevice> getDevices();
 
     public abstract Set<Person> getPeople();
 

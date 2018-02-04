@@ -1,6 +1,6 @@
 package clquebec.com.framework.controllable;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * WearableHouseCoat
@@ -9,5 +9,5 @@ import java.util.Set;
  */
 
 public interface ControllableDeviceGroup extends ControllableDevice {
-    Set<ControllableDevice> getDevices();
+    List<ControllableDevice> getDevices();
 }

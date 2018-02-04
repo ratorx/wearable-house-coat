@@ -2,13 +2,14 @@ package clquebec.com.framework.location;
 
 import android.content.Context;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
-import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
 
@@ -50,10 +51,10 @@ public class Room extends Place {
     }
 
     @Override
-    public Set<ControllableDevice> getDevices() {
+    public List<ControllableDevice> getDevices() {
         //TODO: Read this from somewhere
         //For now, return a set with just an IFTTT Light controller.
-        Set<ControllableDevice> devices = new HashSet<>();
+        List<ControllableDevice> devices = new ArrayList<>();
 
         ControllableDevice myLight = new IFTTTLight(mContext, this);
         myLight.setName("IFTTT Test");
