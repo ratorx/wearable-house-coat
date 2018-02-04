@@ -1,26 +1,16 @@
 package clquebec.com.wearablehousecoat;
 
-import android.bluetooth.BluetoothClass;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.activity.WearableActivity;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Set;
 
-import clquebec.com.framework.controllable.ControllableDevice;
-import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.location.IndoorLocationProvider;
-import clquebec.com.framework.location.LocationChangeListener;
-import clquebec.com.framework.location.Place;
-import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
-import clquebec.com.implementations.controllable.IFTTTLight;
 import clquebec.com.implementations.location.DummyLocationProvider;
-import clquebec.com.wearablehousecoat.components.DeviceControlButton;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity {
@@ -41,6 +31,7 @@ public class MainActivity extends WearableActivity {
         mPersonCountView = findViewById(R.id.main_companions);
         mToggleButtons = findViewById(R.id.main_togglebuttons);
 
+        //Make a new grid of with width 3
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 3));
 
         mToggleAdapter = new DeviceTogglesAdapter(null); //No Place provided yet

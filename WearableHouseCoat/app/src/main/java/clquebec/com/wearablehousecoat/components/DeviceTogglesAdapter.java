@@ -53,7 +53,6 @@ public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdap
 
         public void attachDevice(ControllableDevice d){
             mButton.attachDevice(d);
-            Log.d("DeviceViewHolder", "ViewHolder attached to "+d.getName());
         }
 
         @Override
