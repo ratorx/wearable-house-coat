@@ -9,4 +9,10 @@
     <string name="main_defaultlocation" >Loading</string>
     <string name="main_companion_hint">with</string>
     <string name="main_companions_default">Loading</string>
+
+    <plurals name="companion_strings">
+        <item quantity="zero">No other people</item>
+        <item quantity="one">%d other person</item>
+        <item quantity="other">%d other people</item>
+    </plurals>
 </resources>
