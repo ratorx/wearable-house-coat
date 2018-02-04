@@ -44,8 +44,19 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
     private float mRadius;
     private float[] mCenter = {0, 0};
 
-    public DeviceControlButton(Context context, AttributeSet attrs){
+    public DeviceControlButton(Context context){
+        super(context);
+
+        init(context, null);
+    }
+
+    public DeviceControlButton(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        init(context, attrs);
+    }
+
+    private void init(Context context, AttributeSet attrs){
 
         //Get attribute array
         TypedArray a = context.getTheme().obtainStyledAttributes(
