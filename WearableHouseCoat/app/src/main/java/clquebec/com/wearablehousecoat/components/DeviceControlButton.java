@@ -145,15 +145,16 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
 
         //Fit icon into available space
         final float imageAvailableSize = mSize - mPadding*4; //Padding on both sides
-        final int paddingBounds = (int) mPadding*2;
 
         if(mDeviceIcon != null) {
             //Calculate dimensions
             //Casting to int at last moment to try and reduce rounding errors..
-            //TODO: Calculate such that the _diagonal_ is a minimum distance from the button edge
-            final float scale = mDeviceIcon.getIntrinsicWidth() > mDeviceIcon.getIntrinsicHeight() ?
-                    imageAvailableSize / mDeviceIcon.getIntrinsicWidth() :
-                    imageAvailableSize / mDeviceIcon.getIntrinsicHeight();
+
+            final float diagonalLength = (float) Math.sqrt(
+                    mDeviceIcon.getIntrinsicWidth()*mDeviceIcon.getIntrinsicWidth()
+                    + mDeviceIcon.getIntrinsicHeight()*mDeviceIcon.getIntrinsicHeight()
+            );
+            final float scale = imageAvailableSize / diagonalLength;
 
             final float imageWidth = scale * mDeviceIcon.getIntrinsicWidth();
             final float imageHeight = scale * mDeviceIcon.getIntrinsicHeight();
