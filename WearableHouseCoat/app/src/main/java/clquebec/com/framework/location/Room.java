@@ -16,7 +16,7 @@ import clquebec.com.implementations.controllable.IFTTTLight;
  * Creation Date: 03/02/18
  */
 
-public class Room implements Place {
+public class Room extends Place {
     private String mName;
     private UUID mUUID;
     private Context mContext;

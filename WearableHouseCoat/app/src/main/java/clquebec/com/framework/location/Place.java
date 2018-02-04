@@ -11,10 +11,14 @@ import clquebec.com.framework.controllable.ControllableDevice;
  * Creation Date: 03/02/18
  */
 
-public interface Place {
-    String getName();
+public abstract class Place {
+    public abstract String getName();
 
-    UUID getID();
+    public abstract UUID getID();
 
-    Set<ControllableDevice> getDevices();
+    public abstract Set<ControllableDevice> getDevices();
+
+    public boolean equals(Object other) {
+        return other instanceof Place && ((Place) other).getID().equals(this.getID());
+    }
 }
