@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
+import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
@@ -31,6 +32,16 @@ public class Room extends Place {
     @Override
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public void setName(String name) {
+        mName = name;
+    }
+
+    @Override
+    public ControllableDeviceType getType() {
+        return null;
     }
 
     @Override

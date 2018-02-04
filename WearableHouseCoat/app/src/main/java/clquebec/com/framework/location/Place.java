@@ -14,7 +14,6 @@ import clquebec.com.framework.people.Person;
  */
 
 public abstract class Place implements ControllableDeviceGroup{
-    public abstract String getName();
 
     public abstract UUID getID();
 
@@ -24,5 +23,31 @@ public abstract class Place implements ControllableDeviceGroup{
 
     public boolean equals(Object other) {
         return other instanceof Place && ((Place) other).getID().equals(this.getID());
+    }
+
+    //Device Group methods
+    @Override
+    public boolean enable() {
+        //Enable every device in this place. Return true if success for all.
+        boolean returnValue = true;
+        for(ControllableDevice d : getDevices()){
+            returnValue = returnValue && d.enable();
+        }
+        return returnValue;
+    }
+
+    @Override
+    public boolean disable() {
+        //Disable every device in this place. Return true if success for all.
+        boolean returnValue = true;
+        for(ControllableDevice d : getDevices()){
+            returnValue = returnValue && d.disable();
+        }
+        return returnValue;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return getDevices().stream().allMatch(d -> isEnabled());
     }
 }
