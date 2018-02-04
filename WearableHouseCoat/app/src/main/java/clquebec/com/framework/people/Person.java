@@ -38,7 +38,7 @@ public class Person {
     }
 
     public void setLocation(Place newLocation){
-        if(!mLocation.equals(newLocation)) {
+        if(mLocation == null || !mLocation.equals(newLocation)) {
             if (mListener != null) {
                 mListener.onLocationChanged(mLocation, newLocation);
                 mLocation = newLocation;

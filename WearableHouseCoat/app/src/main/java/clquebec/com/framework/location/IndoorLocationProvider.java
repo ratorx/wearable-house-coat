@@ -18,11 +18,11 @@ public abstract class IndoorLocationProvider {
 
     public void setLocationChangeListener(LocationChangeListener listener){
         mListener = listener;
-        changeLocation(getCurrentLocation());
+        callListener(null, mLocation);
     }
 
     protected void changeLocation(Place currentLocation) {
-        if(!mLocation.equals(currentLocation)){
+        if(mLocation == null || !mLocation.equals(currentLocation)){
             callListener(mLocation, currentLocation);
             mLocation = currentLocation;
         }
