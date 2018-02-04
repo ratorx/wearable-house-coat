@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="light">Light</string>
+    <string name="sound">Sound</string>
+    <string name="thermostat">Thermostat</string>
+    <string name="oven">Oven</string>
+    <string name="curtains">Curtains</string>
+</resources>

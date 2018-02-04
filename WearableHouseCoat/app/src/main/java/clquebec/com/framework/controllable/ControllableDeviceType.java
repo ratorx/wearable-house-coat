@@ -1,5 +1,7 @@
 package clquebec.com.framework.controllable;
 
+import android.content.res.Resources;
+
 import clquebec.com.wearablehousecoat.R;
 
 /**
@@ -34,18 +36,20 @@ public enum ControllableDeviceType {
     }
 
     public String toString() {
-        /* TODO: replace this with something proper with XML resources */
+        //Returns a (translatable) string version of the device type.
+
+        Resources r = Resources.getSystem();
         switch (this) {
             case LIGHT:
-                return "Light";
+                return r.getString(R.string.light);
             case SOUND:
-                return "Sound";
+                return r.getString(R.string.sound);
             case THERMOSTAT:
-                return "Thermostat";
+                return r.getString(R.string.thermostat);
             case OVEN:
-                return "Oven";
+                return r.getString(R.string.oven);
             case CURTAINS:
-                return "Curtains";
+                return r.getString(R.string.curtains);
             default:
                 return "";
         }
