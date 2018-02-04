@@ -1,6 +1,14 @@
 package clquebec.com.framework.location;
 
+import android.content.Context;
+
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+
+import clquebec.com.framework.controllable.ControllableDevice;
+import clquebec.com.framework.controllable.ControllableLightDevice;
+import clquebec.com.implementations.controllable.IFTTTLight;
 
 /**
  * WearableHouseCoat
@@ -11,11 +19,14 @@ import java.util.UUID;
 public class Room implements Place {
     private String mName;
     private UUID mUUID;
+    private Context mContext;
 
-    public Room(String name){
+    public Room(Context context, String name){
         mName = name;
         mUUID = UUID.randomUUID();
+        mContext = context;
     }
+
     @Override
     public String getName() {
         return mName;
@@ -24,5 +35,15 @@ public class Room implements Place {
     @Override
     public UUID getID() {
         return mUUID;
+    }
+
+    @Override
+    public Set<ControllableDevice> getDevices() {
+        //TODO: Read this from somewhere
+        //For now, return a set with just an IFTTT Light controller.
+        Set<ControllableDevice> devices = new HashSet<>();
+        devices.add(new IFTTTLight(mContext, this));
+
+        return devices;
     }
 }

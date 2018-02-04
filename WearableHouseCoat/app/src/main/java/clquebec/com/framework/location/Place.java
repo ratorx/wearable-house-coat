@@ -1,6 +1,9 @@
 package clquebec.com.framework.location;
 
+import java.util.Set;
 import java.util.UUID;
+
+import clquebec.com.framework.controllable.ControllableDevice;
 
 /**
  * WearableHouseCoat
@@ -12,4 +15,6 @@ public interface Place {
     String getName();
 
     UUID getID();
+
+    Set<ControllableDevice> getDevices();
 }
