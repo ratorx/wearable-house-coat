@@ -1,5 +1,7 @@
 package clquebec.com.framework.location;
 
+import android.support.annotation.Nullable;
+
 /**
  * WearableHouseCoat
  * Author: tom
@@ -10,7 +12,9 @@ public abstract class IndoorLocationProvider {
     protected LocationChangeListener mListener;
     protected Place mLocation = null;
 
-    public abstract Place getCurrentLocation();
+    public @Nullable Place getCurrentLocation(){
+        return mLocation;
+    }
 
     public void setLocationChangeListener(LocationChangeListener listener){
         mListener = listener;
