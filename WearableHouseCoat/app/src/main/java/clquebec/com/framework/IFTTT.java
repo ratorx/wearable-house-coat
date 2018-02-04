@@ -3,6 +3,7 @@ package clquebec.com.framework;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -45,7 +46,7 @@ public class IFTTT {
 
         String url = "https://maker.ifttt.com/trigger/"+event+"/with/key/"+mMakerKey;
 
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
         if(values != null && values.size() > 0) {
             //Collect values into JSON
             for(int i = 0; i < values.size(); i++){
@@ -57,10 +58,10 @@ public class IFTTT {
             }
         }
 
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, json,
-                new Response.Listener<JSONObject>() {
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(String response) {
                         // response
                         Log.d("IFTTT", "Response: "+response);
                     }
@@ -72,7 +73,12 @@ public class IFTTT {
                         Log.d("IFTTT", "IFTTT Error: "+error.getMessage());
                     }
                 }
-        );
+        ){
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                return json.toString().getBytes();
+            }
+        };
 
         mQueue.add(postRequest);
     }
