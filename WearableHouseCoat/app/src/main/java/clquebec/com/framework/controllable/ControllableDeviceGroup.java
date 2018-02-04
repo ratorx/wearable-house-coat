@@ -9,5 +9,7 @@ import java.util.List;
  */
 
 public interface ControllableDeviceGroup extends ControllableDevice {
+
+    //This is a list so that ordering is imposed - e.g for DeviceTogglesAdapter
     List<ControllableDevice> getDevices();
 }

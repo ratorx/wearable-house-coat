@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import clquebec.com.framework.controllable.ControllableDevice;
+import clquebec.com.framework.controllable.ControllableDeviceGroup;
 import clquebec.com.framework.location.Place;
 
 /**
@@ -14,33 +16,42 @@ import clquebec.com.framework.location.Place;
  */
 
 public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdapter.ViewHolder> {
-    private DeviceGroup mDeviceGroup;
+    private ControllableDeviceGroup mDeviceGroup;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        DeviceControlButton button = new DeviceControlButton(parent.getContext());
+        return new ViewHolder(button);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
+        if(mDeviceGroup != null) {
+            holder.attachDevice(mDeviceGroup.getDevices().get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mDeviceGroup.getDevices().size();
     }
 
-    public void setDeviceGroup(DeviceGroup group){
+    public void setDeviceGroup(ControllableDeviceGroup group){
         mDeviceGroup = group;
+        super.notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private Button mButton;
+        private DeviceControlButton mButton;
+
         ViewHolder(View toggle){
             super(toggle);
 
-            mButton = (Button) toggle;
+            mButton = (DeviceControlButton) toggle;
+        }
+
+        public void attachDevice(ControllableDevice d){
+            mButton.attachDevice(d);
         }
 
         @Override

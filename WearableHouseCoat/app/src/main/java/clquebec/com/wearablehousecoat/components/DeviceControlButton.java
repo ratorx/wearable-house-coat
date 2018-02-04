@@ -29,10 +29,11 @@ import clquebec.com.wearablehousecoat.R;
 public class DeviceControlButton extends Button implements View.OnClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     private static final float DEFAULT_PADDING = 5;
+    private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
     private float mPadding = DEFAULT_PADDING;
-    private ControllableDeviceType mDeviceType;
+    private ControllableDeviceType mDeviceType = DEFAULT_TYPE;
 
     private ControllableDevice mDevice;
 
@@ -57,21 +58,22 @@ public class DeviceControlButton extends Button implements View.OnClickListener 
     }
 
     private void init(Context context, AttributeSet attrs){
+        if(attrs != null) { //Parse attributes, if supplied
+            //Get attribute array
+            TypedArray a = context.getTheme().obtainStyledAttributes(
+                    attrs,
+                    R.styleable.DeviceControlButton,
+                    0, 0
+            );
 
-        //Get attribute array
-        TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs,
-                R.styleable.DeviceControlButton,
-                0, 0
-        );
-
-        //Parse attributes
-        try {
-            mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_background, DEFAULT_BACKGROUND);
-            mPadding = a.getDimension(R.styleable.DeviceControlButton_padding, DEFAULT_PADDING);
-            mDeviceType = ControllableDeviceType.getType(a.getInt(R.styleable.DeviceControlButton_type, 0));
-        }finally{
-            a.recycle(); //Recycle TypedArray
+            //Parse attributes
+            try {
+                mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_background, DEFAULT_BACKGROUND);
+                mPadding = a.getDimension(R.styleable.DeviceControlButton_padding, DEFAULT_PADDING);
+                mDeviceType = ControllableDeviceType.getType(a.getInt(R.styleable.DeviceControlButton_type, 0));
+            } finally {
+                a.recycle(); //Recycle TypedArray
+            }
         }
 
         //Initialise paint objects
