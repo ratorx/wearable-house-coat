@@ -1,5 +1,6 @@
 package clquebec.com.implementations.controllable;
 
+import android.content.Context;
 import android.graphics.Color;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
@@ -13,8 +14,18 @@ import clquebec.com.framework.controllable.ControllableLightDevice;
  */
 
 public class PhillipsHue implements ControllableLightDevice {
+    //TODO: Implement this.
+
+    public PhillipsHue(Context c){
+        //Scan for Hues on local network
+
+        //Pick the right one(s)
+
+        //Initialise internal state.
+    }
+
     @Override
-    public void setLightColor(Color c) throws ActionNotSupported {
+    public void setLightColor(int color) throws ActionNotSupported {
 
     }
 
@@ -46,5 +57,15 @@ public class PhillipsHue implements ControllableLightDevice {
     @Override
     public ControllableDeviceType getType() {
         return ControllableDeviceType.LIGHT;
+    }
+
+    @Override
+    public boolean quickAction() {
+        return false;
+    }
+
+    @Override
+    public boolean extendedAction() {
+        return false;
     }
 }

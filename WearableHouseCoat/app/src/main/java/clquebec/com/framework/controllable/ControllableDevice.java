@@ -23,5 +23,14 @@ public interface ControllableDevice {
 
     String getName();
 
+    //Mostly used for icons, but also for type names
     ControllableDeviceType getType();
+
+    //The code that should be run in the case of a quick action.
+    //Called by DeviceControlButton
+    boolean quickAction();
+
+    //The code that should be run in the case of an extended action.
+    //Called by DeviceControlButton
+    boolean extendedAction();
 }

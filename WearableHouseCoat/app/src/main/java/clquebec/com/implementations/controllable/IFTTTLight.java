@@ -2,6 +2,7 @@ package clquebec.com.implementations.controllable;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import clquebec.com.framework.location.Place;
  */
 
 public class IFTTTLight implements ControllableLightDevice {
-    private static final String DEBUG_KEY = "71VEJXsAdou0wyCxcBR0D";
+    private static final String DEBUG_KEY = "71VEJXsAdou0wyCxcBR0D"; //This is Tom's personal IFTTT key.
     private static final String EVENT_PREFIX = "light_";
 
     private Place mLocation;
@@ -36,12 +37,12 @@ public class IFTTTLight implements ControllableLightDevice {
     }
 
     @Override
-    public void setLightColor(Color c) throws ActionNotSupported {
+    public void setLightColor(int color) throws ActionNotSupported {
         if(mName != null && mCurrentState){
             List<String> params = new ArrayList<>();
             params.add(mName);
             params.add(mLocation.getName());
-            params.add(c.toString());
+            params.add("#"+Integer.toHexString(color));
 
             mIFTTT.webhook(EVENT_PREFIX+"color", params);
         }
@@ -98,5 +99,27 @@ public class IFTTTLight implements ControllableLightDevice {
     @Override
     public ControllableDeviceType getType() {
         return ControllableDeviceType.LIGHT;
+    }
+
+    @Override
+    public boolean quickAction() {
+        //Toggle the light on and off.
+        return isEnabled() ? enable() : disable();
+    }
+
+    @Override
+    public boolean extendedAction() {
+        //Change the light colour.
+        //TODO: Implement a colour picker
+        String randColor = Integer.toHexString((int) (Math.random()*0xFFFFFF));
+
+        try {
+            setLightColor(Color.parseColor(randColor));
+        }catch(ActionNotSupported e){
+            Log.d("IFTTTLight", "You are using an IFTTT light that doesn't support color.");
+            return false;
+        }
+
+        return true;
     }
 }

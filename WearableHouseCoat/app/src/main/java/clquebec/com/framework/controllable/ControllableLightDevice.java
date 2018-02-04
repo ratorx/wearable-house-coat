@@ -12,5 +12,5 @@ import android.graphics.Color;
 
 public interface ControllableLightDevice extends ControllableDevice {
     //Allows setting of colour
-    void setLightColor(Color c) throws ActionNotSupported;
+    void setLightColor(int color) throws ActionNotSupported;
 }
