@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import clquebec.com.environment.Keys;
+
 /**
  * WearableHouseCoat
  * Author: tom
@@ -27,7 +29,7 @@ import java.util.Map;
  */
 
 public class IFTTT {
-    private String mMakerKey = null;
+    private String mMakerKey = Keys.IFTTT;
     private RequestQueue mQueue;
 
     public IFTTT(Context context, String makerKey){
