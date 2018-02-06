@@ -1,9 +1,11 @@
 package clquebec.com.wearablehousecoat;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Set;
@@ -32,7 +34,7 @@ public class MainActivity extends WearableActivity {
         mPersonCountView = findViewById(R.id.main_companions);
         mToggleButtons = findViewById(R.id.main_togglebuttons);
 
-        //Make a new grid of with width 3
+        //Make a new grid of with width 2
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
         //Attach the adapter which automatically fills with controls for current Place
@@ -42,8 +44,10 @@ public class MainActivity extends WearableActivity {
         //Initialise location provider
         mLocationProvider = new DummyLocationProvider(this);
         mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
+                //Update the location text
                 mLocationNameView.setText(newLocation.getName());
 
+                //Update the companions text
                 Set<Person> people = newLocation.getPeople();
                 mPersonCountView.setText(getResources().getQuantityString( //Automatically varies based on number
                                 R.plurals.companion_strings,
