@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import clquebec.com.environment.Keys;
+
 /**
  * WearableHouseCoat
  * Author: tom
@@ -27,12 +29,15 @@ import java.util.Map;
  */
 
 public class IFTTT {
-    private String mMakerKey = null;
+    private String mMakerKey;
     private RequestQueue mQueue;
 
     public IFTTT(Context context, String makerKey){
         mQueue = Volley.newRequestQueue(context);
-        mMakerKey = makerKey;
+        //Don't replace makerkey - yet
+        //TODO: Replace makerkey with a user-provided one
+        //mMakerKey = makerKey;
+        mMakerKey = Keys.IFTTT;
     }
 
     public void webhook(String event){

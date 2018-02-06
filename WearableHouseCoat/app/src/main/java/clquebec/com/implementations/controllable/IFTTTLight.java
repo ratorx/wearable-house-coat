@@ -20,7 +20,6 @@ import clquebec.com.framework.location.Place;
  */
 
 public class IFTTTLight implements ControllableLightDevice {
-    private static final String DEBUG_KEY = "71VEJXsAdou0wyCxcBR0D"; //This is Tom's personal IFTTT key.
     private static final String EVENT_PREFIX = "light_";
 
     private Place mLocation;
@@ -33,7 +32,8 @@ public class IFTTTLight implements ControllableLightDevice {
         mCurrentState = false; //Is there a good way to get this?
 
         //Setup IFTTT for webrequests
-        mIFTTT = new IFTTT(context, DEBUG_KEY);
+        //TODO: Replace "ARandomKey" with a user-configurable key
+        mIFTTT = new IFTTT(context, "ARandomKey");
     }
 
     @Override
