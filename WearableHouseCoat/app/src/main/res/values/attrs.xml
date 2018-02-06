@@ -3,6 +3,7 @@
     <!-- Stylable attributes for DeviceControlButton -->
     <declare-styleable name="DeviceControlButton">
         <attr name="background" format="color" />
+        <attr name="backgroundoff" format="color" />
         <attr name="padding" format="dimension" />
         <attr name="type" format="enum">
             <!-- These need to match up with framework.controllaControllableDeviceTypeypes -->

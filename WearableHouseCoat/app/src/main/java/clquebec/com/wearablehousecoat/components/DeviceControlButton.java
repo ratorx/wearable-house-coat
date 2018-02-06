@@ -28,17 +28,20 @@ import clquebec.com.wearablehousecoat.R;
 
 public class DeviceControlButton extends Button implements View.OnClickListener, View.OnLongClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
+    public static final int DEFAULT_BACKGROUND_OFF = Color.GRAY;
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
     private static final int DEFAULT_SIZE = 100;
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
+    private int mBackgroundColorOff = DEFAULT_BACKGROUND_OFF;
     private float mPadding = DEFAULT_PADDING;
     private ControllableDeviceType mDeviceType = DEFAULT_TYPE;
 
     private ControllableDevice mDevice;
 
     private Paint mBackgroundPaint;
+    private Paint mBackgroundPaintOff;
     private Drawable mDeviceIcon = null;
 
     //Fields for painting - these are members so they are cached between draws
@@ -70,6 +73,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
             //Parse attributes
             try {
                 mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_background, DEFAULT_BACKGROUND);
+                mBackgroundColorOff = a.getColor(R.styleable.DeviceControlButton_backgroundoff, DEFAULT_BACKGROUND_OFF);
                 mPadding = a.getDimension(R.styleable.DeviceControlButton_padding, DEFAULT_PADDING);
                 mDeviceType = ControllableDeviceType.getType(a.getInt(R.styleable.DeviceControlButton_type, 0));
             } finally {
@@ -81,6 +85,10 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         mBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBackgroundPaint.setStyle(Paint.Style.FILL);
         mBackgroundPaint.setColor(mBackgroundColor);
+
+        mBackgroundPaintOff = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBackgroundPaintOff.setStyle(Paint.Style.FILL);
+        mBackgroundPaintOff.setColor(mBackgroundColorOff);
 
         if(mDeviceType.getIcon() != 0){
             mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
@@ -97,7 +105,11 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
     @Override
     public void onDraw(Canvas canvas){
         /* Draw a circle, with an icon on top. */
-        canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
+        if(mDevice == null || mDevice.isEnabled()) {
+            canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
+        }else{
+            canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaintOff);
+        }
         if(mDeviceIcon != null) {
             mDeviceIcon.draw(canvas);
         }
