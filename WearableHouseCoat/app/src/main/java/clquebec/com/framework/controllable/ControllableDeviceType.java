@@ -30,8 +30,28 @@ public enum ControllableDeviceType {
                 return R.drawable.ic_thermo;
             case OVEN:
                 return R.drawable.ic_oven;
+            case CURTAINS:
+                return R.drawable.ic_curtains;
             default:
                 return 0;
+        }
+    }
+    
+    public int getFadedIcon(){
+        switch(this){
+            case LIGHT:
+                return R.drawable.ic_lightbulb_fade;
+            case SOUND:
+                return R.drawable.ic_speaker_fade;
+            case THERMOSTAT:
+                return R.drawable.ic_thermo_fade;
+            case OVEN:
+                return R.drawable.ic_oven_fade;
+            case CURTAINS:
+                return R.drawable.ic_curtains_fade;
+            default:
+                return 0;
+        
         }
     }
 
