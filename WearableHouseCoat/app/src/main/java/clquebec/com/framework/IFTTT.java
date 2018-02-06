@@ -34,8 +34,9 @@ public class IFTTT {
 
     public IFTTT(Context context, String makerKey){
         mQueue = Volley.newRequestQueue(context);
-        // Should be replaced with user's key
-        // mMakerKey = makerKey;
+        //Don't replace makerkey - yet
+        //TODO: Replace makerkey with a user-provided one
+        //mMakerKey = makerKey;
         mMakerKey = Keys.IFTTT;
     }
 
