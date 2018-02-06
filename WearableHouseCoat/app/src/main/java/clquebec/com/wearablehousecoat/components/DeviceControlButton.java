@@ -43,6 +43,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
     private Paint mBackgroundPaint;
     private Paint mBackgroundPaintOff;
     private Drawable mDeviceIcon = null;
+    private Drawable mDeviceIconOff = null;
 
     //Fields for painting - these are members so they are cached between draws
     private int mSize; /* The side length of the view */
@@ -94,6 +95,10 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
             mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
         }
 
+        if(mDeviceType.getFadedIcon() != 0){
+            mDeviceIconOff = context.getDrawable(mDeviceType.getFadedIcon());
+        }
+
         //Get rid of button background
         setBackgroundResource(0);
 
@@ -107,11 +112,16 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         /* Draw a circle, with an icon on top. */
         if(mDevice == null || mDevice.isEnabled()) {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
+
+            if(mDeviceIcon != null) {
+                mDeviceIcon.draw(canvas);
+            }
         }else{
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaintOff);
-        }
-        if(mDeviceIcon != null) {
-            mDeviceIcon.draw(canvas);
+
+            if(mDeviceIconOff != null){
+                mDeviceIconOff.draw(canvas);
+            }
         }
     }
 
@@ -174,6 +184,9 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
             final float paddingY = (mSize - imageHeight) / 2;
 
             mDeviceIcon.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+            if(mDeviceIconOff != null) {
+                mDeviceIconOff.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+            }
         }
     }
 
@@ -184,7 +197,11 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         mDeviceType = mDevice.getType();
         if(mDeviceType.getIcon() != 0) {
             mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
+            mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
         }
+
+        //Re-calculate size
+        measure();
 
         //Redraw view
         invalidate();
