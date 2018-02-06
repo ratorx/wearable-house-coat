@@ -1,0 +1,3 @@
+[submodule "indoorpos"]
+	path = indoorpos
+	url = git@github.com:ratorx/find.git
