@@ -32,8 +32,7 @@ public class IFTTTLight implements ControllableLightDevice {
         mCurrentState = false; //Is there a good way to get this?
 
         //Setup IFTTT for webrequests
-        //TODO: Replace "ARandomKey" with a user-configurable key
-        mIFTTT = new IFTTT(context, "ARandomKey");
+        mIFTTT = IFTTT.getInstance(context);
     }
 
     @Override
