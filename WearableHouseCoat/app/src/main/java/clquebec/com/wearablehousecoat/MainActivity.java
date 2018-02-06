@@ -33,7 +33,7 @@ public class MainActivity extends WearableActivity {
         mToggleButtons = findViewById(R.id.main_togglebuttons);
 
         //Make a new grid of with width 3
-        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 3));
+        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
         //Attach the adapter which automatically fills with controls for current Place
         mToggleAdapter = new DeviceTogglesAdapter(null); //No Place provided yet
