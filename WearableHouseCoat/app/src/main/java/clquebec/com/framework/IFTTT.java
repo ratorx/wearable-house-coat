@@ -34,7 +34,10 @@ public class IFTTT {
 
     public IFTTT(Context context, String makerKey){
         mQueue = Volley.newRequestQueue(context);
-        mMakerKey = makerKey;
+
+        //Don't replace makerkey - yet
+        //TODO: Replace makerkey with a user-provided one
+        //mMakerKey = makerKey;
     }
 
     public void webhook(String event){
