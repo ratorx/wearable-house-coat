@@ -27,6 +27,8 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
+
         //Initialise Views (UI components)
         mLocationNameView = findViewById(R.id.main_currentlocation);
         mPersonCountView = findViewById(R.id.main_companions);
@@ -40,6 +42,7 @@ public class MainActivity extends WearableActivity {
         mToggleButtons.setAdapter(mToggleAdapter);
 
         //Initialise location provider
+
         mLocationProvider = new DummyLocationProvider(this);
         mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
                 mLocationNameView.setText(newLocation.getName());
@@ -55,7 +58,7 @@ public class MainActivity extends WearableActivity {
                 mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
             }
         );
-
+        */
         // Enables Always-on
         setAmbientEnabled();
     }

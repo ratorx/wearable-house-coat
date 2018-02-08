@@ -12,82 +12,124 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fadingEdgeLength="20dp"
+        android:paddingTop="60dp"
+        android:requiresFadingEdge="vertical">
 
-        <android.support.wear.widget.BoxInsetLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <GridLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:boxedEdges="all">>
+                android:layout_height="match_parent"
+                android:columnCount="2"
+                android:isScrollContainer="true"
+                android:scrollIndicators="left"
+                android:scrollbars="vertical">
 
-                <TextView
-                    android:id="@+id/main_locationlabel"
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/button55"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/main_location_hint"
-                    android:textAlignment="center"
-                    android:textAllCaps="false" />
+                    android:text="Button" />
 
-                <TextView
-                    android:id="@+id/main_currentlocation"
-                    android:layout_width="match_parent"
+                <Button
+                    android:id="@+id/button54"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/main_defaultlocation"
-                    android:textAlignment="center"
-                    android:textAllCaps="true"
-                    android:textSize="18sp"
-                    tools:text="Kitchen" />
+                    android:text="Button" />
 
-                <LinearLayout
-                    android:id="@+id/main_companionview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                <Button
+                    android:id="@+id/button53"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                    <TextView
-                        android:id="@+id/main_companionlabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/main_companion_hint"
-                        android:textAlignment="viewEnd" />
+                <Button
+                    android:id="@+id/button52"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                    <TextView
-                        android:id="@+id/main_companions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:paddingLeft="5dp"
-                        android:text="@string/main_companions_default"
-                        tools:text="1 other person" />
+                <Button
+                    android:id="@+id/button51"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                </LinearLayout>
+                <Button
+                    android:id="@+id/button50"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:layout_weight="1" />
+                <Button
+                    android:id="@+id/button49"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/main_togglebuttons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/button48"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                </android.support.v7.widget.RecyclerView>
+                <Button
+                    android:id="@+id/button47"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp" />
-            </LinearLayout>
+                <Button
+                    android:id="@+id/button46"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
+                <Button
+                    android:id="@+id/button45"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
-        </android.support.wear.widget.BoxInsetLayout>
+                <Button
+                    android:id="@+id/button44"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
 
+                <Button
+                    android:id="@+id/button43"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Button" />
+            </GridLayout>
+        </LinearLayout>
     </ScrollView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        app:boxedEdges="all">
+
+        <TextView
+            android:id="@+id/main_currentlocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/main_defaultlocation"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="18sp"
+            tools:text="Kitchen" />
+
+    </FrameLayout>
 
 </android.support.wear.widget.BoxInsetLayout>
 
