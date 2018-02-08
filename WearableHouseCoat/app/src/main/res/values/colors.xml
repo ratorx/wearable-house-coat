@@ -1,0 +1,17 @@
+<resources>
+    
+    <color name="eerie_black">#051923</color>
+    <color name="prussian_blue">#003554</color>
+    <color name="sea_blue">#006494</color>
+    <color name="ncs_blue">#0582CA</color>
+    <color name="vivid_cerulean">#00A6FB</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="bulb_yellow">#FFD700</color>
+    <color name="red">#FF0000</color>
+    <color name="sky_blue">#00ccff</color>
+    <color name="curtain_rail">#A97B00</color>
+    <color name="dark_red">#A20000</color>
+    <color name="oven_rim">#FF9728</color>
+
+</resources>

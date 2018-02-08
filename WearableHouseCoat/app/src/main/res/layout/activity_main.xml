@@ -5,10 +5,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
+    android:background="@color/eerie_black"
     android:padding="@dimen/box_inset_layout_padding"
     tools:context="clquebec.com.wearablehousecoat.MainActivity"
     tools:deviceIds="wear">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        app:boxedEdges="all">
+
+        <TextView
+            android:id="@+id/main_currentlocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/main_defaultlocation"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="18sp"
+            tools:text="Kitchen" />
+
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -112,24 +130,6 @@
             </GridLayout>
         </LinearLayout>
     </ScrollView>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"
-        app:boxedEdges="all">
-
-        <TextView
-            android:id="@+id/main_currentlocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/main_defaultlocation"
-            android:textAlignment="center"
-            android:textAllCaps="true"
-            android:textSize="18sp"
-            tools:text="Kitchen" />
-
-    </FrameLayout>
 
 </android.support.wear.widget.BoxInsetLayout>
 
