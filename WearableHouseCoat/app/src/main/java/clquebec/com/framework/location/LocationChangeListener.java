@@ -2,6 +2,8 @@ package clquebec.com.framework.location;
 
 import java.util.function.Function;
 
+import clquebec.com.framework.people.Person;
+
 /**
  * WearableHouseCoat
  * Author: tom
@@ -9,5 +11,5 @@ import java.util.function.Function;
  */
 
 public interface LocationChangeListener {
-    void onLocationChanged(Place oldLocation, Place newLocation);
+    void onLocationChanged(Person user, Place oldLocation, Place newLocation);
 }

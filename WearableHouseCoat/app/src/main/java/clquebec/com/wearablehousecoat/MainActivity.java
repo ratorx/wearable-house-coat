@@ -46,7 +46,7 @@ public class MainActivity extends WearableActivity{
 
         //Initialise location provider
         mLocationProvider = new DummyLocationProvider(this);
-        mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
+        mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                 //Update the location text
                 mLocationNameView.setText(newLocation.getName());
 
