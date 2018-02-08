@@ -10,24 +10,6 @@
     tools:context="clquebec.com.wearablehousecoat.MainActivity"
     tools:deviceIds="wear">
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"
-        app:boxedEdges="all">
-
-        <TextView
-            android:id="@+id/main_currentlocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/main_defaultlocation"
-            android:textAlignment="center"
-            android:textAllCaps="true"
-            android:textSize="18sp"
-            tools:text="Kitchen" />
-
-    </FrameLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -54,6 +36,7 @@
                     android:id="@+id/button55"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:elevation="0dp"
                     android:text="Button" />
 
                 <Button
@@ -130,6 +113,27 @@
             </GridLayout>
         </LinearLayout>
     </ScrollView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="0dp"
+        app:boxedEdges="all">
+
+        <TextView
+            android:id="@+id/main_currentlocation"
+            android:layout_width="96dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_horizontal|clip_vertical"
+            android:autoSizeTextType="uniform"
+            android:gravity="center"
+            android:text="@string/main_defaultlocation"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="18sp"
+            tools:text="living room" />
+
+    </FrameLayout>
 
 </android.support.wear.widget.BoxInsetLayout>
 
