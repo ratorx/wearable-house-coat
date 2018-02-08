@@ -15,4 +15,11 @@
         <item quantity="one">%d other person</item>
         <item quantity="other">%d other people</item>
     </plurals>
+    
+    <color name="eerie_black">#051923</color>
+    <color name="prussian_blue">#003554</color>
+    <color name="sea_blue">#006494</color>
+    <color name="ncs_blue">#0582CA</color>
+    <color name="vivid_cerulean">#00A6FB</color>
+    
 </resources>
