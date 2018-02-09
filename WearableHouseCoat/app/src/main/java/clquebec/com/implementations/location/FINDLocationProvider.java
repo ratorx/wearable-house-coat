@@ -37,30 +37,22 @@ import clquebec.com.framework.people.Person;
 
 public class FINDLocationProvider implements IndoorLocationProvider {
     public static final String GROUPID = "LULLINGLABRADOODLE";
-    public static final String SERVERURL = "https://shell.srcf.net:8003/";
+    public static final String SERVERURL = "http://shell.srcf.net:8003/";
 
     private Context mContext;
-    private WifiManager mWifiManager;
     private LocationChangeListener mListener;
     private RequestQueue mQueue; //For making HTTP requests
 
     private Map<Person, Place> mLocationMap;
 
-    private List<ScanResult> getWiFiScan(){
-        //TODO: extract into seperate class
-        mWifiManager.startScan();
-        List<ScanResult> wifiList = mWifiManager.getScanResults();
-        return wifiList;
-    }
-
     public FINDLocationProvider(Context c){
-        mWifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
         mQueue = Volley.newRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
 
         //TODO: Spin up a background thread, to do the following on repeat
         String url = SERVERURL+"location?group="+GROUPID;
+        Log.d("FIND", url);
         JsonObjectRequest locationRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
                 response -> {

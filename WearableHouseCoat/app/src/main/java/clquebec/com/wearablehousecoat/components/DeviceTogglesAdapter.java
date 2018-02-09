@@ -35,7 +35,11 @@ public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdap
 
     @Override
     public int getItemCount() {
-        return mDeviceGroup.getDevices().size();
+        if(mDeviceGroup != null) {
+            return mDeviceGroup.getDevices().size();
+        }else{
+            return 0;
+        }
     }
 
     public DeviceTogglesAdapter(ControllableDeviceGroup group){

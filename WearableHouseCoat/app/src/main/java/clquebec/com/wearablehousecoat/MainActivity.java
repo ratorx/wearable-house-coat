@@ -14,6 +14,7 @@ import java.util.Set;
 import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.DummyLocationProvider;
+import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity{
@@ -45,7 +46,7 @@ public class MainActivity extends WearableActivity{
         mToggleButtons.setAdapter(mToggleAdapter);
 
         //Initialise location provider
-        mLocationProvider = new DummyLocationProvider(this);
+        mLocationProvider = new FINDLocationProvider(this);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                 //Update the location text
                 mLocationNameView.setText(newLocation.getName());
