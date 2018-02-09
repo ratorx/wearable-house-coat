@@ -40,7 +40,7 @@ public class Person {
     public void setLocation(Place newLocation){
         if(mLocation == null || !mLocation.equals(newLocation)) {
             if (mListener != null) {
-                mListener.onLocationChanged(mLocation, newLocation);
+                mListener.onLocationChanged(this, mLocation, newLocation);
                 mLocation = newLocation;
             }
         }

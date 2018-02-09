@@ -3,12 +3,14 @@ package clquebec.com.implementations.location;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.support.annotation.Nullable;
 
 import com.android.volley.RequestQueue;
 
 import java.util.List;
 
 import clquebec.com.framework.location.IndoorLocationProvider;
+import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.people.Person;
 
@@ -18,7 +20,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 08/02/18
  */
 
-public class FINDLocationProvider extends IndoorLocationProvider {
+public class FINDLocationProvider implements IndoorLocationProvider {
     private WifiManager mWifiManager;
     private RequestQueue mQueue; //For making HTTP requests
 
@@ -28,15 +30,22 @@ public class FINDLocationProvider extends IndoorLocationProvider {
         return wifiList;
     }
 
-    private Place trackPosition(){
-        return null;
-    }
-
-    public FINDLocationProvider(Context c, Person p){
+    public FINDLocationProvider(Context c){
         //Spin up a background thread
 
         mWifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
 
+
+    }
+
+    @Nullable
+    @Override
+    public Place getCurrentLocation(Person p) {
+        return null;
+    }
+
+    @Override
+    public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
 
     }
 }
