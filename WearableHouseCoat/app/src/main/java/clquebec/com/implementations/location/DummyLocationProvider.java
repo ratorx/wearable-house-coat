@@ -45,4 +45,9 @@ public class DummyLocationProvider implements IndoorLocationProvider {
             }
         }
     }
+
+    @Override
+    public void forceLocationRefresh() {
+        //Do nothing
+    }
 }

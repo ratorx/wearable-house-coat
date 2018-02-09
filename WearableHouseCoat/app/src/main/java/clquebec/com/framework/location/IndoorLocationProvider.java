@@ -14,4 +14,6 @@ public interface IndoorLocationProvider {
     @Nullable Place getCurrentLocation(Person p);
 
     void setLocationChangeListener(@Nullable LocationChangeListener listener);
+
+    void forceLocationRefresh();
 }

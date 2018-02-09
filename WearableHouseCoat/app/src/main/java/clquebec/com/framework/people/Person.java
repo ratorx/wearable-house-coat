@@ -25,6 +25,12 @@ public class Person {
         mName = "Test Person";
     }
 
+    public Person(String name){
+        //TODO: Read information in from somewhere.
+        mUUID = UUID.randomUUID();
+        mName = name;
+    }
+
     public String getName(){
         return mName;
     }
