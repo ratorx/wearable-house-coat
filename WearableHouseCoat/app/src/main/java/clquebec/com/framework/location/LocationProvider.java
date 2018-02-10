@@ -10,7 +10,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 03/02/18
  */
 
-public interface IndoorLocationProvider {
+public interface LocationProvider {
     @Nullable Place getCurrentLocation(Person p);
 
     void setLocationChangeListener(@Nullable LocationChangeListener listener);

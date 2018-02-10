@@ -6,14 +6,12 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Set;
 
-import clquebec.com.framework.location.IndoorLocationProvider;
+import clquebec.com.framework.location.LocationProvider;
 import clquebec.com.framework.people.Person;
-import clquebec.com.implementations.location.DummyLocationProvider;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
@@ -25,7 +23,7 @@ public class MainActivity extends WearableActivity{
     private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
 
-    private IndoorLocationProvider mLocationProvider;
+    private LocationProvider mLocationProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
