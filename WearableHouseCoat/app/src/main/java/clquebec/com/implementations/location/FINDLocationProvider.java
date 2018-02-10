@@ -8,6 +8,7 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -18,8 +19,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import clquebec.com.framework.location.LocationProvider;
+import clquebec.com.framework.location.LocationCalibrator;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.LocationChangeListener;
+import clquebec.com.framework.location.LocationUpdater;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
@@ -30,7 +33,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 08/02/18
  */
 
-public class FINDLocationProvider implements LocationProvider {
+public class FINDLocationProvider implements LocationGetter, LocationCalibrator, LocationUpdater {
     public static final String GROUPID = "LULLINGLABRADOODLE";
     public static final String SERVERURL = "http://shell.srcf.net:8003/";
     public static final int POLLDELAYMILLIS = 5000;
@@ -61,12 +64,18 @@ public class FINDLocationProvider implements LocationProvider {
     @Nullable
     @Override
     public Place getCurrentLocation(Person p) {
-        return null;
+        return mLocationMap.getOrDefault(p, null);
     }
 
     @Override
     public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
         mListener = listener;
+
+        if(listener != null){
+            for(Person p : mLocationMap.keySet()){
+                listener.onLocationChanged(p, null, mLocationMap.get(p));
+            }
+        }
     }
 
     @Override
@@ -112,5 +121,37 @@ public class FINDLocationProvider implements LocationProvider {
         );
 
         mQueue.add(locationRequest);
+    }
+
+    @Override
+    public boolean update() {
+        return false;
+    }
+
+    @Override
+    public boolean calibrate(Room room) {
+        return false;
+    }
+
+    @Override
+    public boolean calibrate(Room room, String data) {
+        return false;
+    }
+
+    @Override
+    public boolean calibrate(Room room, JSONObject data) {
+        String dataString = data.toString();
+        return calibrate(room, dataString);
+    }
+
+    @Override
+    public boolean reset() {
+        String url = SERVERURL+"database?group="+GROUPID;
+        StringRequest newRequest = new StringRequest(Request.Method.DELETE, url,
+                response -> Log.d("FIND", "Deleted group"),
+                error -> Log.e("FIND", error.getMessage())
+        );
+        mQueue.add(newRequest);
+        return true;
     }
 }

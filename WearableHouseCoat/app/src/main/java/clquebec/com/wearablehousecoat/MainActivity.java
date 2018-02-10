@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-import clquebec.com.framework.location.LocationProvider;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
@@ -23,7 +23,7 @@ public class MainActivity extends WearableActivity{
     private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
 
-    private LocationProvider mLocationProvider;
+    private LocationGetter mLocationProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

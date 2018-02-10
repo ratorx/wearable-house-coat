@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import clquebec.com.framework.location.LocationProvider;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
@@ -19,7 +19,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 04/02/18
  */
 
-public class DummyLocationProvider implements LocationProvider {
+public class DummyLocationProvider implements LocationGetter {
     private Map<Person, Place> mLocationMap;
     private LocationChangeListener mListener;
 
