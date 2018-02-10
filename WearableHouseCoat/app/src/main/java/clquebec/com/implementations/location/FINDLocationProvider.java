@@ -3,6 +3,7 @@ package clquebec.com.implementations.location;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -38,6 +39,7 @@ import clquebec.com.framework.people.Person;
 public class FINDLocationProvider implements IndoorLocationProvider {
     public static final String GROUPID = "LULLINGLABRADOODLE";
     public static final String SERVERURL = "http://shell.srcf.net:8003/";
+    public static final int POLLDELAYMILLIS = 5000;
 
     private Context mContext;
     private LocationChangeListener mListener;
@@ -45,18 +47,42 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
     private Map<Person, Place> mLocationMap;
 
+    private Handler mLocationUpdateHandler = new Handler();
+    private Runnable mLocationUpdater = new Runnable() {
+        @Override
+        public void run() {
+            forceLocationRefresh();
+            mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+        }
+    };
+
     public FINDLocationProvider(Context c){
         mQueue = Volley.newRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
 
-        //TODO: Spin up a background thread, to do the following on repeat
+        mLocationUpdateHandler.post(mLocationUpdater);
+    }
+
+    @Nullable
+    @Override
+    public Place getCurrentLocation(Person p) {
+        return null;
+    }
+
+    @Override
+    public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
+        mListener = listener;
+    }
+
+    @Override
+    public void forceLocationRefresh() {
         String url = SERVERURL+"location?group="+GROUPID;
-        Log.d("FIND", url);
+
         JsonObjectRequest locationRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
                 response -> {
-                    Log.d("FIND", "Succesfully Received Locations\n" + response.toString());
+                    Log.d("FIND", "Succesfully Received Locations");
 
                     try {
                         //Iterate over response
@@ -68,7 +94,8 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                             //Get data
                             JSONArray userData = users.getJSONArray(user);
                             Person person = new Person(user);
-                            Place location = new Room(c, userData.getJSONObject(0).getString("location"));
+
+                            Place location = new Room(mContext, userData.getJSONObject(0).getString("location"));
 
                             //Notify change
                             if(mListener != null){
@@ -92,21 +119,5 @@ public class FINDLocationProvider implements IndoorLocationProvider {
         );
 
         mQueue.add(locationRequest);
-    }
-
-    @Nullable
-    @Override
-    public Place getCurrentLocation(Person p) {
-        return null;
-    }
-
-    @Override
-    public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
-        mListener = listener;
-    }
-
-    @Override
-    public void forceLocationRefresh() {
-
     }
 }
