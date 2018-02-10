@@ -42,6 +42,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private LocationChangeListener mListener;
     private RequestQueue mQueue; //For making HTTP requests
 
+    private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
 
     private Handler mLocationUpdateHandler = new Handler();
@@ -53,10 +54,11 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         }
     };
 
-    public FINDLocationProvider(Context c){
+    public FINDLocationProvider(Context c, Person p){
         mQueue = Volley.newRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
+        mPerson = p;
 
         mLocationUpdateHandler.post(mLocationUpdater);
     }
