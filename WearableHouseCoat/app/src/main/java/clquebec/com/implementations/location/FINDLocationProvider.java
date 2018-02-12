@@ -50,6 +50,10 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private LocationChangeListener mListener;
     private RequestQueue mQueue; //For making HTTP requests
 
+    private interface FingerprintCallback{
+        void onFingerprint(JSONArray fingerprint);
+    }
+
     private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
 
@@ -134,7 +138,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         mQueue.add(locationRequest);
     }
 
-    private void getFingerprint(){
+    private void getFingerprint(FingerprintCallback callback){
         WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
         if(!wifiManager.isWifiEnabled()) {
             //Forcefully enable wifi
@@ -149,12 +153,9 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
                     //Generate fingerprint JSONArray
                     JSONArray fingerprint = new JSONArray();
-                    Log.d("FIND", results.toString());
                     for (ScanResult result : results) {
                         try {
                             JSONObject AP = new JSONObject();
-
-                            Log.d("FIND", result.toString());
 
                             AP.put("mac", result.BSSID);
                             AP.put("rssi", result.level);
@@ -166,8 +167,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                     }
 
                     //Call private method to send update
-                    Log.d("FIND", fingerprint.toString());
-                    sendUpdate(fingerprint);
+                    callback.onFingerprint(fingerprint);
                 }
             }
         }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -175,47 +175,66 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         wifiManager.startScan();
     }
 
-    private void sendUpdate(JSONArray fingerprint){
-        String url = SERVERURL+"track";
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("group", GROUPID);
-            jsonObject.put("username", mPerson.getName());
-            //jsonObject.put("location", getCurrentLocation(mPerson));
-            jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
-            jsonObject.put("wifi-fingerprint", fingerprint);
-        }catch(JSONException e){
-            Log.e("FIND", "Could not generate update request, "+e.getMessage());
-        }
-
-        JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                response -> Log.d("FIND", response.toString()),
-                error -> Log.e("FIND", error.getMessage()));
-
-        mQueue.add(trackRequest);
-    }
-
     @Override
     public boolean update() {
-        getFingerprint();
+        getFingerprint(fingerprint -> {
+            String url = SERVERURL+"track";
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("group", GROUPID);
+                jsonObject.put("username", mPerson.getName());
+                //jsonObject.put("location", getCurrentLocation(mPerson));
+                jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
+                jsonObject.put("wifi-fingerprint", fingerprint);
+            }catch(JSONException e){
+                Log.e("FIND", "Could not generate update request, "+e.getMessage());
+            }
+
+            JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                    response -> Log.d("FIND", "Succesfully calibrated"),
+                    error -> Log.e("FIND", error.getMessage()));
+
+            mQueue.add(trackRequest);
+        });
         return true;
     }
 
     @Override
     public boolean calibrate(Room room) {
-        return false;
+        getFingerprint(fingerprint -> {
+            String url = SERVERURL+"learn";
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("group", GROUPID);
+                jsonObject.put("username", mPerson.getName());
+                jsonObject.put("location", room.getName());
+                jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
+                jsonObject.put("wifi-fingerprint", fingerprint);
+            }catch(JSONException e){
+                Log.e("FIND", "Could not generate update request, "+e.getMessage());
+            }
+
+            JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                    response -> Log.d("FIND", "Succesfully updated fingerprint"),
+                    error -> Log.e("FIND", error.getMessage()));
+
+            mQueue.add(trackRequest);
+        });
+        return true;
     }
 
     @Override
     public boolean calibrate(Room room, String data) {
-        return false;
+        //Discard extra data - for now
+        return calibrate(room);
     }
 
     @Override
     public boolean calibrate(Room room, JSONObject data) {
-        String dataString = data.toString();
-        return calibrate(room, dataString);
+        //Discard extra data - for now
+        return calibrate(room);
     }
 
     @Override
