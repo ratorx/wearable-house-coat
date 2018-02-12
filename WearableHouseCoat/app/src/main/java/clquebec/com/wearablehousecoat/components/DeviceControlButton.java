@@ -5,7 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -28,7 +30,7 @@ import clquebec.com.wearablehousecoat.R;
 
 public class DeviceControlButton extends Button implements View.OnClickListener, View.OnLongClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
-    public static final int DEFAULT_BACKGROUND_OFF = Color.GRAY;
+    public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84);
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
     private static final int DEFAULT_SIZE = 100;
@@ -42,12 +44,15 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
 
     private Paint mBackgroundPaint;
     private Paint mBackgroundPaintOff;
+    private TextPaint mTextPaint;
+    private TextPaint mTextPaintOff;
     private Drawable mDeviceIcon = null;
 
     //Fields for painting - these are members so they are cached between draws
     private int mSize; /* The side length of the view */
     private float mRadius;
     private float[] mCenter = {0, 0};
+    private int mTextHeight;
 
     public DeviceControlButton(Context context){
         super(context);
@@ -90,6 +95,12 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         mBackgroundPaintOff.setStyle(Paint.Style.FILL);
         mBackgroundPaintOff.setColor(mBackgroundColorOff);
 
+        mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mTextPaint.setColor(mBackgroundColorOff);
+
+        mTextPaintOff = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        mTextPaintOff.setColor(mBackgroundColor);
+
         if(mDeviceType.getIcon() != 0){
             mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
         }
@@ -107,8 +118,12 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         /* Draw a circle, with an icon on top. */
         if(mDevice == null || mDevice.isEnabled()) {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
+            if(mDevice != null){
+                canvas.drawText(mDevice.getName(), mPadding*4, mCenter[1] + mTextHeight/2, mTextPaint);
+            }
         }else{
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaintOff);
+            canvas.drawText(mDevice.getName(), mPadding*4, mCenter[1] + mTextHeight/2, mTextPaintOff);
         }
         if(mDeviceIcon != null) {
             mDeviceIcon.draw(canvas);
@@ -156,10 +171,10 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         mRadius = half - mPadding;
 
         //Fit icon into available space
-        final float imageAvailableSize = mSize - mPadding*4; //Padding on both sides
+        final float imageAvailableSize = (mSize - mPadding*4)/2; //Padding on both sides
 
         if(mDeviceIcon != null) {
-            //Calculate dimensions
+            //Calculate icon dimensions
             //Casting to int at last moment to try and reduce rounding errors..
 
             final float diagonalLength = (float) Math.sqrt(
@@ -171,9 +186,18 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
             final float imageWidth = scale * mDeviceIcon.getIntrinsicWidth();
             final float imageHeight = scale * mDeviceIcon.getIntrinsicHeight();
             final float paddingX = (mSize - imageWidth) / 2;
-            final float paddingY = (mSize - imageHeight) / 2;
 
-            mDeviceIcon.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+            mDeviceIcon.setBounds((int) paddingX, (int) mPadding, (int) (imageWidth + paddingX), (int) (imageHeight + mPadding));
+
+            //Calculate text dimensions
+            float textWidth = mTextPaint.measureText(mDevice.getName());
+            float newTextSize = ((mSize - mPadding*8) / textWidth)*mTextPaint.getTextSize();
+            mTextPaint.setTextSize(newTextSize);
+            mTextPaintOff.setTextSize(newTextSize);
+
+            Rect textDimensions = new Rect();
+            mTextPaint.getTextBounds(mDevice.getName(), 0, mDevice.getName().length(), textDimensions);
+            mTextHeight = textDimensions.height();
         }
     }
 
@@ -187,6 +211,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         }
 
         //Redraw view
+        measure();
         invalidate();
     }
 
