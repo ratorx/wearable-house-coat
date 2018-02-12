@@ -1,6 +1,13 @@
 package clquebec.com.implementations.location;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -17,6 +24,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import clquebec.com.framework.location.LocationCalibrator;
@@ -27,7 +35,7 @@ import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
 
-/**
+/*
  * WearableHouseCoat
  * Author: tom
  * Creation Date: 08/02/18
@@ -50,6 +58,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         @Override
         public void run() {
             forceLocationRefresh();
+            update();
             mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
         }
     };
@@ -125,9 +134,72 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         mQueue.add(locationRequest);
     }
 
+    private void getFingerprint(){
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        if(!wifiManager.isWifiEnabled()) {
+            //Forcefully enable wifi
+            wifiManager.setWifiEnabled(true);
+        }
+
+        mContext.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context c, Intent intent) {
+                if(intent.getExtras() != null && intent.getExtras().getBoolean(WifiManager.EXTRA_RESULTS_UPDATED)){
+                    List<ScanResult> results = wifiManager.getScanResults();
+
+                    //Generate fingerprint JSONArray
+                    JSONArray fingerprint = new JSONArray();
+                    Log.d("FIND", results.toString());
+                    for (ScanResult result : results) {
+                        try {
+                            JSONObject AP = new JSONObject();
+
+                            Log.d("FIND", result.toString());
+
+                            AP.put("mac", result.BSSID);
+                            AP.put("rssi", result.level);
+
+                            fingerprint.put(AP);
+                        } catch (JSONException e) {
+                            Log.e("FIND", "Could not add information about AP to fingerprint, " + e.getMessage());
+                        }
+                    }
+
+                    //Call private method to send update
+                    Log.d("FIND", fingerprint.toString());
+                    sendUpdate(fingerprint);
+                }
+            }
+        }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
+        wifiManager.startScan();
+    }
+
+    private void sendUpdate(JSONArray fingerprint){
+        String url = SERVERURL+"track";
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("group", GROUPID);
+            jsonObject.put("username", mPerson.getName());
+            //jsonObject.put("location", getCurrentLocation(mPerson));
+            jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
+            jsonObject.put("wifi-fingerprint", fingerprint);
+        }catch(JSONException e){
+            Log.e("FIND", "Could not generate update request, "+e.getMessage());
+        }
+
+        JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                response -> Log.d("FIND", response.toString()),
+                error -> Log.e("FIND", error.getMessage()));
+
+        mQueue.add(trackRequest);
+    }
+
     @Override
     public boolean update() {
-        return false;
+        getFingerprint();
+        return true;
     }
 
     @Override

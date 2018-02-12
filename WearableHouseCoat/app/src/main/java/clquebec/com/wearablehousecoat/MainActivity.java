@@ -44,7 +44,8 @@ public class MainActivity extends WearableActivity{
         mToggleButtons.setAdapter(mToggleAdapter);
 
         //Initialise location provider
-        mLocationProvider = new FINDLocationProvider(this);
+        Person me = new Person("tcb");
+        mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                 //Update the location text
                 mLocationNameView.setText(newLocation.getName());
