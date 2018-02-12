@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.Set;
 
 import clquebec.com.framework.location.IndoorLocationProvider;
+import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.DummyLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
@@ -30,41 +31,43 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-
-        //Initialise Views (UI components)
-        mLocationNameView = findViewById(R.id.main_currentlocation);
-        mPersonCountView = findViewById(R.id.main_companions);
+        //SECTION: Initialize toggle button grid
         mToggleButtons = findViewById(R.id.main_togglebuttons);
 
-        //Make a new grid of with width 3
+        //Set grid to have width 2
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
+        //Make a dummy Room with a light switch for testing
+        Room room = new Room(this, "Test Room");
+
         //Attach the adapter which automatically fills with controls for current Place
-        mToggleAdapter = new DeviceTogglesAdapter(null); //No Place provided yet
-        mToggleButtons.setAdapter(mToggleAdapter);
+        mToggleAdapter = new DeviceTogglesAdapter(room);
+        mToggleButtons.setAdapter(mToggleAdapter); //Attach
+        //END SECTION
 
-        //Initialise location provider
+        //SECTION: Initialize locations and location provider
+        mLocationNameView = findViewById(R.id.main_currentlocation);
 
+        //Create a dummy location provider to give us dummy information
         mLocationProvider = new DummyLocationProvider(this);
+
+        //Register a listener so that information is updated on location change.
         mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
-                mLocationNameView.setText(newLocation.getName());
+                    //Set location text to the right location
+                    mLocationNameView.setText(newLocation.getName());
 
-                Set<Person> people = newLocation.getPeople();
-                mPersonCountView.setText(getResources().getQuantityString( //Automatically varies based on number
-                                R.plurals.companion_strings,
-                                people.size(),
-                                people.size()
-                        ));
-
-                //This automatically populates and attaches devices to buttons.
-                mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
-            }
+                    //This automatically populates and attaches devices to buttons.
+                    mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
+                }
         );
-        */
+
+
+        //END SECTION
+
         // Enables Always-on
         setAmbientEnabled();
 
+        /* This code is not dynamic - great for testing but not something to keep.
         Button mHueButton = findViewById(R.id.hue_button);
         mHueButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,5 +86,6 @@ public class MainActivity extends WearableActivity {
                 hue_control.setVisibility(View.GONE);
             }
         });
+        */
     }
 }

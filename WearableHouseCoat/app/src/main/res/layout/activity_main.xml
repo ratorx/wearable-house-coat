@@ -28,64 +28,10 @@
             android:orientation="vertical">
 
             <!-- Main button grid -->
-            <GridLayout
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/main_togglebuttons"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:columnCount="2"
-                android:isScrollContainer="true"
-                android:scrollIndicators="left"
-                android:scrollbars="vertical">
-
-                <Button
-                    android:id="@+id/hue_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:elevation="0dp"
-                    android:text="Hue" />
-
-                <Button
-                    android:id="@+id/button54"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:id="@+id/button53"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:id="@+id/button52"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:id="@+id/button51"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:id="@+id/button50"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:id="@+id/button49"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-                <Button
-                    android:id="@+id/button48"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Button" />
-
-            </GridLayout>
+                android:layout_height="match_parent" />
         </LinearLayout>
     </ScrollView>
 
