@@ -3,6 +3,7 @@ package clquebec.com.wearablehousecoat;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.Button;
@@ -70,6 +71,16 @@ public class MainActivity extends WearableActivity {
             public void onClick(View view) {
                 View hue_control = findViewById(R.id.hue_control);
                 hue_control.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //TODO: set the background as the place to touch to close dialog
+        View mainLayout = findViewById(R.id.hue_control);
+        mainLayout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View hue_control = findViewById(R.id.hue_control);
+                hue_control.setVisibility(View.GONE);
             }
         });
     }
