@@ -74,7 +74,7 @@ public class MainActivity extends WearableActivity {
             }
         });
 
-        //TODO: set the background as the place to touch to close dialog
+        //TODO: swipe to close.
         View mainLayout = findViewById(R.id.hue_control);
         mainLayout.setOnClickListener(new View.OnClickListener(){
             @Override
