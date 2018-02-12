@@ -36,11 +36,11 @@
                 android:scrollbars="vertical">
 
                 <Button
-                    android:id="@+id/button55"
+                    android:id="@+id/hue_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:elevation="0dp"
-                    android:text="Button" />
+                    android:text="Hue" />
 
                 <Button
                     android:id="@+id/button54"
@@ -112,7 +112,20 @@
             android:ellipsize="end"
             tools:text="living room and living room and living room and living room and living" />
 
+        <include layout="@layout/hue_control"
+            android:visibility="gone"
+            android:id="@+id/hue_control">
+
+        </include>
+
     </FrameLayout>
+
+
+
+
+
+
+
 
 </android.support.wear.widget.BoxInsetLayout>
 

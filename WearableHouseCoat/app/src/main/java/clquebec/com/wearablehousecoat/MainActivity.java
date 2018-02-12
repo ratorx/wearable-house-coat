@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wearable.activity.WearableActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Set;
@@ -61,5 +63,14 @@ public class MainActivity extends WearableActivity {
         */
         // Enables Always-on
         setAmbientEnabled();
+
+        Button mHueButton = findViewById(R.id.hue_button);
+        mHueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View hue_control = findViewById(R.id.hue_control);
+                hue_control.setVisibility(View.VISIBLE);
+            }
+        });
     }
 }
