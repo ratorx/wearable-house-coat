@@ -78,14 +78,13 @@ public class MainActivity extends WearableActivity{
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                 if(user.equals(me)){ //If the user is me
-                    setRoom(room);
+                    setRoom(room, false);
                 }
             }
         );
 
         //END SECTION
 
-        // TEST THIS
         // Need to add timer on location change.
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
@@ -129,8 +128,12 @@ public class MainActivity extends WearableActivity{
             }
         }
     }
-    
+
     public void setRoom(Room room){
+        setRoom(room, true);
+    }
+    
+    public void setRoom(Room room, boolean showIAmHere){
         //Update the location text
         mLocationNameView.setText(room.getName());
 
@@ -138,15 +141,16 @@ public class MainActivity extends WearableActivity{
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
     
         // Show the "I am here" button for 4 seconds
-        mIAmHereWrapper.setVisibility(View.VISIBLE);
-        Timer mHereTimer = new Timer();
-        mHereTimer.schedule(new TimerTask(){
-            public void run() {
-                runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
+        if(showIAmHere) {
+            mIAmHereWrapper.setVisibility(View.VISIBLE);
+            Timer mHereTimer = new Timer();
+            mHereTimer.schedule(new TimerTask() {
+                public void run() {
+                    runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
 
-            }
-        }, 4000);
-      
+                }
+            }, 4000);
+        }
     }
 
     @Override

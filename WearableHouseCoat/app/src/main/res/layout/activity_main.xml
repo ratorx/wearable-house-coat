@@ -50,7 +50,7 @@
         <LinearLayout
             android:id="@+id/main_currentlocationlayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
@@ -78,12 +78,6 @@
                 android:src="@drawable/ic_down" />
         </LinearLayout>
 
-
-        <include
-            android:id="@+id/hue_control"
-            layout="@layout/hue_control"
-            android:visibility="gone">
-        </include>
 
     </FrameLayout>
     
