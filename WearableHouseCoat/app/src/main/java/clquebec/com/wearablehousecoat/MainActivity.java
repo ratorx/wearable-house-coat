@@ -19,6 +19,8 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import clquebec.com.framework.location.Building;
+import clquebec.com.framework.location.Place;
+import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
@@ -33,8 +35,10 @@ public class MainActivity extends WearableActivity {
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
 
+    private FINDLocationProvider mLocationProvider;
+
     private Building mBuilding;
-    private Room mCurrentDisplayedRoom;
+    private Place mCurrentShowingPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +64,10 @@ public class MainActivity extends WearableActivity {
 
         //Make a dummy Room with a light switch for testing
         Room room = new Room(this, "Test Room");
-        mCurrentDisplayedRoom = room;
+        mCurrentShowingPlace = room;
 
         //Attach the adapter which automatically fills with controls for current Place
-        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(room);
+        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(mCurrentShowingPlace);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
         //END SECTION
 
@@ -72,16 +76,25 @@ public class MainActivity extends WearableActivity {
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //Initialise location provider
         Person me = new Person("tcb");
-        LocationGetter mLocationProvider = new FINDLocationProvider(this, me);
+        mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                    if (user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)) { //If the user is me
-                        setRoom(room, false);
+                    if (user.equals(me) && mCurrentShowingPlace.equals(oldLocation)) { //If the user is me
+                        setRoom(newLocation, false);
                     }
                 }
         );
 
         //END SECTION
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
+        mIAmHereWrapper.setVisibility(View.GONE);
+
+        //On click, calibrate location provider
+        mIAmHereWrapper.setOnClickListener(view -> {
+            mLocationProvider.calibrate(mCurrentShowingPlace);
+        });
+
+        // Enables Always-on
+        setAmbientEnabled();
 
         //SECTION: Allow user to change location
         View mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
@@ -119,16 +132,18 @@ public class MainActivity extends WearableActivity {
         }
     }
 
-    public void setRoom(Room room) {
+    public void setRoom(Place room) {
         setRoom(room, true);
     }
 
-    public void setRoom(Room room, boolean showIAmHere) {
+    public void setRoom(Place room, boolean showIAmHere) {
+        mCurrentShowingPlace = room;
+
         //Update the location text. This needs to be converted to upper case because of a bug
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
 
-        mCurrentDisplayedRoom = room;
+        mCurrentShowingPlace = room;
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
 

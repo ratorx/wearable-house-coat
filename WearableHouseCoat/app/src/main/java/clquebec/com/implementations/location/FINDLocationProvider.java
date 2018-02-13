@@ -205,7 +205,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     }
 
     @Override
-    public boolean calibrate(Room room) {
+    public boolean calibrate(Place room) {
         getFingerprint(fingerprint -> {
             String url = SERVERURL + "learn";
 
@@ -230,13 +230,13 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     }
 
     @Override
-    public boolean calibrate(Room room, String data) {
+    public boolean calibrate(Place room, String data) {
         //Discard extra data - for now
         return calibrate(room);
     }
 
     @Override
-    public boolean calibrate(Room room, JSONObject data) {
+    public boolean calibrate(Place room, JSONObject data) {
         //Discard extra data - for now
         return calibrate(room);
     }
