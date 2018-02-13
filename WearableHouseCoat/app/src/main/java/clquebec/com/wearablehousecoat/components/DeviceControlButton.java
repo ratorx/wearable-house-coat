@@ -30,7 +30,7 @@ import clquebec.com.wearablehousecoat.R;
 
 public class DeviceControlButton extends Button implements View.OnClickListener, View.OnLongClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
-    public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84);
+    public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84); //Prussian Blue
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
     private static final int DEFAULT_SIZE = 100;
