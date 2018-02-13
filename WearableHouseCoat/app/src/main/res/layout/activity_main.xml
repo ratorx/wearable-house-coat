@@ -59,9 +59,10 @@
             android:ellipsize="end"
             tools:text="living room and living room and living room and living room and living" />
 
-        <include layout="@layout/hue_control"
-            android:visibility="gone"
-            android:id="@+id/hue_control">
+        <include
+            android:id="@+id/hue_control"
+            layout="@layout/hue_control"
+            android:visibility="gone">
 
         </include>
 

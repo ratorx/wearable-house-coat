@@ -1,6 +1,7 @@
 package clquebec.com.implementations.controllable;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.location.Place;
+import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
 /**
  * WearableHouseCoat
@@ -26,10 +28,12 @@ public class IFTTTLight implements ControllableLightDevice {
     private String mName = null;
     private boolean mCurrentState;
     private IFTTT mIFTTT;
+    private Context mContext;
 
     public IFTTTLight(Context context, Place location){
         mLocation = location;
         mCurrentState = false; //Is there a good way to get this?
+        mContext = context;
 
         //Setup IFTTT for webrequests
         //TODO: Replace "ARandomKey" with a user-configurable key
@@ -111,16 +115,19 @@ public class IFTTTLight implements ControllableLightDevice {
     @Override
     public boolean extendedAction() {
         Log.d("IFTTTLight", "IFTTT extended action");
-        //Change the light colour.
-        //TODO: Implement a colour picker
-        String randColor = "#"+Integer.toHexString((int) (Math.random()*0xFFFFFF)).toUpperCase();
+        //More in-depth lighting controls
 
+        Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
+        mContext.startActivity(lightControls);
+
+        /*
         try {
             setLightColor(Color.parseColor(randColor));
         }catch(ActionNotSupported e){
             Log.d("IFTTTLight", "You are using an IFTTT light that doesn't support color.");
             return false;
         }
+        */
 
         return true;
     }
