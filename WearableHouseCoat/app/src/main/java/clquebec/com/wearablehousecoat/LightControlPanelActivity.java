@@ -30,12 +30,9 @@ public class LightControlPanelActivity extends WearableActivity {
 
         mColourPreview = findViewById(R.id.colourPreview);
         mColourPreview.setTag(Color.WHITE);
-        mColourPreview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new ColorPickActivity.IntentBuilder().oldColor(((Color) mColourPreview.getTag()).toArgb()).build(LightControlPanelActivity.this);
-                startActivityForResult(intent, REQUEST_PICK_COLOR);
-            }
+        mColourPreview.setOnClickListener(view -> {
+            Intent intent = new ColorPickActivity.IntentBuilder().oldColor(((Integer) mColourPreview.getTag())).build(LightControlPanelActivity.this);
+            startActivityForResult(intent, REQUEST_PICK_COLOR);
         });
     }
 
@@ -50,7 +47,7 @@ public class LightControlPanelActivity extends WearableActivity {
                 }
 
                 int pickedColor = ColorPickActivity.getPickedColor(data);
-                mColourPreview.setTag(Color.valueOf(pickedColor));
+                mColourPreview.setTag(pickedColor);
                 mColourPreview.setColorFilter(pickedColor);
                 break;
         }
