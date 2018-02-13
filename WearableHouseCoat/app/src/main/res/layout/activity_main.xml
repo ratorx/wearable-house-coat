@@ -57,7 +57,6 @@
                 android:id="@+id/main_currentlocation"
                 android:layout_width="96dp"
                 android:layout_height="30dp"
-                android:layout_gravity="center_horizontal|clip_vertical"
                 android:layout_marginLeft="30dp"
                 android:layout_weight="1"
                 android:autoSizeMinTextSize="5sp"
@@ -80,22 +79,23 @@
 
 
     </FrameLayout>
-    
+
 
     <LinearLayout
+        android:id="@+id/iamhere_wrapper"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:padding="0dp"
-        android:layout_gravity="center_horizontal|bottom"
-        android:id="@+id/iamhere_wrapper"
-        >
-        
+        android:layout_gravity="bottom|center_horizontal"
+        android:padding="0dp">
+
         <Button
             android:id="@+id/iamhere_button"
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:text="I am here!"/>
-            
+            android:layout_height="41dp"
+            android:layout_marginTop="-5dp"
+            android:text="I am here!"
+            android:textAlignment="center" />
+
     </LinearLayout>
 
 </android.support.wear.widget.BoxInsetLayout>

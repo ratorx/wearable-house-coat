@@ -3,6 +3,7 @@ package clquebec.com.wearablehousecoat;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
@@ -26,6 +27,9 @@ import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
+
+import static android.support.v4.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM;
+
 
 public class MainActivity extends WearableActivity{
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
@@ -72,7 +76,6 @@ public class MainActivity extends WearableActivity{
 
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
-
         //Initialise location provider
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
@@ -134,9 +137,9 @@ public class MainActivity extends WearableActivity{
     }
     
     public void setRoom(Room room, boolean showIAmHere){
-        //Update the location text
-        mLocationNameView.setText(room.getName());
-
+        //Update the location text. This needs to be converted to upper case because of a bug
+        //in android with text upper case and resizing
+        mLocationNameView.setText(room.getName().toUpperCase());
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
     
