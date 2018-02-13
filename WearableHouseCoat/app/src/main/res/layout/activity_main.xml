@@ -82,20 +82,20 @@
 
 
     <FrameLayout
+        android:id="@+id/iamhere_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:padding="0dp"
+        android:layout_height="30dp"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="0dp"
-        android:id="@+id/iamhere_wrapper"
-        android:visibility="gone"
-        >
-        
+        android:padding="0dp"
+        android:visibility="gone">
+
         <Button
             android:id="@+id/iamhere_button"
             android:layout_width="match_parent"
-            android:text="I am here!"
-            android:background="@color/prussian_blue"/>
+            android:layout_height="match_parent"
+            android:background="@color/prussian_blue"
+            android:text="I am here!" />
 
     </FrameLayout>
 
