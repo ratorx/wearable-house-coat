@@ -21,6 +21,7 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import clquebec.com.framework.location.Building;
+import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
@@ -35,10 +36,11 @@ public class MainActivity extends WearableActivity{
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
     private LinearLayout mIAmHereWrapper;
-    private LocationGetter mLocationProvider;
+    private FINDLocationProvider mLocationProvider;
     private View mChangeLocationView;
 
     private Building mBuilding;
+    private Place mCurrentShowingPlace;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +64,8 @@ public class MainActivity extends WearableActivity{
         //Set grid to have width 2
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
-        //Make a dummy Room with a light switch for testing
-        Room room = new Room(this, "Test Room");
-
         //Attach the adapter which automatically fills with controls for current Place
-        mToggleAdapter = new DeviceTogglesAdapter(room);
+        mToggleAdapter = new DeviceTogglesAdapter(mCurrentShowingPlace);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
         //END SECTION
 
@@ -78,7 +77,7 @@ public class MainActivity extends WearableActivity{
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                 if(user.equals(me)){ //If the user is me
-                    setRoom(room, false);
+                    setRoom(newLocation, false);
                 }
             }
         );
@@ -88,6 +87,11 @@ public class MainActivity extends WearableActivity{
         // Need to add timer on location change.
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
+
+        //On click, calibrate location provider
+        mIAmHereWrapper.setOnClickListener(view -> {
+            mLocationProvider.calibrate(mCurrentShowingPlace);
+        });
 
         // Enables Always-on
         setAmbientEnabled();
@@ -129,11 +133,13 @@ public class MainActivity extends WearableActivity{
         }
     }
 
-    public void setRoom(Room room){
+    public void setRoom(Place room){
         setRoom(room, true);
     }
     
-    public void setRoom(Room room, boolean showIAmHere){
+    public void setRoom(Place room, boolean showIAmHere){
+        mCurrentShowingPlace = room;
+
         //Update the location text
         mLocationNameView.setText(room.getName());
 
