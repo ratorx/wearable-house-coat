@@ -1,5 +1,6 @@
 package clquebec.com.wearablehousecoat;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -7,6 +8,7 @@ import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.Button;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Set;
@@ -17,12 +19,13 @@ import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.DummyLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity{
 
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private TextView mPersonCountView;
+    private BoxInsetLayout mContainerView;
 
     private IndoorLocationProvider mLocationProvider;
 
@@ -33,6 +36,7 @@ public class MainActivity extends WearableActivity {
 
         //SECTION: Initialize toggle button grid
         mToggleButtons = findViewById(R.id.main_togglebuttons);
+        mContainerView = findViewById(R.id.main_container);
 
         //Set grid to have width 2
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
@@ -88,4 +92,19 @@ public class MainActivity extends WearableActivity {
         });
         */
     }
+
+    @Override
+    public void onEnterAmbient(Bundle ambientDetails) {
+        super.onEnterAmbient(ambientDetails);
+
+        mContainerView.setBackgroundColor(Color.BLACK);
+    }
+
+    @Override
+    public void onExitAmbient() {
+        super.onExitAmbient();
+
+        mContainerView.setBackgroundColor(Color.DKGRAY);
+    }
+
 }

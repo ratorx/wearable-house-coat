@@ -36,8 +36,7 @@ public class IFTTTLight implements ControllableLightDevice {
         mContext = context;
 
         //Setup IFTTT for webrequests
-        //TODO: Replace "ARandomKey" with a user-configurable key
-        mIFTTT = new IFTTT(context, "ARandomKey");
+        mIFTTT = IFTTT.getInstance(context);
     }
 
     @Override
