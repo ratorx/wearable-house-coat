@@ -25,6 +25,12 @@ public class Person {
         mName = "Test Person";
     }
 
+    public Person(String name){
+        //TODO: Read information in from somewhere.
+        mUUID = UUID.randomUUID();
+        mName = name;
+    }
+
     public String getName(){
         return mName;
     }
@@ -40,7 +46,7 @@ public class Person {
     public void setLocation(Place newLocation){
         if(mLocation == null || !mLocation.equals(newLocation)) {
             if (mListener != null) {
-                mListener.onLocationChanged(mLocation, newLocation);
+                mListener.onLocationChanged(this, mLocation, newLocation);
                 mLocation = newLocation;
             }
         }

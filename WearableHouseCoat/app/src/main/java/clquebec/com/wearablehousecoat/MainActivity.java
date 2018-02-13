@@ -6,14 +6,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Set;
 
-import clquebec.com.framework.location.IndoorLocationProvider;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
-import clquebec.com.implementations.location.DummyLocationProvider;
+import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity{
@@ -24,7 +23,7 @@ public class MainActivity extends WearableActivity{
     private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
 
-    private IndoorLocationProvider mLocationProvider;
+    private LocationGetter mLocationProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +44,9 @@ public class MainActivity extends WearableActivity{
         mToggleButtons.setAdapter(mToggleAdapter);
 
         //Initialise location provider
-        mLocationProvider = new DummyLocationProvider(this);
-        mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
+        Person me = new Person("tcb");
+        mLocationProvider = new FINDLocationProvider(this, me);
+        mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                 //Update the location text
                 mLocationNameView.setText(newLocation.getName());
 
