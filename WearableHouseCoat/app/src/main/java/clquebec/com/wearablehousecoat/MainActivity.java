@@ -13,10 +13,14 @@ import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
+import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
@@ -24,6 +28,7 @@ import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity{
+    private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
 
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
@@ -33,10 +38,22 @@ public class MainActivity extends WearableActivity{
     private LocationGetter mLocationProvider;
     private View mChangeLocationView;
 
+    private Building mBuilding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //SECTION: Initialize Building
+        //TODO: Read in from somewhere (e.g web)
+
+        mBuilding = new Building(this, "My House");
+        mBuilding.addRoom(new Room(this, "Kitchen"));
+        mBuilding.addRoom(new Room(this, "Living Room"));
+        mBuilding.addRoom(new Room(this, "Dungeon"));
+
+        //END SECTION
 
         //SECTION: Initialize toggle button grid
         mToggleButtons = findViewById(R.id.main_togglebuttons);
@@ -60,11 +77,9 @@ public class MainActivity extends WearableActivity{
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                //Update the location text
-                mLocationNameView.setText(newLocation.getName());
-
-                //This automatically populates and attaches devices to buttons.
-                mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
+                if(user.equals(me)){ //If the user is me
+                    setRoom(room);
+                }
             }
         );
 
@@ -78,31 +93,57 @@ public class MainActivity extends WearableActivity{
         // Enables Always-on
         setAmbientEnabled();
 
-        /* This code is not dynamic - great for testing but not something to keep.
-        Button mHueButton = findViewById(R.id.hue_button);
-        mHueButton.setOnClickListener(new View.OnClickListener() {
-
-        */
         //SECTION: Allow user to change location
         mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
         mChangeLocationView.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
-            MainActivity.this.startActivity(intent);
+
+            //Get room names as strings
+            List<CharSequence> roomNames = mBuilding.getRooms().stream()
+                    .map(Room::getName).collect(Collectors.toList());
+
+            //Pass room names as an extra
+            intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
+            MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
         //END SECTION
 
         // Enables Always-on
         setAmbientEnabled();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == ROOM_CHANGE_REQUEST){
+            //If a result was given, get the Room name, and call setRoom with the Room.
+            if(resultCode == RESULT_OK){
+                if(data != null && data.getExtras() != null){
+                    String name = data.getExtras().getString(RoomSelectionActivity.INTENT_ROOM_NAME);
+
+                    //Get first Room with that name in our building
+                    Room chosenRoom = (Room) mBuilding.getRooms().stream()
+                            .filter(room -> room.getName().equals(name)).toArray()[0];
+
+                    setRoom(chosenRoom);
+                }
+            }
+        }
+    }
     
-    public void setRoom(int roomId){
+    public void setRoom(Room room){
+        //Update the location text
+        mLocationNameView.setText(room.getName());
+
+        //This automatically populates and attaches devices to buttons.
+        mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
     
         // Show the "I am here" button for 4 seconds
         mIAmHereWrapper.setVisibility(View.VISIBLE);
         Timer mHereTimer = new Timer();
         mHereTimer.schedule(new TimerTask(){
             public void run() {
-                mIamHereWrapper.setVisibility(View.GONE);
+                runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
+
             }
         }, 4000);
       
