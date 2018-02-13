@@ -11,7 +11,7 @@ import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.Button;
 import android.util.Log;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class MainActivity extends WearableActivity{
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
-    private LinearLayout mIAmHereWrapper;
+    private FrameLayout mIAmHereWrapper;
     private LocationGetter mLocationProvider;
     private View mChangeLocationView;
 
@@ -83,14 +83,15 @@ public class MainActivity extends WearableActivity{
                 if(user.equals(me)){ //If the user is me
                     setRoom(room, false);
                 }
+                else{
+                    setRoom(room, true);
+                }
             }
         );
 
         //END SECTION
 
-        // Need to add timer on location change.
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
-        mIAmHereWrapper.setVisibility(View.GONE);
 
         // Enables Always-on
         setAmbientEnabled();
@@ -150,7 +151,6 @@ public class MainActivity extends WearableActivity{
             mHereTimer.schedule(new TimerTask() {
                 public void run() {
                     runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
-
                 }
             }, 4000);
         }
