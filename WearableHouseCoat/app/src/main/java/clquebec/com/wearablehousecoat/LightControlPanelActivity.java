@@ -29,7 +29,7 @@ public class LightControlPanelActivity extends WearableActivity {
         setAmbientEnabled();
 
         mColourPreview = findViewById(R.id.colourPreview);
-        mColourPreview.setTag(Color.valueOf(0xffffffff));
+        mColourPreview.setTag(Color.WHITE);
         mColourPreview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
