@@ -13,10 +13,12 @@ import android.widget.TextView;
 
 import java.util.Set;
 
+
 import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.Room;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
-import clquebec.com.implementations.location.DummyLocationProvider;
+import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity{
@@ -27,7 +29,7 @@ public class MainActivity extends WearableActivity{
     private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
 
-    private IndoorLocationProvider mLocationProvider;
+    private LocationGetter mLocationProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +54,16 @@ public class MainActivity extends WearableActivity{
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
 
-        //Create a dummy location provider to give us dummy information
-        mLocationProvider = new DummyLocationProvider(this);
+        //Initialise location provider
+        Person me = new Person("tcb");
+        mLocationProvider = new FINDLocationProvider(this, me);
+        mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
+                //Update the location text
+                mLocationNameView.setText(newLocation.getName());
 
-        //Register a listener so that information is updated on location change.
-        mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
-                    //Set location text to the right location
-                    mLocationNameView.setText(newLocation.getName());
-
-                    //This automatically populates and attaches devices to buttons.
-                    mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
-                }
+                //This automatically populates and attaches devices to buttons.
+                mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
+            }
         );
 
 
