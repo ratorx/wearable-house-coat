@@ -5,4 +5,5 @@
     <string name="thermostat">Thermostat</string>
     <string name="oven">Oven</string>
     <string name="curtains">Curtains</string>
+    <string name="toilet">Toilet</string> 
 </resources>

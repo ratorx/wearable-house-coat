@@ -14,10 +14,10 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.Room;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
-import clquebec.com.implementations.location.DummyLocationProvider;
+import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity{
@@ -26,8 +26,9 @@ public class MainActivity extends WearableActivity{
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
+    private LinearLayout mIAmHereWrapper;
+    private LocationGetter mLocationProvider;
     private View mChangeLocationView;
-    private IndoorLocationProvider mLocationProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,22 +53,33 @@ public class MainActivity extends WearableActivity{
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
 
-        //Create a dummy location provider to give us dummy information
-        mLocationProvider = new DummyLocationProvider(this);
+        //Initialise location provider
+        Person me = new Person("tcb");
+        mLocationProvider = new FINDLocationProvider(this, me);
+        mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
+                //Update the location text
+                mLocationNameView.setText(newLocation.getName());
 
-        //Register a listener so that information is updated on location change.
-        mLocationProvider.setLocationChangeListener((oldLocation, newLocation) -> {
-                    //Set location text to the right location
-                    mLocationNameView.setText(newLocation.getName());
-
-                    //This automatically populates and attaches devices to buttons.
-                    mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
-                }
+                //This automatically populates and attaches devices to buttons.
+                mToggleButtons.swapAdapter(new DeviceTogglesAdapter(newLocation), false);
+            }
         );
-
 
         //END SECTION
 
+        // TEST THIS
+        // Need to add timer on location change.
+        mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
+        mIAmHereWrapper.setVisibility(View.GONE);
+
+        // Enables Always-on
+        setAmbientEnabled();
+
+        /* This code is not dynamic - great for testing but not something to keep.
+        Button mHueButton = findViewById(R.id.hue_button);
+        mHueButton.setOnClickListener(new View.OnClickListener() {
+
+        */
         //SECTION: Allow user to change location
         mChangeLocationView = findViewById(R.id.main_selectroom);
         mChangeLocationView.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +99,7 @@ public class MainActivity extends WearableActivity{
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
 
+        //Low battery consumption in ambient mode
         mContainerView.setBackgroundColor(Color.BLACK);
     }
 
@@ -94,7 +107,8 @@ public class MainActivity extends WearableActivity{
     public void onExitAmbient() {
         super.onExitAmbient();
 
-        mContainerView.setBackgroundColor(Color.DKGRAY);
+        //restore to default background color.
+        mContainerView.setBackgroundColor(getResources().getColor(R.color.eerie_black, getTheme()));
     }
 
 }
