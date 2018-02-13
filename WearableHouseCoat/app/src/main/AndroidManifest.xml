@@ -38,6 +38,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".LightControlPanelActivity"
+            android:label="@string/title_activity_light_control_panel" />
+        <activity
+            android:name=".RoomSelectionActivity"
+            android:label="@string/title_activity_room_selection">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

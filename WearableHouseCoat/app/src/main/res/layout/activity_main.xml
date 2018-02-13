@@ -6,86 +6,102 @@
     android:id="@+id/main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
+    android:background="@color/eerie_black"
     android:padding="@dimen/box_inset_layout_padding"
     tools:context="clquebec.com.wearablehousecoat.MainActivity"
     tools:deviceIds="wear">
-
+    
+    <!-- Scrollable wrapper for buttons -->
     <ScrollView
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fadingEdgeLength="20dp"
+        android:paddingTop="60dp"
+        android:requiresFadingEdge="vertical">
 
-        <android.support.wear.widget.BoxInsetLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <!-- Wrapper to allow centering of RecyclerView in ScrollView -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
-            <LinearLayout
+            <!-- Main button grid -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/main_togglebuttons"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:boxedEdges="all">>
-
-                <TextView
-                    android:id="@+id/main_locationlabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/main_location_hint"
-                    android:textAlignment="center"
-                    android:textAllCaps="false" />
-
-                <TextView
-                    android:id="@+id/main_currentlocation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/main_defaultlocation"
-                    android:textAlignment="center"
-                    android:textAllCaps="true"
-                    android:textSize="18sp"
-                    tools:text="Kitchen" />
-
-                <LinearLayout
-                    android:id="@+id/main_companionview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/main_companionlabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/main_companion_hint"
-                        android:textAlignment="viewEnd" />
-
-                    <TextView
-                        android:id="@+id/main_companions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:paddingLeft="5dp"
-                        android:text="@string/main_companions_default"
-                        tools:text="1 other person" />
-
-                </LinearLayout>
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:layout_weight="1" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/main_togglebuttons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                </android.support.v7.widget.RecyclerView>
-
-            </LinearLayout>
-
-
-        </android.support.wear.widget.BoxInsetLayout>
-
+                android:layout_height="match_parent" />
+        </LinearLayout>
     </ScrollView>
+
+    <!-- Header text -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="0dp"
+        app:boxedEdges="all">
+        
+        <!-- Room name -->
+        <!-- TODO: check ellipsize works as intended (resize first, then ellipsis when minimum size reached.) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/main_currentlocation"
+                android:layout_width="96dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal|clip_vertical"
+                android:layout_marginLeft="30dp"
+                android:layout_weight="1"
+                android:autoSizeMinTextSize="5sp"
+                android:autoSizeTextType="uniform"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:text="@string/main_defaultlocation"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textSize="18sp"
+                tools:text="living room and living room and living room and living room and living" />
+
+            <ImageView
+                android:id="@+id/main_selectroom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/ic_right" />
+        </LinearLayout>
+
+
+        <include
+            android:id="@+id/hue_control"
+            layout="@layout/hue_control"
+            android:visibility="gone">
+        </include>
+
+    </FrameLayout>
+    
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:padding="0dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:id="@+id/iamhere_wrapper"
+        >
+        
+        <Button
+            android:id="@+id/iamhere_button"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:text="I am here!"/>
+            
+    </LinearLayout>
 
 </android.support.wear.widget.BoxInsetLayout>
 
