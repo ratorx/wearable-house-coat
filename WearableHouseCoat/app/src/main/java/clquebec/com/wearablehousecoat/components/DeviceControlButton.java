@@ -194,7 +194,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
 
             mDeviceIcon.setBounds((int) paddingX, (int) mPadding, (int) (imageWidth + paddingX), (int) (imageHeight + mPadding));
             if(mDeviceIconOff != null) {
-                mDeviceIconOff.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+                mDeviceIconOff.setBounds((int) paddingX, (int) mPadding, (int) (imageWidth + paddingX), (int) (imageHeight + mPadding));
             }
 
             //Calculate text dimensions
