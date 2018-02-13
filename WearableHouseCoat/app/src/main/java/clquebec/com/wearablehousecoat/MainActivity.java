@@ -96,6 +96,7 @@ public class MainActivity extends WearableActivity{
     public void onEnterAmbient(Bundle ambientDetails) {
         super.onEnterAmbient(ambientDetails);
 
+        //Low battery consumption in ambient mode
         mContainerView.setBackgroundColor(Color.BLACK);
     }
 
@@ -103,7 +104,8 @@ public class MainActivity extends WearableActivity{
     public void onExitAmbient() {
         super.onExitAmbient();
 
-        mContainerView.setBackgroundColor(Color.DKGRAY);
+        //restore to default background color.
+        mContainerView.setBackgroundColor(getResources().getColor(R.color.eerie_black, getTheme()));
     }
 
 }
