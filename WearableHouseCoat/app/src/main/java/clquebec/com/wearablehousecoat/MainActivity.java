@@ -26,6 +26,7 @@ public class MainActivity extends WearableActivity{
     private TextView mLocationNameView;
     private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
+    private LinearLayout mIAmHereWrapper;
 
     private LocationGetter mLocationProvider;
 
@@ -64,8 +65,12 @@ public class MainActivity extends WearableActivity{
             }
         );
 
-
         //END SECTION
+
+        // TEST THIS
+        // Need to add timer on location change.
+        mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
+        mIAmHereWrapper.setVisibility(View.GONE);
 
         // Enables Always-on
         setAmbientEnabled();

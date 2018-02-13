@@ -92,11 +92,13 @@
 
     </FrameLayout>
     
+    <!--
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="30dp"
         android:padding="0dp"
         android:layout_gravity="center_horizontal|bottom"
+        android:id="@+id/iamhere_wrapper"
         >
         
         <Button
@@ -105,7 +107,7 @@
             android:layout_width="match_parent"
             android:text="I am here!"/>
             
-    </LinearLayout>
+    </LinearLayout> -->
 
 </android.support.wear.widget.BoxInsetLayout>
 
