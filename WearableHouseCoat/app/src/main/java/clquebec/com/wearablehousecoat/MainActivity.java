@@ -82,13 +82,10 @@ public class MainActivity extends WearableActivity{
 
         */
         //SECTION: Allow user to change location
-        mChangeLocationView = findViewById(R.id.main_selectroom);
-        mChangeLocationView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
-                MainActivity.this.startActivity(intent);
-            }
+        mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
+        mChangeLocationView.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
+            MainActivity.this.startActivity(intent);
         });
         //END SECTION
 
