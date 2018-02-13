@@ -47,6 +47,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
     private TextPaint mTextPaint;
     private TextPaint mTextPaintOff;
     private Drawable mDeviceIcon = null;
+    private Drawable mDeviceIconOff = null;
 
     //Fields for painting - these are members so they are cached between draws
     private int mSize; /* The side length of the view */
@@ -103,6 +104,10 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
 
         if(mDeviceType.getIcon() != 0){
             mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
+        }
+
+        if(mDeviceType.getFadedIcon() != 0){
+            mDeviceIconOff = context.getDrawable(mDeviceType.getFadedIcon());
         }
 
         //Get rid of button background
@@ -188,6 +193,9 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
             final float paddingX = (mSize - imageWidth) / 2;
 
             mDeviceIcon.setBounds((int) paddingX, (int) mPadding, (int) (imageWidth + paddingX), (int) (imageHeight + mPadding));
+            if(mDeviceIconOff != null) {
+                mDeviceIconOff.setBounds((int) paddingX, (int) paddingY, (int) (imageWidth + paddingX), (int) (imageHeight + paddingY));
+            }
 
             //Calculate text dimensions
             float textWidth = mTextPaint.measureText(mDevice.getName());
@@ -208,7 +216,11 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
         mDeviceType = mDevice.getType();
         if(mDeviceType.getIcon() != 0) {
             mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
+            mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
         }
+
+        //Re-calculate size
+        measure();
 
         //Redraw view
         measure();
