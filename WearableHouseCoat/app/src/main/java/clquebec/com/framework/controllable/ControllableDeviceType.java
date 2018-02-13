@@ -13,7 +13,7 @@ import clquebec.com.wearablehousecoat.R;
 public enum ControllableDeviceType {
     //These need to match up with the values in attrs.xml or there will be trouble
     //As in, be the same order
-    LIGHT, SOUND, THERMOSTAT, CURTAINS, OVEN;
+    LIGHT, SOUND, THERMOSTAT, CURTAINS, OVEN, TOILET;
 
     public static ControllableDeviceType getType(int typeNumber){
         return ControllableDeviceType.values()[typeNumber];
@@ -32,6 +32,9 @@ public enum ControllableDeviceType {
                 return R.drawable.ic_oven;
             case CURTAINS:
                 return R.drawable.ic_curtains;
+            case TOILET:
+                //return R.drawable.ic_toilet;
+                return 0;
             default:
                 return 0;
         }
@@ -49,6 +52,9 @@ public enum ControllableDeviceType {
                 return R.drawable.ic_oven_fade;
             case CURTAINS:
                 return R.drawable.ic_curtains_fade;
+            case TOILET:
+                //return R.drawable.ic_toilet_fade;
+                return 0;
             default:
                 return 0;
         
@@ -70,6 +76,8 @@ public enum ControllableDeviceType {
                 return r.getString(R.string.oven);
             case CURTAINS:
                 return r.getString(R.string.curtains);
+            case TOILET:
+                return r.getString(R.string.toilet); 
             default:
                 return "";
         }

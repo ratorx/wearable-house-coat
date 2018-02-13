@@ -10,8 +10,9 @@
             <enum name="light" value="0" />
             <enum name="sound" value="1" />
             <enum name="thermostat" value="2" />
-            <enum name="curtains" value="3" />
+            <enum name="curtains" value="3" /> 
             <enum name="oven" value="4" />
+            <enum name="toilet" value="5" />
         </attr>
     </declare-styleable>
     
