@@ -48,8 +48,9 @@
         <!-- Room name -->
         <!-- TODO: check ellipsize works as intended (resize first, then ellipsis when minimum size reached.) -->
         <LinearLayout
+            android:id="@+id/main_currentlocationlayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <TextView
@@ -74,15 +75,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_right" />
+                android:src="@drawable/ic_down" />
         </LinearLayout>
 
-
-        <include
-            android:id="@+id/hue_control"
-            layout="@layout/hue_control"
-            android:visibility="gone">
-        </include>
 
     </FrameLayout>
     
