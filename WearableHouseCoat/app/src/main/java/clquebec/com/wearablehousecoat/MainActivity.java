@@ -1,5 +1,6 @@
 package clquebec.com.wearablehousecoat;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,6 +10,7 @@ import android.support.wearable.activity.WearableActivity;
 import android.view.View;
 import android.widget.Button;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Set;
@@ -26,11 +28,10 @@ public class MainActivity extends WearableActivity{
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
-    private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
     private LinearLayout mIAmHereWrapper;
-
     private LocationGetter mLocationProvider;
+    private View mChangeLocationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,23 +81,21 @@ public class MainActivity extends WearableActivity{
         /* This code is not dynamic - great for testing but not something to keep.
         Button mHueButton = findViewById(R.id.hue_button);
         mHueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                View hue_control = findViewById(R.id.hue_control);
-                hue_control.setVisibility(View.VISIBLE);
-            }
-        });
 
-        //TODO: swipe to close.
-        View mainLayout = findViewById(R.id.hue_control);
-        mainLayout.setOnClickListener(new View.OnClickListener(){
+        */
+        //SECTION: Allow user to change location
+        mChangeLocationView = findViewById(R.id.main_selectroom);
+        mChangeLocationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                View hue_control = findViewById(R.id.hue_control);
-                hue_control.setVisibility(View.GONE);
+                Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
+                MainActivity.this.startActivity(intent);
             }
         });
-        */
+        //END SECTION
+
+        // Enables Always-on
+        setAmbientEnabled();
     }
     
     public void setRoom(int roomId){

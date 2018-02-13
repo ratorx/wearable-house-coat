@@ -15,7 +15,8 @@
         <item quantity="one">%d other person</item>
         <item quantity="other">%d other people</item>
     </plurals>
-  
+
     <string name="title_activity_light_control_panel">LightControlPanel</string>
+    <string name="title_activity_room_selection">RoomSelectionActivity</string>
 
 </resources>
