@@ -86,7 +86,7 @@
 
     </FrameLayout>
     
-    <!--
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="30dp"
@@ -101,7 +101,7 @@
             android:layout_width="match_parent"
             android:text="I am here!"/>
             
-    </LinearLayout> -->
+    </LinearLayout>
 
 </android.support.wear.widget.BoxInsetLayout>
 
