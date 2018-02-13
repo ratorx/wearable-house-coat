@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-
-import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
