@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
@@ -91,6 +93,19 @@ public class MainActivity extends WearableActivity{
 
         // Enables Always-on
         setAmbientEnabled();
+    }
+    
+    public void setRoom(int roomId){
+    
+        // Show the "I am here" button for 4 seconds
+        mIAmHereWrapper.setVisibility(View.VISIBLE);
+        Timer mHereTimer = new Timer();
+        mHereTimer.schedule(new TimerTask(){
+            public void run() {
+                mIamHereWrapper.setVisibility(View.GONE);
+            }
+        }, 4000);
+      
     }
 
     @Override
