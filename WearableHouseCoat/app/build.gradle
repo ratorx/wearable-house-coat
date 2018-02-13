@@ -33,4 +33,6 @@ dependencies {
 
     //For easy networking
     compile 'com.android.volley:volley:1.1.0'
+
+    compile 'org.jraf:android-wear-color-picker:1.0.1'
 }
