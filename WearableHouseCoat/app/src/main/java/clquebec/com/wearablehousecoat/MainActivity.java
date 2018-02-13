@@ -1,5 +1,6 @@
 package clquebec.com.wearablehousecoat;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,9 +25,8 @@ public class MainActivity extends WearableActivity{
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
-    private TextView mPersonCountView;
     private BoxInsetLayout mContainerView;
-
+    private View mChangeLocationView;
     private IndoorLocationProvider mLocationProvider;
 
     @Override
@@ -68,29 +68,19 @@ public class MainActivity extends WearableActivity{
 
         //END SECTION
 
+        //SECTION: Allow user to change location
+        mChangeLocationView = findViewById(R.id.main_selectroom);
+        mChangeLocationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
+        //END SECTION
+
         // Enables Always-on
         setAmbientEnabled();
-
-        /* This code is not dynamic - great for testing but not something to keep.
-        Button mHueButton = findViewById(R.id.hue_button);
-        mHueButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                View hue_control = findViewById(R.id.hue_control);
-                hue_control.setVisibility(View.VISIBLE);
-            }
-        });
-
-        //TODO: swipe to close.
-        View mainLayout = findViewById(R.id.hue_control);
-        mainLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                View hue_control = findViewById(R.id.hue_control);
-                hue_control.setVisibility(View.GONE);
-            }
-        });
-        */
     }
 
     @Override
