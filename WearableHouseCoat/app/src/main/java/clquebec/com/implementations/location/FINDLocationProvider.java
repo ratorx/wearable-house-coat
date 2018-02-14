@@ -196,7 +196,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Successfully calibrated"),
+                    response -> Log.d("FIND", "Succesfully updated fingerprint"),
                     error -> Log.e("FIND", error.getMessage()));
 
             mQueue.add(trackRequest);
@@ -220,8 +220,9 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                 Log.e("FIND", "Could not generate update request, " + e.getMessage());
             }
 
+            Log.d("FIND", jsonObject.toString());
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Successfully updated fingerprint"),
+                    response -> Log.d("FIND", "Succesfully calibrated"),
                     error -> Log.e("FIND", error.getMessage()));
 
             mQueue.add(trackRequest);
