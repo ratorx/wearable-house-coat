@@ -11,4 +11,7 @@
 * TODO
 
 ## Website
-* TODO
+* Clone project.
+* cd into web directory.
+* run `npm install` to download all dependencies
+* use `npm start` to start a node server and go to localhost:3000 if it does not happen automatically
