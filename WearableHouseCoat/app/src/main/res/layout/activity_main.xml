@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
+            <clquebec.com.wearablehousecoat.components.AutoResizeTextView
                 android:id="@+id/main_currentlocation"
                 android:layout_width="96dp"
                 android:layout_height="30dp"
@@ -66,8 +66,7 @@
                 android:text="@string/main_defaultlocation"
                 android:textAlignment="center"
                 android:textAllCaps="true"
-                android:textSize="18sp"
-                tools:text="living room and living room and living room and living room and living" />
+                android:textSize="18sp" />
 
             <ImageView
                 android:id="@+id/main_selectroom"

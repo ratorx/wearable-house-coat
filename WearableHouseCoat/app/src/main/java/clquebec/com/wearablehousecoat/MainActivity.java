@@ -26,9 +26,10 @@ import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
+import clquebec.com.wearablehousecoat.components.AutoResizeTextView;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
-import static android.support.v4.widget.TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM;
+import android.support.v4.widget.TextViewCompat;
 
 
 public class MainActivity extends WearableActivity{
@@ -36,7 +37,7 @@ public class MainActivity extends WearableActivity{
 
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
-    private TextView mLocationNameView;
+    private AutoResizeTextView mLocationNameView;
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
     private LocationGetter mLocationProvider;
@@ -141,6 +142,8 @@ public class MainActivity extends WearableActivity{
         //Update the location text. This needs to be converted to upper case because of a bug
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
+        mLocationNameView.resizeText();
+
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
     
