@@ -29,9 +29,8 @@ import clquebec.com.implementations.controllable.IFTTTLight;
 public class Room extends Place {
     private String mName;
     private Context mContext;
-    private final Set<Person> mPeople = new HashSet<>();
-
     private List<ControllableDevice> mDevices;
+    private final Set<Person> mPeople = new HashSet<>();
 
     public Room(Context context, JSONObject roomData) throws JSONException{
         //Only use LSB - for now
@@ -88,6 +87,16 @@ public class Room extends Place {
     @Override
     public ControllableDeviceType getType() {
         return null;
+    }
+
+    @Override
+    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
+        try {
+            return new Room(context, config);
+        }catch(JSONException e){
+            Log.e("Room", "Could not instantiate based on JSON config "+e.getMessage());
+            throw new IllegalArgumentException("Malformed JSON for Room instantiation");
+        }
     }
 
     @Override
