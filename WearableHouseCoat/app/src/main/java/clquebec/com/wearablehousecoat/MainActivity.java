@@ -46,6 +46,7 @@ public class MainActivity extends WearableActivity{
     private View mChangeLocationView;
 
     private Building mBuilding;
+    private Room mCurrentDisplayedRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class MainActivity extends WearableActivity{
 
         //Make a dummy Room with a light switch for testing
         Room room = new Room(this, "Test Room");
+        mCurrentDisplayedRoom = room;
 
         //Attach the adapter which automatically fills with controls for current Place
         mToggleAdapter = new DeviceTogglesAdapter(room);
@@ -84,11 +86,8 @@ public class MainActivity extends WearableActivity{
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                if(user.equals(me)){ //If the user is me
+                if( user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)){ //If the user is me
                     setRoom(room, false);
-                }
-                else{
-                    setRoom(room, true);
                 }
             }
         );
@@ -146,6 +145,7 @@ public class MainActivity extends WearableActivity{
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
 
+        mCurrentDisplayedRoom = room;
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
     
