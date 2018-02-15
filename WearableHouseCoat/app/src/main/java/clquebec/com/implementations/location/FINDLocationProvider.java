@@ -231,18 +231,6 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     }
 
     @Override
-    public boolean calibrate(Place room, String data) {
-        //Discard extra data - for now
-        return calibrate(room);
-    }
-
-    @Override
-    public boolean calibrate(Place room, JSONObject data) {
-        //Discard extra data - for now
-        return calibrate(room);
-    }
-
-    @Override
     public boolean reset() {
         String url = SERVERURL + "database?group=" + GROUPID;
         StringRequest newRequest = new StringRequest(Request.Method.DELETE, url,
