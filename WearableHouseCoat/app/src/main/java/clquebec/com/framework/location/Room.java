@@ -9,18 +9,12 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
-import clquebec.com.framework.people.Person;
-import clquebec.com.implementations.controllable.IFTTTLight;
-
 /**
  * WearableHouseCoat
  * Author: tom
@@ -30,11 +24,11 @@ import clquebec.com.implementations.controllable.IFTTTLight;
 public class Room extends Place {
     private String mName;
     private Context mContext;
-    private final Set<Person> mPeople = new HashSet<>();
     private List<ControllableDevice> mDevices;
 
     public Room(Context context, JSONObject roomData) throws JSONException{
-        super(UUID.randomUUID());
+        //Only use LSB - for now
+        super(new UUID(0L, roomData.getLong("uid")));
 
         mContext = context;
         mName = roomData.getString("name");
@@ -42,8 +36,6 @@ public class Room extends Place {
         //Instantiate devices
         mDevices = new ArrayList<>();
         JSONArray deviceList = roomData.getJSONArray("devices");
-
-        Log.d("Room", deviceList.toString());
         for(int i = 0; i < deviceList.length(); i++){
             JSONObject deviceData = deviceList.getJSONObject(i);
             //Load in device dynamically - Java reflection!
@@ -89,16 +81,6 @@ public class Room extends Place {
     @Override
     public ControllableDeviceType getType() {
         return null;
-    }
-
-    @Override
-    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
-        try {
-            return new Room(context, config);
-        }catch(JSONException e){
-            Log.e("Room", "Could not instantiate based on JSON config "+e.getMessage());
-            throw new IllegalArgumentException("Malformed JSON for Room instantiation");
-        }
     }
 
     @Override
