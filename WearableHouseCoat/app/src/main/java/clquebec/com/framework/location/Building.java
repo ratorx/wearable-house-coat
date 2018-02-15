@@ -58,6 +58,17 @@ public class Building extends Place {
     }
 
     @Override
+    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
+        try{
+            String name = config.getString("name");
+            return new Building(context, name);
+        }catch(JSONException e){
+            Log.e("Building", "JSON does not have required 'name'");
+            return new Building(context, "My Building");
+        }
+    }
+
+    @Override
     public void setName(String name) {
         mName = name;
     }
