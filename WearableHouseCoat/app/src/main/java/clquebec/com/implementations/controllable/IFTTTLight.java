@@ -5,11 +5,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import clquebec.com.framework.IFTTT;
 import clquebec.com.framework.controllable.ActionNotSupported;
+import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.location.Place;
@@ -24,14 +28,14 @@ import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 public class IFTTTLight implements ControllableLightDevice {
     private static final String EVENT_PREFIX = "light_";
 
-    private Place mLocation;
+    private String mLocation;
     private String mName = null;
     private boolean mCurrentState;
     private IFTTT mIFTTT;
     private Context mContext;
 
-    public IFTTTLight(Context context, Place location){
-        mLocation = location;
+    public IFTTTLight(Context context, String locationName){
+        mLocation = locationName;
         mCurrentState = false; //Is there a good way to get this?
         mContext = context;
 
@@ -44,7 +48,7 @@ public class IFTTTLight implements ControllableLightDevice {
         if(mName != null && mCurrentState){
             List<String> params = new ArrayList<>();
             params.add(mName);
-            params.add(mLocation.getName());
+            params.add(mLocation);
             params.add("#"+Integer.toHexString(color));
 
             mIFTTT.webhook(EVENT_PREFIX+"color", params);
@@ -58,7 +62,7 @@ public class IFTTTLight implements ControllableLightDevice {
 
             List<String> params = new ArrayList<>();
             params.add(mName);
-            params.add(mLocation.getName());
+            params.add(mLocation);
             mIFTTT.webhook(EVENT_PREFIX+"on", params);
 
             return true;
@@ -74,7 +78,7 @@ public class IFTTTLight implements ControllableLightDevice {
 
             List<String> params = new ArrayList<>();
             params.add(mName);
-            params.add(mLocation.getName());
+            params.add(mLocation);
 
             mIFTTT.webhook(EVENT_PREFIX+"off", params);
 
@@ -119,15 +123,16 @@ public class IFTTTLight implements ControllableLightDevice {
         Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
         mContext.startActivity(lightControls);
 
-        /*
-        try {
-            setLightColor(Color.parseColor(randColor));
-        }catch(ActionNotSupported e){
-            Log.d("IFTTTLight", "You are using an IFTTT light that doesn't support color.");
-            return false;
-        }
-        */
-
         return true;
+    }
+
+    @Override
+    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
+        try {
+            return new IFTTTLight(context, config.getString("location"));
+        }catch(JSONException e){
+            Log.e("IFTTTLight", "JSON Does not have required attributes "+e.getMessage());
+            return new IFTTTLight(context, "Test Room");
+        }
     }
 }

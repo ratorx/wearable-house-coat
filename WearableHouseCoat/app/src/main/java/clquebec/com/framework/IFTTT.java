@@ -73,19 +73,13 @@ public class IFTTT {
         }
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.d("IFTTT", "Response: "+response);
-                    }
+                response -> {
+                    // response
+                    Log.d("IFTTT", "Response: "+response);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.d("IFTTT", "IFTTT Error: "+error.getMessage());
-                    }
+                error -> {
+                    // error
+                    Log.d("IFTTT", "IFTTT Error: "+error.getMessage());
                 }
         ){
             @Override
