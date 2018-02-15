@@ -2,7 +2,7 @@
 <resources>
     <!-- Stylable attributes for DeviceControlButton -->
     <declare-styleable name="DeviceControlButton">
-        <attr name="background" format="color" />
+        <attr name="dcb_background" format="color" />
         <attr name="backgroundoff" format="color" />
         <attr name="padding" format="dimension" />
         <attr name="type" format="enum">

@@ -53,22 +53,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/main_currentlocation"
                 android:layout_width="96dp"
                 android:layout_height="30dp"
-                android:layout_gravity="center_horizontal|clip_vertical"
                 android:layout_marginLeft="30dp"
                 android:layout_weight="1"
-                android:autoSizeMinTextSize="5sp"
-                android:autoSizeTextType="uniform"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:text="@string/main_defaultlocation"
                 android:textAlignment="center"
                 android:textAllCaps="true"
                 android:textSize="18sp"
-                tools:text="living room and living room and living room and living room and living" />
+                app:autoSizeTextType="uniform"/>
 
             <ImageView
                 android:id="@+id/main_selectroom"
@@ -80,23 +77,25 @@
 
 
     </FrameLayout>
-    
 
-    <LinearLayout
+
+    <FrameLayout
+        android:id="@+id/iamhere_wrapper"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:padding="0dp"
         android:layout_gravity="center_horizontal|bottom"
-        android:id="@+id/iamhere_wrapper"
-        >
-        
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:visibility="gone">
+
         <Button
             android:id="@+id/iamhere_button"
-            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:text="I am here!"/>
-            
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:background="@color/prussian_blue"
+            android:text="I am here!" />
+
+    </FrameLayout>
 
 </android.support.wear.widget.BoxInsetLayout>
 
