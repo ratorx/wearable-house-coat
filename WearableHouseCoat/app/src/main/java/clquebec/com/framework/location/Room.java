@@ -29,6 +29,7 @@ import clquebec.com.implementations.controllable.IFTTTLight;
 public class Room extends Place {
     private String mName;
     private Context mContext;
+    private List<ControllableDevice> mDevices;
     private final Set<Person> mPeople = new HashSet<>();
     private List<ControllableDevice> mDevices;
 
@@ -58,6 +59,42 @@ public class Room extends Place {
             }
         }
 
+    }
+
+    public Room(Context context, JSONObject roomData) throws JSONException{
+        super(UUID.randomUUID());
+
+        mContext = context;
+        mName = roomData.getString("name");
+        //Only use LSB - for now
+        mUUID = new UUID(0L, roomData.getLong("uid"));
+
+        //Instantiate devices
+        mDevices = new ArrayList<>();
+        JSONArray deviceList = roomData.getJSONArray("devices");
+        for(int i = 0; i < deviceList.length(); i++){
+            JSONObject deviceData = deviceList.getJSONObject(i);
+            //Load in device dynamically - Java reflection!
+            try {
+                Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("name"));
+                Method getInstance = deviceClass.getMethod("getDeviceInstance", Context.class, JSONObject.class);
+                ControllableDevice device = (ControllableDevice) getInstance.invoke(null, mContext, deviceData);
+
+                mDevices.add(device);
+            }catch(ClassNotFoundException e){
+                Log.e("Room", "Failed to create device "+deviceData.getString("name"));
+            }catch(IllegalAccessException e) {
+                Log.e("Room", "Do not have permissions to instantiate device " + deviceData.getString("name"));
+            }catch(ClassCastException | NoSuchMethodException | InvocationTargetException e){
+                Log.e("Room", "Class is not a controllable device "+deviceData.getString("name"));
+            }
+        }
+
+        //TODO: Read this from somewhere - do we really need this??
+        UUID personId = UUID.randomUUID();
+        Person myPerson = new Person(personId);
+
+        mPeople.add(myPerson);
     }
 
     public Room(Context context, String name) {
