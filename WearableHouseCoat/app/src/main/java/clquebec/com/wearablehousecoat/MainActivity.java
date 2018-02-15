@@ -26,7 +26,6 @@ import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
-import clquebec.com.wearablehousecoat.components.AutoResizeTextView;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 import android.support.v4.widget.TextViewCompat;
@@ -60,7 +59,6 @@ public class MainActivity extends WearableActivity{
         mBuilding.addRoom(new Room(this, "Kitchen"));
         mBuilding.addRoom(new Room(this, "Living Room"));
         mBuilding.addRoom(new Room(this, "Dungeon"));
-        mBuilding.addRoom(new Room(this, "Darth Plagueis The Wise?"));
 
         //END SECTION
 
