@@ -53,20 +53,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <clquebec.com.wearablehousecoat.components.AutoResizeTextView
+            <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/main_currentlocation"
                 android:layout_width="96dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="30dp"
                 android:layout_weight="1"
-                android:autoSizeMinTextSize="5sp"
-                android:autoSizeTextType="uniform"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:text="@string/main_defaultlocation"
                 android:textAlignment="center"
                 android:textAllCaps="true"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:autoSizeTextType="uniform"/>
 
             <ImageView
                 android:id="@+id/main_selectroom"

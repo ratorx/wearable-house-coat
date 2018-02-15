@@ -30,6 +30,9 @@ import clquebec.com.wearablehousecoat.components.AutoResizeTextView;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 import android.support.v4.widget.TextViewCompat;
+import android.support.v7.app.AppCompatActivity;
+
+import org.w3c.dom.Text;
 
 
 public class MainActivity extends WearableActivity{
@@ -37,7 +40,7 @@ public class MainActivity extends WearableActivity{
 
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
-    private AutoResizeTextView mLocationNameView;
+    private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
     private LocationGetter mLocationProvider;
@@ -57,6 +60,7 @@ public class MainActivity extends WearableActivity{
         mBuilding.addRoom(new Room(this, "Kitchen"));
         mBuilding.addRoom(new Room(this, "Living Room"));
         mBuilding.addRoom(new Room(this, "Dungeon"));
+        mBuilding.addRoom(new Room(this, "Darth Plagueis The Wise?"));
 
         //END SECTION
 
@@ -77,6 +81,7 @@ public class MainActivity extends WearableActivity{
 
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //Initialise location provider
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
@@ -142,7 +147,6 @@ public class MainActivity extends WearableActivity{
         //Update the location text. This needs to be converted to upper case because of a bug
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
-        mLocationNameView.resizeText();
 
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
