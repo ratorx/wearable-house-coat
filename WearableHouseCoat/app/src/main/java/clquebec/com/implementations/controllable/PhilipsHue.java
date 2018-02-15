@@ -2,7 +2,10 @@ package clquebec.com.implementations.controllable;
 
 import android.content.Context;
 
+import org.json.JSONObject;
+
 import clquebec.com.framework.controllable.ActionNotSupported;
+import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 
@@ -66,5 +69,10 @@ public class PhilipsHue implements ControllableLightDevice {
     @Override
     public boolean extendedAction() {
         return false;
+    }
+
+    @Override
+    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
+        return null;
     }
 }
