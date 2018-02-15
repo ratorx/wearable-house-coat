@@ -57,23 +57,11 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
 
-    private Handler mLocationUpdateHandler = new Handler();
-    private Runnable mLocationUpdater = new Runnable() {
-        @Override
-        public void run() {
-            forceLocationRefresh();
-            update();
-            mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-        }
-    };
-
     public FINDLocationProvider(Context c, Person p){
         mQueue = Volley.newRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
         mPerson = p;
-
-        mLocationUpdateHandler.post(mLocationUpdater);
     }
 
     @Nullable

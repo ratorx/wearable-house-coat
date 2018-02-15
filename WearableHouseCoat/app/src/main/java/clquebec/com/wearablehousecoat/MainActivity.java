@@ -1,8 +1,14 @@
 package clquebec.com.wearablehousecoat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
@@ -30,6 +36,7 @@ import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity{
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
+    public static final int POLLDELAYMILLIS = 5000;
 
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
@@ -37,6 +44,7 @@ public class MainActivity extends WearableActivity{
     private BoxInsetLayout mContainerView;
     private LinearLayout mIAmHereWrapper;
     private FINDLocationProvider mLocationProvider;
+    private Handler mLocationUpdateHandler = new Handler();
     private View mChangeLocationView;
 
     private Building mBuilding;
@@ -47,6 +55,7 @@ public class MainActivity extends WearableActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("MainActivity", "This should be printed right?");
         //SECTION: Initialize Building
         //TODO: Read in from somewhere (e.g web)
 
@@ -110,6 +119,18 @@ public class MainActivity extends WearableActivity{
             MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
         //END SECTION
+
+        // Set up location update
+
+            Log.d("LocationUpdater", "Using timer");
+            mLocationUpdateHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mLocationProvider.forceLocationRefresh();
+                    mLocationProvider.update();
+                    mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+                }
+            });
 
         // Enables Always-on
         setAmbientEnabled();
