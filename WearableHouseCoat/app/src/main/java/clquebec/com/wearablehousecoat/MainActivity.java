@@ -83,14 +83,9 @@ public class MainActivity extends WearableActivity{
             }
         );
 
-        //END SECTION
-
         // Need to add timer on location change.
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
-
-        // Enables Always-on
-        setAmbientEnabled();
 
         //SECTION: Allow user to change location
         mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
@@ -105,7 +100,6 @@ public class MainActivity extends WearableActivity{
             intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
             MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
-        //END SECTION
 
         // Enables Always-on
         setAmbientEnabled();
