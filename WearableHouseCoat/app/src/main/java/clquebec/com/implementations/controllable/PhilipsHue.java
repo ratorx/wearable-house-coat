@@ -70,4 +70,9 @@ public class PhilipsHue implements ControllableLightDevice {
     public boolean extendedAction() {
         return false;
     }
+
+    @Override
+    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
+        return null;
+    }
 }
