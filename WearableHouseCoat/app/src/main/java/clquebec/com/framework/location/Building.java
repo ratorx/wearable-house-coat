@@ -7,6 +7,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
@@ -56,6 +60,17 @@ public class Building extends Place {
     @Override
     public ControllableDeviceType getType() {
         return null;
+    }
+
+    @Override
+    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
+        try{
+            String name = config.getString("name");
+            return new Building(context, name);
+        }catch(JSONException e){
+            Log.e("Building", "JSON does not have required 'name'");
+            return new Building(context, "My Building");
+        }
     }
 
     @Override
