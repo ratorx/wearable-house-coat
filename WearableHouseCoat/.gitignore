@@ -32,5 +32,9 @@ Thumbs.db
 /.idea/libraries
 .DS_Store
 /build
+app/build
 /captures
 .externalNativeBuild
+
+# Key file
+app/src/main/java/clquebec/com/environment/
