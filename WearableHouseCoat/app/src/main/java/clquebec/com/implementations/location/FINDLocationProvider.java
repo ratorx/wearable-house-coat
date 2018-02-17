@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.LocationCalibrator;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.LocationChangeListener;
@@ -39,7 +40,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 08/02/18
  */
 
-public class FINDLocationProvider implements LocationGetter, LocationCalibrator, LocationUpdater {
+public class FINDLocationProvider implements IndoorLocationProvider {
     public static final String GROUPID = "LULLINGLABRADOODLE";
     public static final String SERVERURL = "http://shell.srcf.net:8003/";
     public static final int POLLDELAYMILLIS = 5000;
@@ -126,7 +127,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
     private void getFingerprint(FingerprintCallback callback){
         WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        if(!wifiManager.isWifiEnabled()) {
+        if(!wifiManager.isWifiEnabled()) { // TODO: Deal with potential NullPointerException
             //Forcefully enable wifi
             wifiManager.setWifiEnabled(true);
         }

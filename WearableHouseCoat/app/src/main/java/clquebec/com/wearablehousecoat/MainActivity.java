@@ -1,12 +1,7 @@
 package clquebec.com.wearablehousecoat;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.TextViewCompat;
@@ -14,6 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -25,27 +21,28 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import clquebec.com.framework.location.Building;
+import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
-import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
-public class MainActivity extends WearableActivity{
+public class MainActivity extends WearableActivity {
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
-    public static final int POLLDELAYMILLIS = 5000;
+    private final static int POLLDELAYMILLIS = 5000;
 
     private RecyclerView mToggleButtons;
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
-    private LocationGetter mLocationProvider;
+    private IndoorLocationProvider mLocationProvider;
     private View mChangeLocationView;
+    private final Handler mLocationUpdateHandler = new Handler();
 
     private Building mBuilding;
-    private Room mCurrentDisplayedRoom;
+    private Place mCurrentDisplayedRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +72,7 @@ public class MainActivity extends WearableActivity{
         mCurrentDisplayedRoom = room;
 
         //Attach the adapter which automatically fills with controls for current Place
-        mToggleAdapter = new DeviceTogglesAdapter(mCurrentShowingPlace);
+        mToggleAdapter = new DeviceTogglesAdapter(mCurrentDisplayedRoom);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
         //END SECTION
 
@@ -86,10 +83,10 @@ public class MainActivity extends WearableActivity{
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                if( user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)){ //If the user is me
-                    setRoom(room, false);
+                    if (user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)) { //If the user is me
+                        setRoom(room, false);
+                    }
                 }
-            }
         );
 
         //END SECTION
@@ -111,15 +108,15 @@ public class MainActivity extends WearableActivity{
 
         // Set up location update
 
-            Log.d("LocationUpdater", "Using timer");
-            mLocationUpdateHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mLocationProvider.forceLocationRefresh();
-                    mLocationProvider.update();
-                    mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-                }
-            });
+        Log.d("LocationUpdater", "Using timer");
+        mLocationUpdateHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mLocationProvider.forceLocationRefresh();
+                mLocationProvider.update();
+                mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+            }
+        });
 
         // Enables Always-on
         setAmbientEnabled();
@@ -127,10 +124,10 @@ public class MainActivity extends WearableActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == ROOM_CHANGE_REQUEST){
+        if (requestCode == ROOM_CHANGE_REQUEST) {
             //If a result was given, get the Room name, and call setRoom with the Room.
-            if(resultCode == RESULT_OK){
-                if(data != null && data.getExtras() != null){
+            if (resultCode == RESULT_OK) {
+                if (data != null && data.getExtras() != null) {
                     String name = data.getExtras().getString(RoomSelectionActivity.INTENT_ROOM_NAME);
 
                     //Get first Room with that name in our building
@@ -143,11 +140,11 @@ public class MainActivity extends WearableActivity{
         }
     }
 
-    public void setRoom(Place room){
+    public void setRoom(Place room) {
         setRoom(room, true);
     }
-    
-    public void setRoom(Room room, boolean showIAmHere){
+
+    public void setRoom(Place room, boolean showIAmHere) {
         //Update the location text. This needs to be converted to upper case because of a bug
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
@@ -155,9 +152,9 @@ public class MainActivity extends WearableActivity{
         mCurrentDisplayedRoom = room;
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
-    
+
         // Show the "I am here" button for 4 seconds
-        if(showIAmHere) {
+        if (showIAmHere) {
             mIAmHereWrapper.setVisibility(View.VISIBLE);
             Timer mHereTimer = new Timer();
             mHereTimer.schedule(new TimerTask() {
