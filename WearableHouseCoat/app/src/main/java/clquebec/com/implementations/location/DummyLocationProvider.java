@@ -23,7 +23,7 @@ public class DummyLocationProvider implements LocationGetter {
     private Map<Person, Place> mLocationMap;
     private LocationChangeListener mListener;
 
-    public DummyLocationProvider(Context context){
+    public DummyLocationProvider(Context context) {
         mLocationMap = new HashMap<>();
         mLocationMap.put(new Person(UUID.randomUUID()), new Room(context, "Test Room"));
     }
@@ -39,7 +39,7 @@ public class DummyLocationProvider implements LocationGetter {
         mListener = listener;
 
         //Call once for every user
-        if(listener != null) {
+        if (listener != null) {
             for (Person p : mLocationMap.keySet()) {
                 listener.onLocationChanged(p, null, mLocationMap.get(p));
             }

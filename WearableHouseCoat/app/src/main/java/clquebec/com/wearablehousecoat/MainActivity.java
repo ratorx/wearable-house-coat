@@ -25,7 +25,7 @@ import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
-public class MainActivity extends WearableActivity{
+public class MainActivity extends WearableActivity {
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
 
     private RecyclerView mToggleButtons;
@@ -77,10 +77,10 @@ public class MainActivity extends WearableActivity{
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                if( user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)){ //If the user is me
-                    setRoom(room, false);
+                    if (user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)) { //If the user is me
+                        setRoom(room, false);
+                    }
                 }
-            }
         );
 
         //END SECTION
@@ -106,10 +106,10 @@ public class MainActivity extends WearableActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == ROOM_CHANGE_REQUEST){
+        if (requestCode == ROOM_CHANGE_REQUEST) {
             //If a result was given, get the Room name, and call setRoom with the Room.
-            if(resultCode == RESULT_OK){
-                if(data != null && data.getExtras() != null){
+            if (resultCode == RESULT_OK) {
+                if (data != null && data.getExtras() != null) {
                     String name = data.getExtras().getString(RoomSelectionActivity.INTENT_ROOM_NAME);
 
                     //Get first Room with that name in our building
@@ -122,11 +122,11 @@ public class MainActivity extends WearableActivity{
         }
     }
 
-    public void setRoom(Room room){
+    public void setRoom(Room room) {
         setRoom(room, true);
     }
-    
-    public void setRoom(Room room, boolean showIAmHere){
+
+    public void setRoom(Room room, boolean showIAmHere) {
         //Update the location text. This needs to be converted to upper case because of a bug
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
@@ -134,9 +134,9 @@ public class MainActivity extends WearableActivity{
         mCurrentDisplayedRoom = room;
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
-    
+
         // Show the "I am here" button for 4 seconds
-        if(showIAmHere) {
+        if (showIAmHere) {
             mIAmHereWrapper.setVisibility(View.VISIBLE);
             Timer mHereTimer = new Timer();
             mHereTimer.schedule(new TimerTask() {

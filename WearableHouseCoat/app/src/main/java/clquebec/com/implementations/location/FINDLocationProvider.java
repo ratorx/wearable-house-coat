@@ -48,7 +48,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private LocationChangeListener mListener;
     private RequestQueue mQueue; //For making HTTP requests
 
-    private interface FingerprintCallback{
+    private interface FingerprintCallback {
         void onFingerprint(JSONArray fingerprint);
     }
 
@@ -65,7 +65,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         }
     };
 
-    public FINDLocationProvider(Context c, Person p){
+    public FINDLocationProvider(Context c, Person p) {
         mQueue = Volley.newRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
@@ -84,8 +84,8 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
         mListener = listener;
 
-        if(listener != null){
-            for(Person p : mLocationMap.keySet()){
+        if (listener != null) {
+            for (Person p : mLocationMap.keySet()) {
                 listener.onLocationChanged(p, null, mLocationMap.get(p));
             }
         }
@@ -93,7 +93,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
     @Override
     public void forceLocationRefresh() {
-        String url = SERVERURL+"location?group="+GROUPID;
+        String url = SERVERURL + "location?group=" + GROUPID;
 
         JsonObjectRequest locationRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
@@ -104,7 +104,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                         //Iterate over response
                         JSONObject users = response.getJSONObject("users");
                         Iterator<String> keys = users.keys();
-                        while(keys.hasNext()){
+                        while (keys.hasNext()) {
                             String user = keys.next();
 
                             //Get data
@@ -113,8 +113,8 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                             Place location = new Room(mContext, userData.getJSONObject(0).getString("location"));
 
                             //Notify change
-                            if(mListener != null){
-                                if(!mLocationMap.containsKey(person) || !mLocationMap.get(person).equals(location)) {
+                            if (mListener != null) {
+                                if (!mLocationMap.containsKey(person) || !mLocationMap.get(person).equals(location)) {
                                     mListener.onLocationChanged(
                                             person,
                                             mLocationMap.getOrDefault(person, null),
@@ -126,19 +126,19 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                             //Update internal structure
                             mLocationMap.put(person, location);
                         }
-                    }catch(JSONException e){
+                    } catch (JSONException e) {
                         Log.e("FIND", "Cannot extract JSON");
                     }
                 },
-                error -> Log.e("FIND", "Failed to get locations, "+ error.getMessage())
+                error -> Log.e("FIND", "Failed to get locations, " + error.getMessage())
         );
 
         mQueue.add(locationRequest);
     }
 
-    private void getFingerprint(FingerprintCallback callback){
+    private void getFingerprint(FingerprintCallback callback) {
         WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        if(!wifiManager.isWifiEnabled()) {
+        if (!wifiManager.isWifiEnabled()) {
             //Forcefully enable wifi
             wifiManager.setWifiEnabled(true);
         }
@@ -146,7 +146,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         mContext.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context c, Intent intent) {
-                if(intent.getExtras() != null && intent.getExtras().getBoolean(WifiManager.EXTRA_RESULTS_UPDATED)){
+                if (intent.getExtras() != null && intent.getExtras().getBoolean(WifiManager.EXTRA_RESULTS_UPDATED)) {
                     List<ScanResult> results = wifiManager.getScanResults();
 
                     //Generate fingerprint JSONArray
@@ -176,7 +176,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     @Override
     public boolean update() {
         getFingerprint(fingerprint -> {
-            String url = SERVERURL+"track";
+            String url = SERVERURL + "track";
 
             JSONObject jsonObject = new JSONObject();
             try {
@@ -185,8 +185,8 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                 //jsonObject.put("location", getCurrentLocation(mPerson));
                 jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
                 jsonObject.put("wifi-fingerprint", fingerprint);
-            }catch(JSONException e){
-                Log.e("FIND", "Could not generate update request, "+e.getMessage());
+            } catch (JSONException e) {
+                Log.e("FIND", "Could not generate update request, " + e.getMessage());
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -201,7 +201,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     @Override
     public boolean calibrate(Room room) {
         getFingerprint(fingerprint -> {
-            String url = SERVERURL+"learn";
+            String url = SERVERURL + "learn";
 
             JSONObject jsonObject = new JSONObject();
             try {
@@ -210,8 +210,8 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                 jsonObject.put("location", room.getName());
                 jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
                 jsonObject.put("wifi-fingerprint", fingerprint);
-            }catch(JSONException e){
-                Log.e("FIND", "Could not generate update request, "+e.getMessage());
+            } catch (JSONException e) {
+                Log.e("FIND", "Could not generate update request, " + e.getMessage());
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -237,7 +237,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
     @Override
     public boolean reset() {
-        String url = SERVERURL+"database?group="+GROUPID;
+        String url = SERVERURL + "database?group=" + GROUPID;
         StringRequest newRequest = new StringRequest(Request.Method.DELETE, url,
                 response -> Log.d("FIND", "Deleted group"),
                 error -> Log.e("FIND", error.getMessage())

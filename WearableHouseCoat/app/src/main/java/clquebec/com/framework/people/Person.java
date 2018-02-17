@@ -19,32 +19,33 @@ public class Person {
     private Place mLocation;
     private LocationChangeListener mListener;
 
-    public Person(UUID id){
+    public Person(UUID id) {
         //TODO: Read information in from somewhere.
         mUUID = id;
         mName = "Test Person";
     }
 
-    public Person(String name){
+    public Person(String name) {
         //TODO: Read information in from somewhere.
         mUUID = UUID.randomUUID();
         mName = name;
     }
 
-    public String getName(){
+    public String getName() {
         return mName;
     }
 
-    public boolean equals(Object other){
+    public boolean equals(Object other) {
         return other instanceof Person && ((Person) other).getName().equals(this.getName());
     }
 
-    public @Nullable Place getLocation(){
+    public @Nullable
+    Place getLocation() {
         return mLocation;
     }
 
-    public void setLocation(Place newLocation){
-        if(mLocation == null || !mLocation.equals(newLocation)) {
+    public void setLocation(Place newLocation) {
+        if (mLocation == null || !mLocation.equals(newLocation)) {
             if (mListener != null) {
                 mListener.onLocationChanged(this, mLocation, newLocation);
                 mLocation = newLocation;
@@ -52,7 +53,7 @@ public class Person {
         }
     }
 
-    public void setLocationListener(LocationChangeListener listener){
+    public void setLocationListener(LocationChangeListener listener) {
         mListener = listener;
     }
 }

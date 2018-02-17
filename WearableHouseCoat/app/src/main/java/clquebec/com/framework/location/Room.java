@@ -24,7 +24,7 @@ public class Room extends Place {
     private UUID mUUID;
     private Context mContext;
 
-    public Room(Context context, String name){
+    public Room(Context context, String name) {
         mName = name;
         mUUID = UUID.randomUUID();
         mContext = context;

@@ -21,7 +21,7 @@ public class RoomSelectionActivity extends WearableActivity {
         ListView mListView = findViewById(R.id.room_listview);
 
         //Get rooms from Intent
-        if(getIntent().getExtras() == null) {
+        if (getIntent().getExtras() == null) {
             throw new IllegalArgumentException("Provide a list of rooms");
         }
 

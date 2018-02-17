@@ -29,40 +29,40 @@ public class IFTTT {
 
     private static IFTTT mInstance = null;
 
-    private IFTTT(Context context){
+    private IFTTT(Context context) {
         mQueue = Volley.newRequestQueue(context);
 
         //TODO: Replace makerkey with a user-provided one
         mMakerKey = Keys.IFTTT;
     }
 
-    public static IFTTT getInstance(Context context){
-        if(mInstance == null){
+    public static IFTTT getInstance(Context context) {
+        if (mInstance == null) {
             mInstance = new IFTTT(context);
         }
 
         return mInstance;
     }
 
-    public void webhook(String event){
+    public void webhook(String event) {
         webhook(event, new ArrayList<>());
     }
 
-    public void webhook(String event, final List<String> values){
+    public void webhook(String event, final List<String> values) {
         //Takes the first 3 values and sends them
 
-        if(mMakerKey == null || event == null) return;
+        if (mMakerKey == null || event == null) return;
 
-        String url = "https://maker.ifttt.com/trigger/"+event+"/with/key/"+mMakerKey;
+        String url = "https://maker.ifttt.com/trigger/" + event + "/with/key/" + mMakerKey;
 
         final JSONObject json = new JSONObject();
-        if(values != null && values.size() > 0) {
+        if (values != null && values.size() > 0) {
             //Collect values into JSON
-            for(int i = 0; i < values.size(); i++){
+            for (int i = 0; i < values.size(); i++) {
                 try {
                     json.put("values" + (i + 1), values.get(i));
-                }catch(JSONException e){
-                    Log.d("IFTTT", "JSONException on value"+(i+1));
+                } catch (JSONException e) {
+                    Log.d("IFTTT", "JSONException on value" + (i + 1));
                 }
             }
         }
@@ -70,13 +70,13 @@ public class IFTTT {
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
                     // response
-                    Log.d("IFTTT", "Response: "+response);
+                    Log.d("IFTTT", "Response: " + response);
                 },
                 error -> {
                     // error
-                    Log.d("IFTTT", "IFTTT Error: "+error.getMessage());
+                    Log.d("IFTTT", "IFTTT Error: " + error.getMessage());
                 }
-        ){
+        ) {
             @Override
             public byte[] getBody() throws AuthFailureError {
                 return json.toString().getBytes();

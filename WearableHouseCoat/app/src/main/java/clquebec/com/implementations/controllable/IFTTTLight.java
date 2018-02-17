@@ -29,7 +29,7 @@ public class IFTTTLight implements ControllableLightDevice {
     private IFTTT mIFTTT;
     private Context mContext;
 
-    public IFTTTLight(Context context, Place location){
+    public IFTTTLight(Context context, Place location) {
         mLocation = location;
         mCurrentState = false; //Is there a good way to get this?
         mContext = context;
@@ -40,25 +40,25 @@ public class IFTTTLight implements ControllableLightDevice {
 
     @Override
     public void setLightColor(int color) throws ActionNotSupported {
-        if(mName != null && mCurrentState){
+        if (mName != null && mCurrentState) {
             List<String> params = new ArrayList<>();
             params.add(mName);
             params.add(mLocation.getName());
-            params.add("#"+Integer.toHexString(color));
+            params.add("#" + Integer.toHexString(color));
 
-            mIFTTT.webhook(EVENT_PREFIX+"color", params);
+            mIFTTT.webhook(EVENT_PREFIX + "color", params);
         }
     }
 
     @Override
     public boolean enable() {
-        if(mName != null && !mCurrentState) {
+        if (mName != null && !mCurrentState) {
             mCurrentState = true;
 
             List<String> params = new ArrayList<>();
             params.add(mName);
             params.add(mLocation.getName());
-            mIFTTT.webhook(EVENT_PREFIX+"on", params);
+            mIFTTT.webhook(EVENT_PREFIX + "on", params);
 
             return true;
         }
@@ -68,14 +68,14 @@ public class IFTTTLight implements ControllableLightDevice {
 
     @Override
     public boolean disable() {
-        if(mName != null && mCurrentState){
+        if (mName != null && mCurrentState) {
             mCurrentState = false;
 
             List<String> params = new ArrayList<>();
             params.add(mName);
             params.add(mLocation.getName());
 
-            mIFTTT.webhook(EVENT_PREFIX+"off", params);
+            mIFTTT.webhook(EVENT_PREFIX + "off", params);
 
             return true;
         }

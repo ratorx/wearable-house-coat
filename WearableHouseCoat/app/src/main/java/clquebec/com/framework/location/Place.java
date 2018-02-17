@@ -14,7 +14,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 03/02/18
  */
 
-public abstract class Place implements ControllableDeviceGroup{
+public abstract class Place implements ControllableDeviceGroup {
 
     public abstract UUID getID();
 
@@ -31,7 +31,7 @@ public abstract class Place implements ControllableDeviceGroup{
     public boolean enable() {
         //Enable every device in this place. Return true if success for all.
         boolean returnValue = true;
-        for(ControllableDevice d : getDevices()){
+        for (ControllableDevice d : getDevices()) {
             returnValue = returnValue && d.enable();
         }
         return returnValue;
@@ -41,7 +41,7 @@ public abstract class Place implements ControllableDeviceGroup{
     public boolean disable() {
         //Disable every device in this place. Return true if success for all.
         boolean returnValue = true;
-        for(ControllableDevice d : getDevices()){
+        for (ControllableDevice d : getDevices()) {
             returnValue = returnValue && d.disable();
         }
         return returnValue;
@@ -53,13 +53,13 @@ public abstract class Place implements ControllableDeviceGroup{
     }
 
     @Override
-    public boolean quickAction(){
+    public boolean quickAction() {
         //Toggle all on or off
         return isEnabled() ? disable() : enable();
     }
 
     @Override
-    public boolean extendedAction(){
+    public boolean extendedAction() {
         //TODO: Implement something useful here, like displaying a list / sub-list of toggles.
         return false;
     }

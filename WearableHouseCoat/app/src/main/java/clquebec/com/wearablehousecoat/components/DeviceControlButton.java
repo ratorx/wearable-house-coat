@@ -20,7 +20,7 @@ import clquebec.com.wearablehousecoat.R;
  * WearableHouseCoat
  * Author: Tom
  * Creation Date: 03/02/18
- *
+ * <p>
  * This is the circular button that is used as a device toggle.
  * Right now, it's effectively just a custom layout for a button,
  * but in the future this class can be adapted (or extended) to include
@@ -54,7 +54,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     private float[] mCenter = {0, 0};
     private int mTextHeight;
 
-    public DeviceControlButton(Context context){
+    public DeviceControlButton(Context context) {
         super(context);
 
         init(context, null);
@@ -66,8 +66,8 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         init(context, attrs);
     }
 
-    private void init(Context context, AttributeSet attrs){
-        if(attrs != null) { //Parse attributes, if supplied
+    private void init(Context context, AttributeSet attrs) {
+        if (attrs != null) { //Parse attributes, if supplied
             //Get attribute array
             TypedArray a = context.getTheme().obtainStyledAttributes(
                     attrs,
@@ -101,11 +101,11 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         mTextPaintOff = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mTextPaintOff.setColor(mBackgroundColor);
 
-        if(mDeviceType.getIcon() != 0){
+        if (mDeviceType.getIcon() != 0) {
             mDeviceIcon = context.getDrawable(mDeviceType.getIcon());
         }
 
-        if(mDeviceType.getFadedIcon() != 0){
+        if (mDeviceType.getFadedIcon() != 0) {
             mDeviceIconOff = context.getDrawable(mDeviceType.getFadedIcon());
         }
 
@@ -118,18 +118,18 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     }
 
     @Override
-    public void onDraw(Canvas canvas){
+    public void onDraw(Canvas canvas) {
         /* Draw a circle, with an icon on top. */
-        if(mDevice == null || mDevice.isEnabled()) {
+        if (mDevice == null || mDevice.isEnabled()) {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
-            if(mDevice != null){
-                canvas.drawText(mDevice.getName(), mPadding*4, mCenter[1] + mTextHeight/2, mTextPaint);
+            if (mDevice != null) {
+                canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaint);
             }
-        }else{
+        } else {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaintOff);
-            canvas.drawText(mDevice.getName(), mPadding*4, mCenter[1] + mTextHeight/2, mTextPaintOff);
+            canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaintOff);
         }
-        if(mDeviceIcon != null) {
+        if (mDeviceIcon != null) {
             mDeviceIcon.draw(canvas);
         }
     }
@@ -143,16 +143,16 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
 
-        if(height != 0) {
+        if (height != 0) {
             mSize = width > height ? height : width;
-        }else{
+        } else {
             mSize = width;
         }
 
-        if(mSize == 0){
-            if(getParent() != null){
-                mSize = ((View) getParent()).getMeasuredWidth()/3; //Automatically set to 1/3rd size
-            }else{
+        if (mSize == 0) {
+            if (getParent() != null) {
+                mSize = ((View) getParent()).getMeasuredWidth() / 3; //Automatically set to 1/3rd size
+            } else {
                 mSize = DEFAULT_SIZE; //If all else fails.
             }
         }
@@ -162,28 +162,29 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         measure();
     }
 
-    public void setSize(int size){
+    public void setSize(int size) {
         mSize = size;
         measure();
     }
 
-    private void measure(){
+    private void measure() {
         //Calculate things for painting
         //Called on both onMeasure and setSize();
-        float half = mSize/2.0f;
-        mCenter[0] = half; mCenter[1] = half;
+        float half = mSize / 2.0f;
+        mCenter[0] = half;
+        mCenter[1] = half;
         mRadius = half - mPadding;
 
         //Fit icon into available space
-        final float imageAvailableSize = (mSize - mPadding*4)/2; //Padding on both sides
+        final float imageAvailableSize = (mSize - mPadding * 4) / 2; //Padding on both sides
 
-        if(mDeviceIcon != null) {
+        if (mDeviceIcon != null) {
             //Calculate icon dimensions
             //Casting to int at last moment to try and reduce rounding errors..
 
             final float diagonalLength = (float) Math.sqrt(
-                    mDeviceIcon.getIntrinsicWidth()*mDeviceIcon.getIntrinsicWidth()
-                    + mDeviceIcon.getIntrinsicHeight()*mDeviceIcon.getIntrinsicHeight()
+                    mDeviceIcon.getIntrinsicWidth() * mDeviceIcon.getIntrinsicWidth()
+                            + mDeviceIcon.getIntrinsicHeight() * mDeviceIcon.getIntrinsicHeight()
             );
             final float scale = imageAvailableSize / diagonalLength;
 
@@ -192,13 +193,13 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
             final float paddingX = (mSize - imageWidth) / 2;
 
             mDeviceIcon.setBounds((int) paddingX, (int) mPadding, (int) (imageWidth + paddingX), (int) (imageHeight + mPadding));
-            if(mDeviceIconOff != null) {
+            if (mDeviceIconOff != null) {
                 mDeviceIconOff.setBounds((int) paddingX, (int) mPadding, (int) (imageWidth + paddingX), (int) (imageHeight + mPadding));
             }
 
             //Calculate text dimensions
             float textWidth = mTextPaint.measureText(mDevice.getName());
-            float newTextSize = ((mSize - mPadding*8) / textWidth)*mTextPaint.getTextSize();
+            float newTextSize = ((mSize - mPadding * 8) / textWidth) * mTextPaint.getTextSize();
             mTextPaint.setTextSize(newTextSize);
             mTextPaintOff.setTextSize(newTextSize);
 
@@ -208,12 +209,12 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         }
     }
 
-    public void attachDevice(ControllableDevice device){
+    public void attachDevice(ControllableDevice device) {
         mDevice = device;
 
         //Set the correct icon
         mDeviceType = mDevice.getType();
-        if(mDeviceType.getIcon() != 0) {
+        if (mDeviceType.getIcon() != 0) {
             mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
             mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
         }
@@ -229,7 +230,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public void onClick(View view) {
         //Call quickAction in the attached device
-        if(mDevice != null) {
+        if (mDevice != null) {
             mDevice.quickAction();
         }
     }
@@ -237,7 +238,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public boolean onLongClick(View view) {
         //Call extendedAction in the attached device
-        if(mDevice != null){
+        if (mDevice != null) {
             mDevice.extendedAction();
             return true;
         }

@@ -25,34 +25,34 @@ public class DeviceTogglesAdapter extends RecyclerView.Adapter<DeviceTogglesAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if(mDeviceGroup != null) {
+        if (mDeviceGroup != null) {
             holder.attachDevice(mDeviceGroup.getDevices().get(position));
         }
     }
 
     @Override
     public int getItemCount() {
-        if(mDeviceGroup != null) {
+        if (mDeviceGroup != null) {
             return mDeviceGroup.getDevices().size();
-        }else{
+        } else {
             return 0;
         }
     }
 
-    public DeviceTogglesAdapter(ControllableDeviceGroup group){
+    public DeviceTogglesAdapter(ControllableDeviceGroup group) {
         mDeviceGroup = group;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private DeviceControlButton mButton;
 
-        ViewHolder(View toggle){
+        ViewHolder(View toggle) {
             super(toggle);
 
             mButton = (DeviceControlButton) toggle;
         }
 
-        public void attachDevice(ControllableDevice d){
+        public void attachDevice(ControllableDevice d) {
             mButton.attachDevice(d);
         }
 

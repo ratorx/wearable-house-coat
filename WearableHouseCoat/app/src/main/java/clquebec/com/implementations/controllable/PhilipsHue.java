@@ -15,7 +15,7 @@ import clquebec.com.framework.controllable.ControllableLightDevice;
 public class PhilipsHue implements ControllableLightDevice {
     //TODO: Implement this.
 
-    public PhilipsHue(Context c){
+    public PhilipsHue(Context c) {
         //Scan for Hues on local network
 
         //Pick the right one(s)

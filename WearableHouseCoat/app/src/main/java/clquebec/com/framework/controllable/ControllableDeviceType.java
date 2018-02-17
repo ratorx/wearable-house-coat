@@ -15,11 +15,11 @@ public enum ControllableDeviceType {
     //As in, be the same order
     LIGHT, SOUND, THERMOSTAT, CURTAINS, OVEN, TOILET;
 
-    public static ControllableDeviceType getType(int typeNumber){
+    public static ControllableDeviceType getType(int typeNumber) {
         return ControllableDeviceType.values()[typeNumber];
     }
 
-    public int getIcon(){
+    public int getIcon() {
         //Maps from ControllableDeviceType to drawable resources
         switch (this) {
             case LIGHT:
@@ -39,9 +39,9 @@ public enum ControllableDeviceType {
                 return 0;
         }
     }
-    
-    public int getFadedIcon(){
-        switch(this){
+
+    public int getFadedIcon() {
+        switch (this) {
             case LIGHT:
                 return R.drawable.ic_lightbulb_fade;
             case SOUND:
@@ -57,7 +57,7 @@ public enum ControllableDeviceType {
                 return 0;
             default:
                 return 0;
-        
+
         }
     }
 
@@ -77,7 +77,7 @@ public enum ControllableDeviceType {
             case CURTAINS:
                 return r.getString(R.string.curtains);
             case TOILET:
-                return r.getString(R.string.toilet); 
+                return r.getString(R.string.toilet);
             default:
                 return "";
         }

@@ -11,7 +11,8 @@ import clquebec.com.framework.people.Person;
  */
 
 public interface LocationGetter {
-    @Nullable Place getCurrentLocation(Person p);
+    @Nullable
+    Place getCurrentLocation(Person p);
 
     void setLocationChangeListener(@Nullable LocationChangeListener listener);
 

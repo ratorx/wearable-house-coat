@@ -8,6 +8,8 @@ package clquebec.com.framework.controllable;
 
 public interface ControllableCurtainDevice extends ControllableDevice {
     void open();
+
     void close();
+
     void openFraction(float fraction) throws ActionNotSupported;
 }
