@@ -1,7 +1,5 @@
 package clquebec.com.framework.location;
 
-import java.util.function.Function;
-
 import clquebec.com.framework.people.Person;
 
 /**

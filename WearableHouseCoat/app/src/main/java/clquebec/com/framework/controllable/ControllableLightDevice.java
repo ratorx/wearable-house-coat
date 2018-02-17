@@ -1,6 +1,5 @@
 package clquebec.com.framework.controllable;
 
-import android.graphics.Color;
 
 /**
  * WearableHouseCoat

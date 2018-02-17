@@ -7,11 +7,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatButton;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
@@ -28,7 +27,7 @@ import clquebec.com.wearablehousecoat.R;
  * logging and calls to our preference learner.
  */
 
-public class DeviceControlButton extends Button implements View.OnClickListener, View.OnLongClickListener {
+public class DeviceControlButton extends AppCompatButton implements View.OnClickListener, View.OnLongClickListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84); //Prussian Blue
     private static final float DEFAULT_PADDING = 5;
@@ -78,7 +77,7 @@ public class DeviceControlButton extends Button implements View.OnClickListener,
 
             //Parse attributes
             try {
-                mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_background, DEFAULT_BACKGROUND);
+                mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_dcb_background, DEFAULT_BACKGROUND);
                 mBackgroundColorOff = a.getColor(R.styleable.DeviceControlButton_backgroundoff, DEFAULT_BACKGROUND_OFF);
                 mPadding = a.getDimension(R.styleable.DeviceControlButton_padding, DEFAULT_PADDING);
                 mDeviceType = ControllableDeviceType.getType(a.getInt(R.styleable.DeviceControlButton_type, 0));

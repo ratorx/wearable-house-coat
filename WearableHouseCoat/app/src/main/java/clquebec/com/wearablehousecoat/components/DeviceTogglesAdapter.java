@@ -1,14 +1,11 @@
 package clquebec.com.wearablehousecoat.components;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceGroup;
-import clquebec.com.framework.location.Place;
 
 /**
  * WearableHouseCoat

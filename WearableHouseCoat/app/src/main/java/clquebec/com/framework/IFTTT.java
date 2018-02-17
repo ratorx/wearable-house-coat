@@ -6,9 +6,6 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -16,9 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import clquebec.com.environment.Keys;
 
@@ -50,7 +45,7 @@ public class IFTTT {
     }
 
     public void webhook(String event){
-        webhook(event, new ArrayList<String>());
+        webhook(event, new ArrayList<>());
     }
 
     public void webhook(String event, final List<String> values){
@@ -73,19 +68,13 @@ public class IFTTT {
         }
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // response
-                        Log.d("IFTTT", "Response: "+response);
-                    }
+                response -> {
+                    // response
+                    Log.d("IFTTT", "Response: "+response);
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // error
-                        Log.d("IFTTT", "IFTTT Error: "+error.getMessage());
-                    }
+                error -> {
+                    // error
+                    Log.d("IFTTT", "IFTTT Error: "+error.getMessage());
                 }
         ){
             @Override

@@ -14,16 +14,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/inner_frame_layout_padding"
-        app:boxedEdges="all">
+        app:boxedEdges="all"
+        android:background="@drawable/layout_bg">
 
-        <include
-            android:id="@+id/hue_control"
-            layout="@layout/hue_control"
+        <SeekBar
+            android:id="@+id/seekBar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible">
+            android:layout_height="44dp" />
 
-        </include>
+        <ImageView
+            android:id="@+id/colourPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="35dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/circle" />
 
     </FrameLayout>
 

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import android.content.Context;
 
 import clquebec.com.framework.controllable.ControllableDevice;
-import clquebec.com.framework.controllable.ControllableDeviceGroup;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.people.Person;
 
@@ -30,7 +29,7 @@ public class Building extends Place {
         mName = name;
         mUUID = UUID.randomUUID();
         mContext = context;
-        mRooms = new HashSet<Room>();
+        mRooms = new HashSet<>();
     }
 
     public Building(Context context, String name, Set<Room> rooms) {

@@ -9,19 +9,17 @@ import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
-import android.widget.Button;
-import android.util.Log;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -42,13 +40,12 @@ public class MainActivity extends WearableActivity{
     private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
-    private LinearLayout mIAmHereWrapper;
-    private FINDLocationProvider mLocationProvider;
-    private Handler mLocationUpdateHandler = new Handler();
+    private FrameLayout mIAmHereWrapper;
+    private LocationGetter mLocationProvider;
     private View mChangeLocationView;
 
     private Building mBuilding;
-    private Place mCurrentShowingPlace;
+    private Room mCurrentDisplayedRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +70,10 @@ public class MainActivity extends WearableActivity{
         //Set grid to have width 2
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
+        //Make a dummy Room with a light switch for testing
+        Room room = new Room(this, "Test Room");
+        mCurrentDisplayedRoom = room;
+
         //Attach the adapter which automatically fills with controls for current Place
         mToggleAdapter = new DeviceTogglesAdapter(mCurrentShowingPlace);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
@@ -80,30 +81,19 @@ public class MainActivity extends WearableActivity{
 
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
-
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //Initialise location provider
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                if(user.equals(me)){ //If the user is me
-                    setRoom(newLocation, false);
+                if( user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)){ //If the user is me
+                    setRoom(room, false);
                 }
             }
         );
 
         //END SECTION
-
-        // Need to add timer on location change.
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
-        mIAmHereWrapper.setVisibility(View.GONE);
-
-        //On click, calibrate location provider
-        findViewById(R.id.iamhere_button).setOnClickListener(view -> {
-            mLocationProvider.calibrate(mCurrentShowingPlace);
-        });
-
-        // Enables Always-on
-        setAmbientEnabled();
 
         //SECTION: Allow user to change location
         mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
@@ -118,7 +108,6 @@ public class MainActivity extends WearableActivity{
             intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
             MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
-        //END SECTION
 
         // Set up location update
 
@@ -158,12 +147,12 @@ public class MainActivity extends WearableActivity{
         setRoom(room, true);
     }
     
-    public void setRoom(Place room, boolean showIAmHere){
-        mCurrentShowingPlace = room;
+    public void setRoom(Room room, boolean showIAmHere){
+        //Update the location text. This needs to be converted to upper case because of a bug
+        //in android with text upper case and resizing
+        mLocationNameView.setText(room.getName().toUpperCase());
 
-        //Update the location text
-        mLocationNameView.setText(room.getName());
-
+        mCurrentDisplayedRoom = room;
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
     
@@ -174,7 +163,6 @@ public class MainActivity extends WearableActivity{
             mHereTimer.schedule(new TimerTask() {
                 public void run() {
                     runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
-
                 }
             }, 4000);
         }

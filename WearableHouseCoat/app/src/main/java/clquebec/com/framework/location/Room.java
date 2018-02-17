@@ -12,7 +12,6 @@ import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
-import clquebec.com.implementations.controllable.PhillipsHue;
 
 /**
  * WearableHouseCoat
@@ -67,7 +66,7 @@ public class Room extends Place {
 
     @Override
     public Set<Person> getPeople() {
-        //TODO: Read this from somewhere
+        //TODO: Read this from somewhere - do we really need this??
 
         Set<Person> people = new HashSet<>();
 

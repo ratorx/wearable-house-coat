@@ -1,7 +1,6 @@
 package clquebec.com.implementations.controllable;
 
 import android.content.Context;
-import android.graphics.Color;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDeviceType;
@@ -13,10 +12,10 @@ import clquebec.com.framework.controllable.ControllableLightDevice;
  * Creation Date: 03/02/18
  */
 
-public class PhillipsHue implements ControllableLightDevice {
+public class PhilipsHue implements ControllableLightDevice {
     //TODO: Implement this.
 
-    public PhillipsHue(Context c){
+    public PhilipsHue(Context c){
         //Scan for Hues on local network
 
         //Pick the right one(s)
