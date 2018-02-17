@@ -1,4 +1,4 @@
-# Wearable House Control
+# Wearable House Control [![Build Status](https://travis-ci.org/ratorx/wearable-house-coat.svg?branch=master)](https://travis-ci.org/ratorx/wearable-house-coat)
 
 # Setting up the Project
 

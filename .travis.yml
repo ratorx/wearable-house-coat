@@ -1,4 +1,12 @@
-language: java
+language: android
+
+android:
+  components:
+    - build-tools-26.0.2
+    - android-26
+    - extra
 
 git:
   submodules: false
+
+before_install: cd WearableHouseCoat
