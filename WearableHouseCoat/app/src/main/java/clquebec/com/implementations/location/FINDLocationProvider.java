@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import clquebec.com.framework.location.LocationCalibrator;
-import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.LocationChangeListener;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.LocationUpdater;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;

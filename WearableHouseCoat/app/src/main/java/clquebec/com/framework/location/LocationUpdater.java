@@ -6,5 +6,5 @@ package clquebec.com.framework.location;
 
 public interface LocationUpdater {
     // Send current location fingerprint (+ name) to server
-    public boolean update();
+    boolean update();
 }

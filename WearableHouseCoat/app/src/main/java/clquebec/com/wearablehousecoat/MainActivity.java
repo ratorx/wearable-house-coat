@@ -19,8 +19,8 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import clquebec.com.framework.location.Building;
-import clquebec.com.framework.location.Room;
 import clquebec.com.framework.location.LocationGetter;
+import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;

@@ -5,14 +5,12 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.List;
 
 public class RoomSelectionActivity extends WearableActivity {
-    public static String INTENT_ROOMS_EXTRA = "rooms";
-    public static String INTENT_ROOM_NAME = "room";
-    private TextView mTextView;
+    public static final String INTENT_ROOMS_EXTRA = "rooms";
+    public static final String INTENT_ROOM_NAME = "room";
     private List<CharSequence> mRoomArray;
 
     @Override

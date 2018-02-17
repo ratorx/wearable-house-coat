@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.LocationChangeListener;
+import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
