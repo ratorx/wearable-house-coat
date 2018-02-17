@@ -2,13 +2,8 @@ package clquebec.com.wearablehousecoat;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.wearable.activity.WearableActivity;
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 

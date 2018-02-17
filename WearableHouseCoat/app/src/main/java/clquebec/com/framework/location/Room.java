@@ -12,7 +12,6 @@ import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
-import clquebec.com.implementations.controllable.PhillipsHue;
 
 /**
  * WearableHouseCoat

@@ -2,7 +2,6 @@ package clquebec.com.implementations.controllable;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.util.Log;
 
 import java.util.ArrayList;

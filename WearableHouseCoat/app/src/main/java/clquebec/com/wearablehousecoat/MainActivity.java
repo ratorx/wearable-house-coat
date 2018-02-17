@@ -9,14 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
 import android.view.View;
-import android.widget.Button;
-import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -27,12 +24,6 @@ import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
-
-import android.support.v4.widget.TextViewCompat;
-import android.support.v7.app.AppCompatActivity;
-
-import org.w3c.dom.Text;
-
 
 public class MainActivity extends WearableActivity{
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
