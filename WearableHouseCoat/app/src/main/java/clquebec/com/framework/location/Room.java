@@ -22,11 +22,18 @@ import clquebec.com.implementations.controllable.IFTTTLight;
 public class Room extends Place {
     private String mName;
     private Context mContext;
+    private final Set<Person> mPeople = new HashSet<>();
 
     public Room(Context context, String name) {
         super(UUID.randomUUID());
         mName = name;
         mContext = context;
+
+        //TODO: Read this from somewhere - do we really need this??
+        UUID personId = UUID.randomUUID();
+        Person myPerson = new Person(personId);
+
+        mPeople.add(myPerson);
     }
 
     @Override
@@ -65,14 +72,6 @@ public class Room extends Place {
 
     @Override
     public Set<Person> getPeople() {
-        //TODO: Read this from somewhere - do we really need this??
-
-        Set<Person> people = new HashSet<>();
-
-        UUID personId = UUID.randomUUID();
-        Person myPerson = new Person(personId);
-
-        people.add(myPerson);
-        return people;
+        return new HashSet<>(mPeople);
     }
 }
