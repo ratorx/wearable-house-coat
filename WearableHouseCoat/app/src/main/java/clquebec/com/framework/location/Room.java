@@ -21,12 +21,11 @@ import clquebec.com.implementations.controllable.IFTTTLight;
 
 public class Room extends Place {
     private String mName;
-    private UUID mUUID;
     private Context mContext;
 
     public Room(Context context, String name) {
+        super(UUID.randomUUID());
         mName = name;
-        mUUID = UUID.randomUUID();
         mContext = context;
     }
 

@@ -1,6 +1,7 @@
 package clquebec.com.framework.location;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,15 +16,28 @@ import clquebec.com.framework.people.Person;
  */
 
 public abstract class Place implements ControllableDeviceGroup {
+    @SuppressWarnings("WeakerAccess")
+    //We want this to be protected, even if extended into a different package.
+    protected final UUID mUUID;
 
-    public abstract UUID getID();
+    public Place(UUID id){
+        mUUID = id;
+    }
+
+    public UUID getID(){
+        return mUUID;
+    }
 
     public abstract List<ControllableDevice> getDevices();
 
     public abstract Set<Person> getPeople();
 
     public boolean equals(Object other) {
-        return other instanceof Place && ((Place) other).getID().equals(this.getID());
+        return other instanceof Place && Objects.equals(((Place) other).getID(), this.getID());
+    }
+
+    public int hashCode(){
+        return Objects.hashCode(getID());
     }
 
     //Device Group methods

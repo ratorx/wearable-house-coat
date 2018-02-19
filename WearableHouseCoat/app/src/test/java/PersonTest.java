@@ -8,10 +8,8 @@ import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.people.Person;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,5 +101,6 @@ public class PersonTest extends TestCase {
             //newLocation should be place1, and should be mLocation
             assertThat(newLocation).isEqualTo(place1).isEqualTo(mPerson.getLocation());
         });
+        mPerson.setLocation(place1);
     }
 }

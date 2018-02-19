@@ -21,22 +21,22 @@ import clquebec.com.framework.people.Person;
 
 public class Building extends Place {
     private String mName;
-    private UUID mUUID;
     private Context mContext;
     private Set<Room> mRooms;
 
     public Building(Context context, String name) {
+        super(UUID.randomUUID());
         mName = name;
-        mUUID = UUID.randomUUID();
         mContext = context;
         mRooms = new HashSet<>();
     }
 
     public Building(Context context, String name, Set<Room> rooms) {
+        super(UUID.randomUUID());
         mName = name;
-        mUUID = UUID.randomUUID();
         mContext = context;
-        mRooms = rooms;
+
+        mRooms = new HashSet<>(rooms);
     }
 
     public void addRoom(Room newRoom) {
@@ -45,8 +45,7 @@ public class Building extends Place {
     }
 
     public Set<Room> getRooms() {
-        // Currently doesn't clone - so be careful when removing from it!
-        return mRooms;
+        return new HashSet<>(mRooms);
     }
 
     @Override
@@ -62,11 +61,6 @@ public class Building extends Place {
     @Override
     public void setName(String name) {
         mName = name;
-    }
-
-    @Override
-    public UUID getID() {
-        return mUUID;
     }
 
     @Override
