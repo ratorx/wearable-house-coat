@@ -34,7 +34,7 @@ public class IFTTTLight implements ControllableLightDevice {
         mCurrentState = false; //Is there a good way to get this?
         mContext = context;
 
-        //Setup IFTTT for webrequests
+        //Setup IFTTT for web requests
         mIFTTT = IFTTT.getInstance(context);
     }
 

@@ -29,12 +29,9 @@ public class MainActivity extends WearableActivity {
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
 
     private RecyclerView mToggleButtons;
-    private DeviceTogglesAdapter mToggleAdapter;
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
-    private LocationGetter mLocationProvider;
-    private View mChangeLocationView;
 
     private Building mBuilding;
     private Room mCurrentDisplayedRoom;
@@ -66,7 +63,7 @@ public class MainActivity extends WearableActivity {
         mCurrentDisplayedRoom = room;
 
         //Attach the adapter which automatically fills with controls for current Place
-        mToggleAdapter = new DeviceTogglesAdapter(room);
+        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(room);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
         //END SECTION
 
@@ -75,7 +72,7 @@ public class MainActivity extends WearableActivity {
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //Initialise location provider
         Person me = new Person("tcb");
-        mLocationProvider = new FINDLocationProvider(this, me);
+        LocationGetter mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
                     if (user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)) { //If the user is me
                         setRoom(room, false);
@@ -87,7 +84,7 @@ public class MainActivity extends WearableActivity {
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
 
         //SECTION: Allow user to change location
-        mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
+        View mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
         mChangeLocationView.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
 

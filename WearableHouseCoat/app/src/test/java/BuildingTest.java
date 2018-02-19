@@ -1,13 +1,10 @@
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import clquebec.com.framework.controllable.ControllableDevice;
@@ -17,15 +14,9 @@ import clquebec.com.framework.people.Person;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 /**
  * WearableHouseCoat
@@ -74,7 +65,7 @@ public class BuildingTest extends TestCase {
         myRooms.add(room3);
         assertThat(mBuilding.getRooms()).isNotEqualTo(myRooms);
 
-        //Should not be able to modify the Set retreived from getRooms
+        //Should not be able to modify the Set retrieved from getRooms
         mBuilding.getRooms().add(room3);
         assertThat(mBuilding.getRooms()).isNotEqualTo(myRooms);
 

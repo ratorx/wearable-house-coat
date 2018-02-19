@@ -13,7 +13,6 @@
     
     <!-- Scrollable wrapper for buttons -->
     <ScrollView
-        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fadingEdgeLength="20dp"
@@ -39,25 +38,21 @@
     </ScrollView>
 
     <!-- Header text -->
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/main_currentlocationlayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:padding="0dp"
         app:boxedEdges="all">
-        
-        <!-- Room name -->
-        <!-- TODO: check ellipsize works as intended (resize first, then ellipsis when minimum size reached.) -->
-        <LinearLayout
-            android:id="@+id/main_currentlocationlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
+            <!-- Room name -->
+            <!-- TODO: check ellipsize works as intended (resize first, then ellipsis when minimum size reached.) -->
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/main_currentlocation"
                 android:layout_width="96dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="30dp"
+                android:layout_marginStart="30dp"
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:gravity="center"
@@ -68,15 +63,13 @@
                 app:autoSizeTextType="uniform"/>
 
             <ImageView
-                android:id="@+id/main_selectroom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/ic_down" />
-        </LinearLayout>
+                android:src="@drawable/ic_down"
+                android:contentDescription="@string/selectroom_content_description" />
+    </LinearLayout>
 
-
-    </FrameLayout>
 
 
     <FrameLayout
@@ -89,11 +82,10 @@
         android:visibility="gone">
 
         <Button
-            android:id="@+id/iamhere_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/prussian_blue"
-            android:text="I am here!" />
+            android:text="@string/iamhere_text" />
 
     </FrameLayout>
 

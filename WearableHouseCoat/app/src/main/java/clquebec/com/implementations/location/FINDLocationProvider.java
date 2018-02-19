@@ -56,14 +56,6 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private Map<Person, Place> mLocationMap;
 
     private Handler mLocationUpdateHandler = new Handler();
-    private Runnable mLocationUpdater = new Runnable() {
-        @Override
-        public void run() {
-            forceLocationRefresh();
-            update();
-            mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-        }
-    };
 
     public FINDLocationProvider(Context c, Person p) {
         mQueue = Volley.newRequestQueue(c);
@@ -71,6 +63,14 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         mContext = c;
         mPerson = p;
 
+        Runnable mLocationUpdater = new Runnable() {
+            @Override
+            public void run() {
+                forceLocationRefresh();
+                update();
+                mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+            }
+        };
         mLocationUpdateHandler.post(mLocationUpdater);
     }
 
@@ -98,7 +98,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
         JsonObjectRequest locationRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
                 response -> {
-                    Log.d("FIND", "Succesfully Received Locations");
+                    Log.d("FIND", "Successfully Received Locations");
 
                     try {
                         //Iterate over response
@@ -138,6 +138,12 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
     private void getFingerprint(FingerprintCallback callback) {
         WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+
+        if(wifiManager == null){
+            Log.e("FIND", "WiFi is not available");
+            return;
+        }
+
         if (!wifiManager.isWifiEnabled()) {
             //Forcefully enable wifi
             wifiManager.setWifiEnabled(true);
@@ -190,7 +196,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Succesfully calibrated"),
+                    response -> Log.d("FIND", "Successfully calibrated"),
                     error -> Log.e("FIND", error.getMessage()));
 
             mQueue.add(trackRequest);
@@ -215,7 +221,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Succesfully updated fingerprint"),
+                    response -> Log.d("FIND", "Successfully updated fingerprint"),
                     error -> Log.e("FIND", error.getMessage()));
 
             mQueue.add(trackRequest);

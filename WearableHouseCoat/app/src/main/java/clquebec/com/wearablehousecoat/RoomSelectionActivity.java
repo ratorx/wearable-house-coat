@@ -27,6 +27,10 @@ public class RoomSelectionActivity extends WearableActivity {
 
         mRoomArray = getIntent().getExtras().getCharSequenceArrayList(INTENT_ROOMS_EXTRA);
 
+        if(mRoomArray == null){
+            throw new IllegalArgumentException("Room Array must be passed");
+        }
+
         ArrayAdapter<CharSequence> arrayAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,

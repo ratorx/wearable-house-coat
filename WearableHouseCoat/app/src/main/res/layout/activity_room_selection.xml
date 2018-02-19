@@ -17,16 +17,10 @@
         android:padding="@dimen/inner_frame_layout_padding"
         app:boxedEdges="all">
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/room_listview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <ListView
-                android:id="@+id/room_listview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+            android:layout_height="match_parent" />
     </FrameLayout>
 </android.support.wear.widget.BoxInsetLayout>
 

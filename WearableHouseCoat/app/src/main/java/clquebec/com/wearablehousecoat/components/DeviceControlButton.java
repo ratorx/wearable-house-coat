@@ -78,7 +78,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
             //Parse attributes
             try {
                 mBackgroundColor = a.getColor(R.styleable.DeviceControlButton_dcb_background, DEFAULT_BACKGROUND);
-                mBackgroundColorOff = a.getColor(R.styleable.DeviceControlButton_backgroundoff, DEFAULT_BACKGROUND_OFF);
+                mBackgroundColorOff = a.getColor(R.styleable.DeviceControlButton_dcb_backgroundoff, DEFAULT_BACKGROUND_OFF);
                 mPadding = a.getDimension(R.styleable.DeviceControlButton_padding, DEFAULT_PADDING);
                 mDeviceType = ControllableDeviceType.getType(a.getInt(R.styleable.DeviceControlButton_type, 0));
             } finally {

@@ -21,6 +21,7 @@ import clquebec.com.framework.people.Person;
 
 public class DummyLocationProvider implements LocationGetter {
     private Map<Person, Place> mLocationMap;
+    @SuppressWarnings("FieldCanBeLocal")
     private LocationChangeListener mListener;
 
     public DummyLocationProvider(Context context) {

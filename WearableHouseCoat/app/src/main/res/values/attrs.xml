@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Stylable attributes for DeviceControlButton -->
+    <!-- Styleable attributes for DeviceControlButton -->
     <declare-styleable name="DeviceControlButton">
         <attr name="dcb_background" format="color" />
-        <attr name="backgroundoff" format="color" />
+        <attr name="dcb_backgroundoff" format="color" />
         <attr name="padding" format="dimension" />
         <attr name="type" format="enum">
-            <!-- These need to match up with framework.controllaControllableDeviceTypeypes -->
+            <!-- These need to match up with framework.ControllableDeviceTypes -->
             <enum name="light" value="0" />
             <enum name="sound" value="1" />
             <enum name="thermostat" value="2" />

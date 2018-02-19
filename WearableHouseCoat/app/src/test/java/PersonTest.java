@@ -1,5 +1,3 @@
-import android.location.LocationListener;
-
 import junit.framework.TestCase;
 
 import java.util.UUID;

@@ -4,19 +4,12 @@
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
-    <string name="hello_world">Hello Square World!</string>
-    <string name="main_location_hint">you are in</string>
     <string name="main_defaultlocation">Loading</string>
-    <string name="main_companion_hint">with</string>
-    <string name="main_companions_default">Loading</string>
-
-    <plurals name="companion_strings">
-        <item quantity="zero">No other people</item>
-        <item quantity="one">%d other person</item>
-        <item quantity="other">%d other people</item>
-    </plurals>
 
     <string name="title_activity_light_control_panel">LightControlPanel</string>
     <string name="title_activity_room_selection">RoomSelectionActivity</string>
+    <string name="colourPreviewContentDescription">A preview of the light\'s colour</string>
+    <string name="selectroom_content_description">A down-arrow which shows room selection on click.</string>
+    <string name="iamhere_text">I am here!</string>
 
 </resources>
