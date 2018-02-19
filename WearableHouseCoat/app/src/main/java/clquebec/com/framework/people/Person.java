@@ -2,6 +2,7 @@ package clquebec.com.framework.people;
 
 import android.support.annotation.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import clquebec.com.framework.location.LocationChangeListener;
@@ -14,8 +15,8 @@ import clquebec.com.framework.location.Place;
  */
 
 public class Person {
-    private String mName;
-    private UUID mUUID;
+    private final String mName;
+    private final UUID mUUID;
     private Place mLocation;
     private LocationChangeListener mListener;
 
@@ -34,9 +35,19 @@ public class Person {
     public String getName() {
         return mName;
     }
+    public UUID getUUID(){ return mUUID; }
 
-    public boolean equals(Object other) {
-        return other instanceof Person && ((Person) other).getName().equals(this.getName());
+    @Override
+    public final boolean equals(Object other) {
+        return other instanceof Person
+                && Objects.equals(((Person) other).getUUID(), this.getUUID())
+                && Objects.equals(((Person) other).getName(), this.getName());
+    }
+
+    @Override
+    public final int hashCode(){
+        //A simple hashcode.
+        return Objects.hashCode(mUUID) + Objects.hashCode(mName);
     }
 
     public @Nullable
@@ -45,10 +56,12 @@ public class Person {
     }
 
     public void setLocation(Place newLocation) {
-        if (mLocation == null || !mLocation.equals(newLocation)) {
+        Place oldLocation = mLocation;
+        mLocation = newLocation;
+
+        if (!Objects.equals(oldLocation, newLocation)) {
             if (mListener != null) {
-                mListener.onLocationChanged(this, mLocation, newLocation);
-                mLocation = newLocation;
+                mListener.onLocationChanged(this, oldLocation, newLocation);
             }
         }
     }
