@@ -2,6 +2,8 @@ package clquebec.com.framework.people;
 
 import android.support.annotation.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,21 +17,27 @@ import clquebec.com.framework.location.Place;
  */
 
 public class Person {
+    private static final Map<UUID, Person> people = new HashMap<>();
+
     private final String mName;
     private final UUID mUUID;
     private Place mLocation;
     private LocationChangeListener mListener;
 
-    public Person(UUID id) {
-        //TODO: Read information in from somewhere.
-        mUUID = id;
-        mName = "Test Person";
+    public static Person getPerson(UUID id) {
+        if (people.containsKey(id)) {
+            return people.get(id);
+        }
+
+        Person p = new Person(id);
+        people.put(id, p);
+        return p;
     }
 
-    public Person(String name) {
-        //TODO: Read information in from somewhere.
-        mUUID = UUID.randomUUID();
-        mName = name;
+    private Person(UUID id) {
+        // TODO: Instantiate from Tom's fancy config store
+        mUUID = id;
+        mName = "Test Person";
     }
 
     public String getName() {

@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
-import clquebec.com.framework.people.Person;
 
 
 /**
@@ -70,15 +69,6 @@ public class Building extends Place {
             devices.addAll(r.getDevices());
         }
         return devices;
-    }
-
-    @Override
-    public Set<Person> getPeople() {
-        HashSet<Person> people = new HashSet<>();
-        for (Room r : mRooms) {
-            people.addAll(r.getPeople());
-        }
-        return people;
     }
 
 }

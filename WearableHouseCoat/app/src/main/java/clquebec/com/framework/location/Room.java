@@ -28,12 +28,6 @@ public class Room extends Place {
         super(UUID.randomUUID());
         mName = name;
         mContext = context;
-
-        //TODO: Read this from somewhere - do we really need this??
-        UUID personId = UUID.randomUUID();
-        Person myPerson = new Person(personId);
-
-        mPeople.add(myPerson);
     }
 
     @Override
@@ -70,8 +64,4 @@ public class Room extends Place {
         return devices;
     }
 
-    @Override
-    public Set<Person> getPeople() {
-        return new HashSet<>(mPeople);
-    }
 }

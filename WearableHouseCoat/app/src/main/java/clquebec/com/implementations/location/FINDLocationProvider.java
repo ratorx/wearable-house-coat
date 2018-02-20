@@ -11,10 +11,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,12 +22,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.location.LocationCalibrator;
 import clquebec.com.framework.location.LocationChangeListener;
-import clquebec.com.framework.location.LocationGetter;
-import clquebec.com.framework.location.LocationUpdater;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
@@ -40,7 +37,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 08/02/18
  */
 
-public class FINDLocationProvider implements LocationGetter, LocationCalibrator, LocationUpdater {
+public class FINDLocationProvider implements IndoorLocationProvider {
     public static final String GROUPID = "LULLINGLABRADOODLE";
     public static final String SERVERURL = "http://shell.srcf.net:8003/";
     public static final int POLLDELAYMILLIS = 5000;
@@ -56,44 +53,21 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
 
-    private Handler mLocationUpdateHandler = new Handler();
-
     public FINDLocationProvider(Context c, Person p) {
         mQueue = HTTPRequestQueue.getRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
         mPerson = p;
-
-        Runnable mLocationUpdater = new Runnable() {
-            @Override
-            public void run() {
-                forceLocationRefresh();
-                update();
-                mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-            }
-        };
-        mLocationUpdateHandler.post(mLocationUpdater);
     }
 
     @Nullable
     @Override
-    public Place getCurrentLocation(Person p) {
+    public Place getLocation(Person p) {
         return mLocationMap.getOrDefault(p, null);
     }
 
     @Override
-    public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
-        mListener = listener;
-
-        if (listener != null) {
-            for (Person p : mLocationMap.keySet()) {
-                listener.onLocationChanged(p, null, mLocationMap.get(p));
-            }
-        }
-    }
-
-    @Override
-    public void forceLocationRefresh() {
+    public void refreshLocations() {
         String url = SERVERURL + "location?group=" + GROUPID;
 
         JsonObjectRequest locationRequest = new JsonObjectRequest(
@@ -110,22 +84,12 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
                             //Get data
                             JSONArray userData = users.getJSONArray(user);
-                            Person person = new Person(user);
+                            Person person = Person.getPerson(UUID.fromString(user));
                             Place location = new Room(mContext, userData.getJSONObject(0).getString("location"));
-
-                            //Notify change
-                            if (mListener != null) {
-                                if (!mLocationMap.containsKey(person) || !mLocationMap.get(person).equals(location)) {
-                                    mListener.onLocationChanged(
-                                            person,
-                                            mLocationMap.getOrDefault(person, null),
-                                            location
-                                    );
-                                }
-                            }
 
                             //Update internal structure
                             mLocationMap.put(person, location);
+                            person.setLocation(location);
                         }
                     } catch (JSONException e) {
                         Log.e("FIND", "Cannot extract JSON");
@@ -145,7 +109,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
             return;
         }
 
-        if (!wifiManager.isWifiEnabled()) {
+        if (!wifiManager.isWifiEnabled()) { // TODO: Deal with potential NullPointerException
             //Forcefully enable wifi
             wifiManager.setWifiEnabled(true);
         }
@@ -197,7 +161,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Successfully calibrated"),
+                    response -> Log.d("FIND", "Succesfully updated fingerprint"),
                     error -> Log.e("FIND", error.getMessage()));
 
             mQueue.addToRequestQueue(trackRequest);
@@ -206,7 +170,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     }
 
     @Override
-    public boolean calibrate(Room room) {
+    public boolean calibrate(Place room) {
         getFingerprint(fingerprint -> {
             String url = SERVERURL + "learn";
 
@@ -221,25 +185,14 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                 Log.e("FIND", "Could not generate update request, " + e.getMessage());
             }
 
+            Log.d("FIND", jsonObject.toString());
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Successfully updated fingerprint"),
+                    response -> Log.d("FIND", "Succesfully calibrated"),
                     error -> Log.e("FIND", error.getMessage()));
 
             mQueue.addToRequestQueue(trackRequest);
         });
         return true;
-    }
-
-    @Override
-    public boolean calibrate(Room room, String data) {
-        //Discard extra data - for now
-        return calibrate(room);
-    }
-
-    @Override
-    public boolean calibrate(Room room, JSONObject data) {
-        //Discard extra data - for now
-        return calibrate(room);
     }
 
     @Override

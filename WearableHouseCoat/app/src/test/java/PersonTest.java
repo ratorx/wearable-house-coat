@@ -20,18 +20,11 @@ import static org.mockito.Mockito.verify;
 
 public class PersonTest extends TestCase {
     private Person mPerson;
-    private String mTestName = "TestName";
-
-    public void testGetName(){
-        //Instantiating with a name should yield that name
-        mPerson = new Person(mTestName);
-        assertThat(mPerson.getName()).isEqualTo(mTestName);
-    }
 
     public void testGetUUID(){
         //Instantiating with a UUID should yield that UUID
         UUID uuid = UUID.randomUUID();
-        mPerson = new Person(uuid);
+        mPerson = Person.getPerson(uuid);
         assertThat(mPerson.getUUID()).isEqualTo(uuid);
     }
 
@@ -49,7 +42,7 @@ public class PersonTest extends TestCase {
     public void testGetLocation(){
         Place place1 = mock(Place.class);
         Place place2 = mock(Place.class);
-        mPerson = new Person(mTestName);
+        mPerson = Person.getPerson(UUID.randomUUID());
 
         //Setting location then immediately getting it should yield that location
         mPerson.setLocation(place1);
@@ -61,7 +54,7 @@ public class PersonTest extends TestCase {
     }
 
     public void testLocationListener(){
-        mPerson = new Person(mTestName);
+        mPerson = Person.getPerson(UUID.randomUUID());
         Place place1 = mock(Place.class);
         Place place2 = mock(Place.class);
 

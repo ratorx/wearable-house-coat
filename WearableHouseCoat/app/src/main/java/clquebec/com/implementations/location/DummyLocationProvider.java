@@ -26,29 +26,17 @@ public class DummyLocationProvider implements LocationGetter {
 
     public DummyLocationProvider(Context context) {
         mLocationMap = new HashMap<>();
-        mLocationMap.put(new Person(UUID.randomUUID()), new Room(context, "Test Room"));
+        mLocationMap.put(Person.getPerson(UUID.randomUUID()), new Room(context, "Test Room"));
     }
 
     @Nullable
     @Override
-    public Place getCurrentLocation(Person p) {
+    public Place getLocation(Person p) {
         return mLocationMap.get(p);
     }
 
     @Override
-    public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
-        mListener = listener;
-
-        //Call once for every user
-        if (listener != null) {
-            for (Person p : mLocationMap.keySet()) {
-                listener.onLocationChanged(p, null, mLocationMap.get(p));
-            }
-        }
-    }
-
-    @Override
-    public void forceLocationRefresh() {
+    public void refreshLocations() {
         //Do nothing
     }
 }

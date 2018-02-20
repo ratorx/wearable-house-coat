@@ -74,37 +74,6 @@ public class BuildingTest extends TestCase {
         assertThat(mBuilding.getRooms()).isEqualTo(myRooms);
     }
 
-    public void testGetPeople(){
-        mContext = mock(Context.class);
-
-        //Some test rooms
-        Room room1 = new Room(mContext, "TestRoom1");
-        Room room2 = new Room(mContext, "TestRoom2");
-        Room room3 = new Room(mContext, "TestRoom3");
-
-        //Instantiate building
-        Set<Room> myRooms = new HashSet<>();
-        myRooms.add(room1);
-        myRooms.add(room2);
-        mBuilding = new Building(mContext, mTestName, myRooms);
-
-        //getPeople() should contain all the people from the rooms in it
-        Set<Person> includedPeople = new HashSet<>();
-        for(Room r : myRooms){
-            includedPeople.addAll(r.getPeople());
-        }
-        assertThat(mBuilding.getPeople().containsAll(includedPeople)).isTrue();
-
-        //Adding a room should add its people
-        mBuilding.addRoom(room3);
-        assertThat(mBuilding.getPeople().containsAll(room3.getPeople())).isTrue();
-
-        //People Set should be immutable
-        Person mockPerson = mock(Person.class);
-        mBuilding.getPeople().add(mockPerson);
-        assertThat(mBuilding.getPeople().contains(mockPerson)).isFalse();
-    }
-
     public void testGetDevices(){
         mContext = mock(Context.class);
 
