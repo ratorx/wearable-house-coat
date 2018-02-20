@@ -81,7 +81,7 @@ public class MainActivity extends WearableActivity {
         Person me = new Person("tcb");
         mLocationProvider = new FINDLocationProvider(this, me);
         mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                    if (user.equals(me) && mCurrentShowingPlace.equals(oldLocation)) { //If the user is me
+                    if (user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)) { //If the user is me
                         setRoom(newLocation, false);
                     }
                 }
@@ -93,7 +93,7 @@ public class MainActivity extends WearableActivity {
 
         //On click, calibrate location provider
         findViewById(R.id.iamhere_wrapper).setOnClickListener(view -> {
-            mLocationProvider.calibrate(mCurrentShowingPlace);
+            mLocationProvider.calibrate(mCurrentDisplayedRoom);
         });
 
         // Enables Always-on
