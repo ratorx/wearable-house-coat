@@ -14,36 +14,54 @@ class App extends React.Component {
 			pages: [
 				{
 					name: "Overview",
-					component: <Overview/>
+					component: null,
+					onPageLoad: function() { // Do NOT use () => syntax as it breaks binding. (WTF?)
+						this.component = <Overview/>
+					}
 				},
 				{
 					name: "Setup",
 					dropdown: [
 						{
 							name: "Rooms",
-							component: <SetRooms/>
+							component: null,
+							onPageLoad: function() {
+								this.component = <SetRooms/>
+							}
 						},
 						{
 							name: "Devices",
-							component: <SetDevices/>
+							component: null,
+							onPageLoad: function() {
+								this.component = <SetDevices/>
+							}
 						},
 						{
 							name: "Groups",
-							component: <SetGroups/>
+							component: null,
+							onPageLoad: function() {
+								this.component = <SetGroups/>
+							}
 						}
 					]
 				},
 				{
 					name: "Help",
-					component: <Help/>
+					component: null,
+					onPageLoad: function() {
+						this.component = <Help/>
+					}
 				}
-			]
-		}
-		this.state.currentPage = this.state.pages[0]
+			],
+			currentPage: null
+		};
+		this.state.currentPage = this.state.pages[0];
+		this.state.currentPage.onPageLoad.bind(this.state.currentPage).call();
 	}
 
 	setCurrentPage(page) {
-		this.setState(() => {return {currentPage: page}})
+		this.setState(() => {return {currentPage: page}});
+		page.onPageLoad.bind(page)();
 	}
 
 	render() {
