@@ -89,7 +89,7 @@ public class MainActivity extends WearableActivity {
         mIAmHereWrapper.setVisibility(View.GONE);
 
         //On click, calibrate location provider
-        findViewById(R.id.iamhere_button).setOnClickListener(view -> {
+        findViewById(R.id.iamhere_wrapper).setOnClickListener(view -> {
             mLocationProvider.calibrate(mCurrentShowingPlace);
         });
 
