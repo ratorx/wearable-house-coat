@@ -51,5 +51,5 @@ dependencies {
     //For testing HTTP
     testCompile 'org.apache.httpcomponents:httpclient:4.5.5'
     //For testing JSON
-    testCompile 'org.json:json:20140107'
+    testCompile 'org.json:json:20180130'
 }
