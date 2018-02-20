@@ -3,11 +3,13 @@ package clquebec.com.wearablehousecoat;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -21,30 +23,31 @@ import java.util.stream.Collectors;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
-import clquebec.com.framework.location.LocationGetter;
-import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity {
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
+    private final static int POLLDELAYMILLIS = 5000;
 
     private RecyclerView mToggleButtons;
     private TextView mLocationNameView;
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
-
     private FINDLocationProvider mLocationProvider;
+    private View mChangeLocationView;
+    private final Handler mLocationUpdateHandler = new Handler();
 
     private Building mBuilding;
-    private Place mCurrentShowingPlace;
+    private Place mCurrentDisplayedRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("MainActivity", "This should be printed right?");
         //SECTION: Initialize Building
         //TODO: Read in from somewhere (e.g web)
 
@@ -64,10 +67,10 @@ public class MainActivity extends WearableActivity {
 
         //Make a dummy Room with a light switch for testing
         Room room = new Room(this, "Test Room");
-        mCurrentShowingPlace = room;
+        mCurrentDisplayedRoom = room;
 
         //Attach the adapter which automatically fills with controls for current Place
-        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(mCurrentShowingPlace);
+        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(mCurrentDisplayedRoom);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
         //END SECTION
 
@@ -110,6 +113,18 @@ public class MainActivity extends WearableActivity {
             MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
 
+        // Set up location update
+
+        Log.d("LocationUpdater", "Using timer");
+        mLocationUpdateHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mLocationProvider.forceLocationRefresh();
+                mLocationProvider.update();
+                mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+            }
+        });
+
         // Enables Always-on
         setAmbientEnabled();
     }
@@ -137,13 +152,12 @@ public class MainActivity extends WearableActivity {
     }
 
     public void setRoom(Place room, boolean showIAmHere) {
-        mCurrentShowingPlace = room;
-
+        mCurrentDisplayedRoom = room;
         //Update the location text. This needs to be converted to upper case because of a bug
         //in android with text upper case and resizing
         mLocationNameView.setText(room.getName().toUpperCase());
 
-        mCurrentShowingPlace = room;
+        mCurrentDisplayedRoom = room;
         //This automatically populates and attaches devices to buttons.
         mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
 

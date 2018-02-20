@@ -6,4 +6,5 @@ package clquebec.com.environment;
 
 public final class Keys {
     public static final String IFTTT = "";
+	public static final String ConfigJSON = "";
 }

@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.LocationCalibrator;
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.LocationGetter;
@@ -39,7 +40,7 @@ import clquebec.com.framework.people.Person;
  * Creation Date: 08/02/18
  */
 
-public class FINDLocationProvider implements LocationGetter, LocationCalibrator, LocationUpdater {
+public class FINDLocationProvider implements IndoorLocationProvider {
     public static final String GROUPID = "LULLINGLABRADOODLE";
     public static final String SERVERURL = "http://shell.srcf.net:8003/";
     public static final int POLLDELAYMILLIS = 5000;
@@ -55,23 +56,11 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
 
-    private Handler mLocationUpdateHandler = new Handler();
-
-    public FINDLocationProvider(Context c, Person p) {
+    public FINDLocationProvider(Context c, Person p){
         mQueue = Volley.newRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
         mPerson = p;
-
-        Runnable mLocationUpdater = new Runnable() {
-            @Override
-            public void run() {
-                forceLocationRefresh();
-                update();
-                mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-            }
-        };
-        mLocationUpdateHandler.post(mLocationUpdater);
     }
 
     @Nullable
@@ -144,7 +133,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
             return;
         }
 
-        if (!wifiManager.isWifiEnabled()) {
+        if (!wifiManager.isWifiEnabled()) { // TODO: Deal with potential NullPointerException
             //Forcefully enable wifi
             wifiManager.setWifiEnabled(true);
         }
