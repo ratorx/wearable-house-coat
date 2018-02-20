@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.environment.Keys;
+import clquebec.com.framework.HTTPRequestQueue;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
@@ -38,7 +39,7 @@ public class ConfigurationStore {
     public static final String CONFIG_SERVER = "https://shell.srcf.net:3000/";
     private static ConfigurationStore mInstance;
 
-    private RequestQueue mQueue;
+    private HTTPRequestQueue mQueue;
     private JSONObject mData;
     private Set<ConfigurationAvailableCallback> mCallbacks;
     private Map<UUID, JSONObject> mPersonDataMap;
@@ -47,8 +48,14 @@ public class ConfigurationStore {
         void onConfigurationAvailable(ConfigurationStore config);
     }
 
-    private ConfigurationStore(Context c) {
-        mQueue = Volley.newRequestQueue(c);
+    //Used for production
+    private ConfigurationStore(Context c){
+        this(c, HTTPRequestQueue.getRequestQueue(c));
+    }
+
+    //This constructor is mostly used for testing
+    private ConfigurationStore(Context c, HTTPRequestQueue queue) {
+        mQueue = queue;
         mCallbacks = new HashSet<>();
         mPersonDataMap = new HashMap<>();
 
@@ -65,42 +72,50 @@ public class ConfigurationStore {
                 }
         );
 
-        mQueue.add(request);
+        mQueue.addToRequestQueue(request);
+
+        //Required for testing - so that the singleton can be instantiated
+        if(mInstance == null){
+            mInstance = this;
+        }
     }
 
-    private void setData(JSONObject data) {
-        Log.d(TAG, "Received config store");
-        Log.d(TAG, data.toString());
+    public void setData(JSONObject data) {
         this.mData = data;
 
-        //Load in People as a UUID->JSONObject map
-        try {
-            JSONArray people = mData.getJSONArray("people");
-            for(int i = 0; i < people.length(); i++) {
-                try {
-                    JSONObject personData = people.getJSONObject(i);
-                    UUID id = new UUID(0, personData.getLong("id"));
+        if(data != null) {
+            Log.d(TAG, "Received config store");
+            Log.d(TAG, data.toString());
 
-                    mPersonDataMap.put(id, personData);
-                }catch(JSONException e){
-                    Log.e(TAG, "Unable to parse Person "+i+": "+e.getMessage());
+            //Load in People as a UUID->JSONObject map
+            try {
+                JSONArray people = mData.getJSONArray("people");
+                for (int i = 0; i < people.length(); i++) {
+                    try {
+                        JSONObject personData = people.getJSONObject(i);
+                        UUID id = new UUID(0, personData.getLong("id"));
+
+                        mPersonDataMap.put(id, personData);
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Unable to parse Person " + i + ": " + e.getMessage());
+                    }
                 }
+            } catch (JSONException | NullPointerException e) {
+                Log.e(TAG, "No 'people' array: there will not be any users.");
             }
-        }catch(JSONException e){
-            Log.e(TAG, "No 'people' array: there will not be any users.");
-        }
 
-        //Call all the callbacks, and remove them so they're only called once.
-        //Not thread safe ("synchronised" would help).
-        Set<ConfigurationAvailableCallback> callbacks = new HashSet<>(mCallbacks);
-        for(ConfigurationAvailableCallback callback : callbacks){
-            callback.onConfigurationAvailable(this);
-            mCallbacks.remove(callback);
+            //Call all the callbacks, and remove them so they're only called once.
+            //Not thread safe ("synchronised" would help).
+            Set<ConfigurationAvailableCallback> callbacks = new HashSet<>(mCallbacks);
+            for (ConfigurationAvailableCallback callback : callbacks) {
+                callback.onConfigurationAvailable(this);
+                mCallbacks.remove(callback);
+            }
         }
     }
 
     public void onConfigAvailable(ConfigurationAvailableCallback callback){
-        Log.d("ConfigurationStore", "onConfigAvailable added");
+        Log.d(TAG, "onConfigAvailable added");
         if(mData != null) {
             callback.onConfigurationAvailable(this);
         }else{
@@ -148,7 +163,7 @@ public class ConfigurationStore {
         try {
             //Perform a copy
             return new JSONObject(mPersonDataMap.get(id).toString());
-        }catch(JSONException e){
+        }catch(JSONException | NullPointerException e){
             //Person does not exist
             return null;
         }

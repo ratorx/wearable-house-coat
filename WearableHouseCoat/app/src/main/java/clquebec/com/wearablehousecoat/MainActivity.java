@@ -51,19 +51,12 @@ public class MainActivity extends WearableActivity {
 
         Log.d("MainActivity", "This should be printed right?");
         //SECTION: Initialize Building
-        //TODO: Read in from somewhere (e.g web)
 
-        /*
-        mBuilding = new Building(this, "My House");
-        mBuilding.addRoom(new Room(this, "Kitchen"));
-        mBuilding.addRoom(new Room(this, "Living Room"));
-        mBuilding.addRoom(new Room(this, "Dungeon"));
-        */
+        mBuilding = new Building(this, "Placeholder"); //Placeholder building
 
         //Get building from store
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
-            mBuilding = config.getBuilding();
-            //Log.d("MainActivity", "Configuration Available");
+            mBuilding = config.getBuilding(this);
         });
 
         //END SECTION
