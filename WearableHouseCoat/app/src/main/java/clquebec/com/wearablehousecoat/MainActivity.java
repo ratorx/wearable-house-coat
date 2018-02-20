@@ -45,11 +45,19 @@ public class MainActivity extends WearableActivity {
 
         //SECTION: Initialize Building
 
+        /*
         mBuilding = new Building(this, "Placeholder"); //Placeholder building
 
         //Get building from store
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
             mBuilding = config.getBuilding(this);
+        });
+        */
+
+        //Get building from store
+        ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+            mBuilding = config.getBuilding();
+            //Log.d("MainActivity", "Configuration Available");
         });
 
         //END SECTION

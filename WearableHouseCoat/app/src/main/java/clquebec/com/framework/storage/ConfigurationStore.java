@@ -4,29 +4,22 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.environment.Keys;
 import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
-import clquebec.com.implementations.location.FINDLocationProvider;
 
 /**
  * WearableHouseCoat
@@ -56,6 +49,7 @@ public class ConfigurationStore {
     //This constructor is mostly used for testing
     private ConfigurationStore(Context c, HTTPRequestQueue queue) {
         mQueue = queue;
+
         mCallbacks = new HashSet<>();
         mPersonDataMap = new HashMap<>();
 
@@ -163,7 +157,7 @@ public class ConfigurationStore {
         try {
             //Perform a copy
             return new JSONObject(mPersonDataMap.get(id).toString());
-        }catch(JSONException | NullPointerException e){
+        }catch(JSONException e){
             //Person does not exist
             return null;
         }
