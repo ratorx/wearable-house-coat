@@ -96,16 +96,6 @@ public class Room extends Place {
     }
 
     @Override
-    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
-        try {
-            return new Room(context, config);
-        }catch(JSONException e){
-            Log.e("Room", "Could not instantiate based on JSON config "+e.getMessage());
-            throw new IllegalArgumentException("Malformed JSON for Room instantiation");
-        }
-    }
-
-    @Override
     public UUID getID() {
         return mUUID;
     }

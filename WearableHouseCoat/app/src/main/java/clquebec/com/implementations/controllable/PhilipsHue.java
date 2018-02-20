@@ -4,6 +4,8 @@ import android.content.Context;
 
 import org.json.JSONObject;
 
+import org.json.JSONObject;
+
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;

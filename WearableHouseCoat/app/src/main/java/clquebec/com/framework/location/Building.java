@@ -11,6 +11,10 @@ import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
