@@ -34,6 +34,18 @@ public class IFTTTLight implements ControllableLightDevice {
     private Context mContext;
 
     public IFTTTLight(Context context, String locationName) {
+        init(context, locationName);
+    }
+
+    public IFTTTLight(Context context, JSONObject config) throws JSONException{
+        //Initialise dynamically from a JSON Object
+        String location = config.getString("location");
+        init(context, location);
+
+        setName(config.getString("name"));
+    }
+
+    private void init(Context context, String locationName){
         mLocation = locationName;
         mCurrentState = false; //Is there a good way to get this?
         mContext = context;
@@ -123,15 +135,5 @@ public class IFTTTLight implements ControllableLightDevice {
         mContext.startActivity(lightControls);
 
         return true;
-    }
-
-    @Override
-    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
-        try {
-            return new IFTTTLight(context, config.getString("location"));
-        }catch(JSONException e){
-            Log.e("IFTTTLight", "JSON Does not have required attributes "+e.getMessage());
-            return new IFTTTLight(context, "Test Room");
-        }
     }
 }

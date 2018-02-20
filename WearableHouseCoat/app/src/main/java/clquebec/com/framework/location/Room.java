@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,27 +38,34 @@ public class Room extends Place {
 
         mContext = context;
         mName = roomData.getString("name");
-        //Only use LSB - for now
-        mUUID = new UUID(0L, roomData.getLong("uid"));
 
         //Instantiate devices
         mDevices = new ArrayList<>();
         JSONArray deviceList = roomData.getJSONArray("devices");
+
+        Log.d("Room", deviceList.toString());
         for(int i = 0; i < deviceList.length(); i++){
             JSONObject deviceData = deviceList.getJSONObject(i);
             //Load in device dynamically - Java reflection!
             try {
-                Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("name"));
-                Method getInstance = deviceClass.getMethod("getDeviceInstance", Context.class, JSONObject.class);
-                ControllableDevice device = (ControllableDevice) getInstance.invoke(null, mContext, deviceData);
+                //Get device config
+                JSONObject deviceConfig = deviceData.getJSONObject("config");
+                deviceConfig.put("location", mName);
+
+                //Load class and call getDeviceInstance
+                Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("type"));
+                Constructor<?> getInstance = deviceClass.getConstructor(Context.class, JSONObject.class);
+                ControllableDevice device = (ControllableDevice) getInstance.newInstance(mContext, deviceConfig);
 
                 mDevices.add(device);
             }catch(ClassNotFoundException e){
-                Log.e("Room", "Failed to create device "+deviceData.getString("name"));
+                Log.e("Room", "Failed to create device "+deviceData.getString("type"));
             }catch(IllegalAccessException e) {
-                Log.e("Room", "Do not have permissions to instantiate device " + deviceData.getString("name"));
+                Log.e("Room", "Do not have permissions to instantiate device " + deviceData.getString("type"));
             }catch(ClassCastException | NoSuchMethodException | InvocationTargetException e){
-                Log.e("Room", "Class is not a controllable device "+deviceData.getString("name"));
+                Log.e("Room", "Class is not a controllable device "+deviceData.getString("type"));
+            }catch(InstantiationException e){
+                Log.e("Room", "Class does not have a valid (Context, JSONObject) constructor");
             }
         }
 
@@ -72,6 +80,7 @@ public class Room extends Place {
         super(UUID.randomUUID());
         mName = name;
         mContext = context;
+        mDevices = new ArrayList<>();
 
         //TODO: Read this from somewhere - do we really need this??
         UUID personId = UUID.randomUUID();
@@ -102,16 +111,7 @@ public class Room extends Place {
 
     @Override
     public List<ControllableDevice> getDevices() {
-        //TODO: Read this from somewhere
-        //For now, return a set with just an IFTTT Light controller.
-        List<ControllableDevice> devices = new ArrayList<>();
-
-        ControllableDevice myLight = new IFTTTLight(mContext, this);
-        myLight.setName("IFTTT Test");
-
-        devices.add(myLight);
-
-        return devices;
+        return new ArrayList<>(mDevices);
     }
 
     @Override

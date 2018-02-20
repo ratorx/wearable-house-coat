@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.LocationGetter;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
+import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
@@ -44,10 +46,18 @@ public class MainActivity extends WearableActivity {
         //SECTION: Initialize Building
         //TODO: Read in from somewhere (e.g web)
 
+        /*
         mBuilding = new Building(this, "My House");
         mBuilding.addRoom(new Room(this, "Kitchen"));
         mBuilding.addRoom(new Room(this, "Living Room"));
         mBuilding.addRoom(new Room(this, "Dungeon"));
+        */
+
+        //Get building from store
+        ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+            mBuilding = config.getBuilding();
+            //Log.d("MainActivity", "Configuration Available");
+        });
 
         //END SECTION
 
