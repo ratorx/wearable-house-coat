@@ -4,10 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.gms.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,10 +20,8 @@ import java.util.UUID;
 
 import clquebec.com.environment.Keys;
 import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
-import clquebec.com.implementations.location.FINDLocationProvider;
 
 /**
  * WearableHouseCoat
@@ -56,6 +51,7 @@ public class ConfigurationStore {
     //This constructor is mostly used for testing
     private ConfigurationStore(Context c, HTTPRequestQueue queue) {
         mQueue = queue;
+
         mCallbacks = new HashSet<>();
         mPersonDataMap = new HashMap<>();
 
