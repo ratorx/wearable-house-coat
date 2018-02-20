@@ -35,41 +35,43 @@ public class Room extends Place {
 
     public Room(Context context, JSONObject roomData) throws JSONException{
         //Only use LSB - for now
-        super(new UUID(0L, roomData.getLong("uid")));
+        super(new UUID(0L, roomData.getLong("id")));
 
         mContext = context;
         mName = roomData.getString("name");
 
         //Instantiate devices
         mDevices = new ArrayList<>();
-        JSONArray deviceList = roomData.getJSONArray("devices");
 
-        Log.d("Room", deviceList.toString());
-        for(int i = 0; i < deviceList.length(); i++){
-            JSONObject deviceData = deviceList.getJSONObject(i);
-            //Load in device dynamically - Java reflection!
-            try {
-                //Get device config
-                JSONObject deviceConfig = deviceData.getJSONObject("config");
-                deviceConfig.put("location", mName);
+        if(roomData.has("devices")) {
+            JSONArray deviceList = roomData.getJSONArray("devices");
 
-                //Load class and call getDeviceInstance
-                Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("type"));
-                Constructor<?> getInstance = deviceClass.getConstructor(Context.class, JSONObject.class);
-                ControllableDevice device = (ControllableDevice) getInstance.newInstance(mContext, deviceConfig);
+            Log.d("Room", deviceList.toString());
+            for (int i = 0; i < deviceList.length(); i++) {
+                JSONObject deviceData = deviceList.getJSONObject(i);
+                //Load in device dynamically - Java reflection!
+                try {
+                    //Get device config
+                    JSONObject deviceConfig = deviceData.getJSONObject("config");
+                    deviceConfig.put("location", mName);
 
-                mDevices.add(device);
-            }catch(ClassNotFoundException e){
-                Log.e("Room", "Failed to create device "+deviceData.getString("type"));
-            }catch(IllegalAccessException e) {
-                Log.e("Room", "Do not have permissions to instantiate device " + deviceData.getString("type"));
-            }catch(ClassCastException | NoSuchMethodException | InvocationTargetException e){
-                Log.e("Room", "Class is not a controllable device "+deviceData.getString("type"));
-            }catch(InstantiationException e){
-                Log.e("Room", "Class does not have a valid (Context, JSONObject) constructor");
+                    //Load class and call getDeviceInstance
+                    Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("type"));
+                    Constructor<?> getInstance = deviceClass.getConstructor(Context.class, JSONObject.class);
+                    ControllableDevice device = (ControllableDevice) getInstance.newInstance(mContext, deviceConfig);
+
+                    mDevices.add(device);
+                } catch (ClassNotFoundException e) {
+                    Log.e("Room", "Failed to create device " + deviceData.getString("type"));
+                } catch (IllegalAccessException e) {
+                    Log.e("Room", "Do not have permissions to instantiate device " + deviceData.getString("type"));
+                } catch (ClassCastException | NoSuchMethodException | InvocationTargetException e) {
+                    Log.e("Room", "Class is not a controllable device " + deviceData.getString("type"));
+                } catch (InstantiationException e) {
+                    Log.e("Room", "Class does not have a valid (Context, JSONObject) constructor");
+                }
             }
         }
-
     }
 
     public Room(Context context, String name) {
@@ -98,16 +100,6 @@ public class Room extends Place {
     @Override
     public ControllableDeviceType getType() {
         return null;
-    }
-
-    @Override
-    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
-        try {
-            return new Room(context, config);
-        }catch(JSONException e){
-            Log.e("Room", "Could not instantiate based on JSON config "+e.getMessage());
-            throw new IllegalArgumentException("Malformed JSON for Room instantiation");
-        }
     }
 
     @Override

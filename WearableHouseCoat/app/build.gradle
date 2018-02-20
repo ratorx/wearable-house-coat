@@ -20,6 +20,10 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -46,4 +50,6 @@ dependencies {
     testCompile 'nl.jqno.equalsverifier:equalsverifier:2.4.3'
     //For testing HTTP
     testCompile 'org.apache.httpcomponents:httpclient:4.5.5'
+    //For testing JSON
+    testCompile 'org.json:json:20140107'
 }
