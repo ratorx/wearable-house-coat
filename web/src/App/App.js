@@ -48,7 +48,7 @@ class App extends React.Component {
 
 	render() {
 		return <div>
-			<Navbar fixedTop inverse>
+			<Navbar fixedTop inverse collapseOnSelect>
 				<Navbar.Header>
 					<Navbar.Brand>
 						<a href="#home">Wearable House Coat</a>
