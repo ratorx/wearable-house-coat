@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import clquebec.com.framework.location.IndoorLocationProvider;
+import clquebec.com.framework.HTTPRequestQueue;
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
@@ -44,7 +44,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
     private Context mContext;
     private LocationChangeListener mListener;
-    private RequestQueue mQueue; //For making HTTP requests
+    private HTTPRequestQueue mQueue; //For making HTTP requests
 
     private interface FingerprintCallback {
         void onFingerprint(JSONArray fingerprint);
@@ -53,8 +53,8 @@ public class FINDLocationProvider implements IndoorLocationProvider {
     private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
 
-    public FINDLocationProvider(Context c, Person p){
-        mQueue = Volley.newRequestQueue(c);
+    public FINDLocationProvider(Context c, Person p) {
+        mQueue = HTTPRequestQueue.getRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
         mPerson = p;
@@ -98,7 +98,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                 error -> Log.e("FIND", "Failed to get locations, " + error.getMessage())
         );
 
-        mQueue.add(locationRequest);
+        mQueue.addToRequestQueue(locationRequest);
     }
 
     private void getFingerprint(FingerprintCallback callback) {
@@ -164,7 +164,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                     response -> Log.d("FIND", "Succesfully updated fingerprint"),
                     error -> Log.e("FIND", error.getMessage()));
 
-            mQueue.add(trackRequest);
+            mQueue.addToRequestQueue(trackRequest);
         });
         return true;
     }
@@ -190,7 +190,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                     response -> Log.d("FIND", "Succesfully calibrated"),
                     error -> Log.e("FIND", error.getMessage()));
 
-            mQueue.add(trackRequest);
+            mQueue.addToRequestQueue(trackRequest);
         });
         return true;
     }
@@ -202,7 +202,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                 response -> Log.d("FIND", "Deleted group"),
                 error -> Log.e("FIND", error.getMessage())
         );
-        mQueue.add(newRequest);
+        mQueue.addToRequestQueue(newRequest);
         return true;
     }
 }

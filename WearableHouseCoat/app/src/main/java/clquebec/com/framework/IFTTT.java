@@ -25,12 +25,12 @@ import clquebec.com.environment.Keys;
 
 public class IFTTT {
     private String mMakerKey;
-    private RequestQueue mQueue;
+    private HTTPRequestQueue mQueue;
 
     private static IFTTT mInstance = null;
 
     private IFTTT(Context context) {
-        mQueue = Volley.newRequestQueue(context);
+        mQueue = HTTPRequestQueue.getRequestQueue(context);
 
         //TODO: Replace makerkey with a user-provided one
         mMakerKey = Keys.IFTTT;
@@ -83,6 +83,6 @@ public class IFTTT {
             }
         };
 
-        mQueue.add(postRequest);
+        mQueue.addToRequestQueue(postRequest);
     }
 }
