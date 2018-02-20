@@ -25,11 +25,11 @@ public class HTTPRequestQueue {
         return mRequestQueue;
     }
 
-    public static void addToRequestQueue(JsonObjectRequest request) {
+    public void addToRequestQueue(JsonObjectRequest request) {
         mQueue.add(request);
     }
 
-    public static void addToRequestQueue(StringRequest request) {
+    public void addToRequestQueue(StringRequest request) {
         mQueue.add(request);
     }
 
