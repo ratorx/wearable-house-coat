@@ -1,57 +1,36 @@
+"use strict"
+
 import React from 'react';
 import './App.css';
 import Lorem from './Lorem.js';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 class App extends React.Component {
-
-	// Pages enum
-	Pages = [
-		{
-			name: "Overview",
-			active: false,
-			action: () => {
-				console.log("Overview");
-			}
-		},
-		{
-			name: "Setup",
-			dropdown: [
+	constructor(){
+		super();
+		this.state = {
+			Pages: [
+				{name: "Overview"},
 				{
-					name: "Rooms",
-					active: false,
-					action: () => {
-						console.log("Rooms");
-					}
+					name: "Setup",
+					dropdown: [
+						{name: "Rooms"},
+						{name: "Devices"},
+						{name: "Groups"}
+					]
 				},
-				{
-					name: "Devices",
-					active: true,
-					action: () => {
-						console.log("Devices");
-					}
-				},
-				{
-					name: "Groups",
-					active: false,
-					action: () => {
-						console.log("Groups");
-					}
-				}
-			]
-		},
-		{
-			name: "Help",
-			active: false,
-			action: () => {
-				console.log("HEEEEEEELP!!!");
-			}
+				{name: "Help"}
+			],
+			currentPage: "Overview"
 		}
-	]
+	}
+
+	setCurrentPage(page) {
+		this.setState(() => {return {currentPage: page.name}})
+	}
 
 	render() {
 		return <div>
-			{/* <NavBar title="Wearable House Coat" pages={this.Pages}/>*/}
 			<Navbar fixedTop inverse>
 				<Navbar.Header>
 					<Navbar.Brand>
@@ -62,14 +41,14 @@ class App extends React.Component {
 				<Navbar.Collapse>
 					<Nav>
 						{
-							this.Pages.map((page, i) => {
+							this.state.Pages.map((page, i) => {
 								if(typeof page.dropdown === "undefined") {
-									return <NavItem key={i} active={page.active} onClick={page.action}>{page.name}</NavItem>
+									return <NavItem key={i} active={page.name === this.state.currentPage} onClick={() => {this.setCurrentPage(page)}}>{page.name}</NavItem>
 								} else {
 									return <NavDropdown key={i} title={page.name} id={"main-navbar-dropdown-" + page.name}>
 										{
 											page.dropdown.map((subpage, j) =>
-												<MenuItem key={i + "." + j} active={subpage.active} onClick={subpage.action}>{subpage.name}</MenuItem>
+												<MenuItem key={i + "." + j} active={subpage.name === this.state.currentPage} onClick={() => {this.setCurrentPage(subpage)}}>{subpage.name}</MenuItem>
 											)
 										}
 									</NavDropdown>
