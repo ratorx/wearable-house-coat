@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import clquebec.com.framework.HTTPRequestQueue;
 import clquebec.com.framework.location.LocationCalibrator;
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.LocationGetter;
@@ -46,7 +47,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
 
     private Context mContext;
     private LocationChangeListener mListener;
-    private RequestQueue mQueue; //For making HTTP requests
+    private HTTPRequestQueue mQueue; //For making HTTP requests
 
     private interface FingerprintCallback {
         void onFingerprint(JSONArray fingerprint);
@@ -58,7 +59,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
     private Handler mLocationUpdateHandler = new Handler();
 
     public FINDLocationProvider(Context c, Person p) {
-        mQueue = Volley.newRequestQueue(c);
+        mQueue = HTTPRequestQueue.getRequestQueue(c);
         mLocationMap = new HashMap<>();
         mContext = c;
         mPerson = p;
@@ -133,7 +134,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                 error -> Log.e("FIND", "Failed to get locations, " + error.getMessage())
         );
 
-        mQueue.add(locationRequest);
+        mQueue.addToRequestQueue(locationRequest);
     }
 
     private void getFingerprint(FingerprintCallback callback) {
@@ -199,7 +200,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                     response -> Log.d("FIND", "Successfully calibrated"),
                     error -> Log.e("FIND", error.getMessage()));
 
-            mQueue.add(trackRequest);
+            mQueue.addToRequestQueue(trackRequest);
         });
         return true;
     }
@@ -224,7 +225,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                     response -> Log.d("FIND", "Successfully updated fingerprint"),
                     error -> Log.e("FIND", error.getMessage()));
 
-            mQueue.add(trackRequest);
+            mQueue.addToRequestQueue(trackRequest);
         });
         return true;
     }
@@ -248,7 +249,7 @@ public class FINDLocationProvider implements LocationGetter, LocationCalibrator,
                 response -> Log.d("FIND", "Deleted group"),
                 error -> Log.e("FIND", error.getMessage())
         );
-        mQueue.add(newRequest);
+        mQueue.addToRequestQueue(newRequest);
         return true;
     }
 }
