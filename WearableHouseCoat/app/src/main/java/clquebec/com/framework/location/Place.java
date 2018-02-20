@@ -2,12 +2,10 @@ package clquebec.com.framework.location;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceGroup;
-import clquebec.com.framework.people.Person;
 
 /**
  * WearableHouseCoat
@@ -29,8 +27,6 @@ public abstract class Place implements ControllableDeviceGroup {
     }
 
     public abstract List<ControllableDevice> getDevices();
-
-    public abstract Set<Person> getPeople();
 
     public boolean equals(Object other) {
         return other instanceof Place && Objects.equals(((Place) other).getID(), this.getID());

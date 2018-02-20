@@ -1,7 +1,5 @@
 package clquebec.com.framework.location;
 
-import org.json.JSONObject;
-
 /**
  * Created by reeto on 09/02/18.
  */

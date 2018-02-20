@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import clquebec.com.framework.location.Building;
@@ -66,8 +67,7 @@ public class MainActivity extends WearableActivity {
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
         //Make a dummy Room with a light switch for testing
-        Room room = new Room(this, "Test Room");
-        mCurrentDisplayedRoom = room;
+        mCurrentDisplayedRoom = new Room(this, "Test Room");
 
         //Attach the adapter which automatically fills with controls for current Place
         DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(mCurrentDisplayedRoom);
@@ -78,23 +78,21 @@ public class MainActivity extends WearableActivity {
         mLocationNameView = findViewById(R.id.main_currentlocation);
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //Initialise location provider
-        Person me = new Person("tcb");
+        Person me = Person.getPerson(UUID.randomUUID());
+        me.setLocationListener((user, oldLocation, newLocation) -> {
+            if (mCurrentDisplayedRoom.equals(oldLocation)) {
+                setRoom(newLocation, false);
+            }
+        });
         mLocationProvider = new FINDLocationProvider(this, me);
-        mLocationProvider.setLocationChangeListener((user, oldLocation, newLocation) -> {
-                    if (user.equals(me) && mCurrentDisplayedRoom.equals(oldLocation)) { //If the user is me
-                        setRoom(newLocation, false);
-                    }
-                }
-        );
 
         //END SECTION
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
 
         //On click, calibrate location provider
-        findViewById(R.id.iamhere_wrapper).setOnClickListener(view -> {
-            mLocationProvider.calibrate(mCurrentDisplayedRoom);
-        });
+        findViewById(R.id.iamhere_wrapper)
+                .setOnClickListener(view -> mLocationProvider.calibrate(mCurrentDisplayedRoom));
 
         // Enables Always-on
         setAmbientEnabled();
@@ -119,7 +117,7 @@ public class MainActivity extends WearableActivity {
         mLocationUpdateHandler.post(new Runnable() {
             @Override
             public void run() {
-                mLocationProvider.forceLocationRefresh();
+                mLocationProvider.refreshLocations();
                 mLocationProvider.update();
                 mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
             }

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -24,12 +23,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import clquebec.com.framework.location.IndoorLocationProvider;
-import clquebec.com.framework.location.LocationCalibrator;
 import clquebec.com.framework.location.LocationChangeListener;
-import clquebec.com.framework.location.LocationGetter;
-import clquebec.com.framework.location.LocationUpdater;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
@@ -65,23 +62,12 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
     @Nullable
     @Override
-    public Place getCurrentLocation(Person p) {
+    public Place getLocation(Person p) {
         return mLocationMap.getOrDefault(p, null);
     }
 
     @Override
-    public void setLocationChangeListener(@Nullable LocationChangeListener listener) {
-        mListener = listener;
-
-        if (listener != null) {
-            for (Person p : mLocationMap.keySet()) {
-                listener.onLocationChanged(p, null, mLocationMap.get(p));
-            }
-        }
-    }
-
-    @Override
-    public void forceLocationRefresh() {
+    public void refreshLocations() {
         String url = SERVERURL + "location?group=" + GROUPID;
 
         JsonObjectRequest locationRequest = new JsonObjectRequest(
@@ -98,22 +84,12 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
                             //Get data
                             JSONArray userData = users.getJSONArray(user);
-                            Person person = new Person(user);
+                            Person person = Person.getPerson(UUID.fromString(user));
                             Place location = new Room(mContext, userData.getJSONObject(0).getString("location"));
-
-                            //Notify change
-                            if (mListener != null) {
-                                if (!mLocationMap.containsKey(person) || !mLocationMap.get(person).equals(location)) {
-                                    mListener.onLocationChanged(
-                                            person,
-                                            mLocationMap.getOrDefault(person, null),
-                                            location
-                                    );
-                                }
-                            }
 
                             //Update internal structure
                             mLocationMap.put(person, location);
+                            person.setLocation(location);
                         }
                     } catch (JSONException e) {
                         Log.e("FIND", "Cannot extract JSON");
