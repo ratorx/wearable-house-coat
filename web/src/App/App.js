@@ -48,10 +48,10 @@ class App extends React.Component {
 
 	render() {
 		return <div>
-			<Navbar fixedTop inverse collapseOnSelect>
+			<Navbar fixedTop inverse collapseOnSelect className="navbar-left-no-margin">
 				<Navbar.Header>
 					<Navbar.Brand>
-						<a href="#home">Wearable House Coat</a>
+						<a onClick={() => {this.setCurrentPage(this.state.pages[0])}}>Wearable House Coat</a>
 					</Navbar.Brand>
 					<Navbar.Toggle/>
 				</Navbar.Header>
