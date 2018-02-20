@@ -36,6 +36,8 @@ public class Room extends Place {
         //Instantiate devices
         mDevices = new ArrayList<>();
         JSONArray deviceList = roomData.getJSONArray("devices");
+
+        Log.d("Room", deviceList.toString());
         for(int i = 0; i < deviceList.length(); i++){
             JSONObject deviceData = deviceList.getJSONObject(i);
             //Load in device dynamically - Java reflection!
@@ -66,6 +68,7 @@ public class Room extends Place {
         super(UUID.randomUUID());
         mName = name;
         mContext = context;
+        mDevices = new ArrayList<>();
     }
 
     @Override

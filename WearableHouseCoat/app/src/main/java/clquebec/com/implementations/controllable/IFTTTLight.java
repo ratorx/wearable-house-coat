@@ -136,14 +136,4 @@ public class IFTTTLight implements ControllableLightDevice {
 
         return true;
     }
-
-    @Override
-    public ControllableDevice getDeviceInstance(Context context, JSONObject config) {
-        try {
-            return new IFTTTLight(context, config.getString("location"));
-        }catch(JSONException e){
-            Log.e("IFTTTLight", "JSON Does not have required attributes "+e.getMessage());
-            return new IFTTTLight(context, "Test Room");
-        }
-    }
 }
