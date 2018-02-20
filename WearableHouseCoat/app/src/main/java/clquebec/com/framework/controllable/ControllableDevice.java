@@ -37,6 +37,4 @@ public interface ControllableDevice {
     //The code that should be run in the case of an extended action.
     //Called by DeviceControlButton
     boolean extendedAction();
-
-    ControllableDevice getDeviceInstance(Context context, JSONObject config);
 }
