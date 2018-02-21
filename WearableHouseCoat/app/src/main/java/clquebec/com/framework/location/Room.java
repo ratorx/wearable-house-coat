@@ -12,6 +12,7 @@ import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.people.Person;
 import clquebec.com.implementations.controllable.IFTTTLight;
+import clquebec.com.implementations.controllable.PhilipsHue;
 
 /**
  * WearableHouseCoat
@@ -24,10 +25,20 @@ public class Room extends Place {
     private UUID mUUID;
     private Context mContext;
 
+    private List<ControllableDevice> devices;
+
     public Room(Context context, String name){
         mName = name;
         mUUID = UUID.randomUUID();
         mContext = context;
+
+        devices = new ArrayList<>();
+
+        ControllableDevice myLight = new PhilipsHue(mContext);
+        myLight.setName("Philips Hue");
+
+        devices.add(myLight);
+
     }
 
     @Override
@@ -54,12 +65,6 @@ public class Room extends Place {
     public List<ControllableDevice> getDevices() {
         //TODO: Read this from somewhere
         //For now, return a set with just an IFTTT Light controller.
-        List<ControllableDevice> devices = new ArrayList<>();
-
-        ControllableDevice myLight = new IFTTTLight(mContext, this);
-        myLight.setName("IFTTT Test");
-
-        devices.add(myLight);
 
         return devices;
     }

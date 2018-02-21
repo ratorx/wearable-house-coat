@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.philips.lighting.hue.sdk.wrapper.Persistence;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -39,9 +41,15 @@ public class MainActivity extends WearableActivity{
     private Building mBuilding;
     private Room mCurrentDisplayedRoom;
 
+    //load HueSDK on startup
+    static {
+        System.loadLibrary("huesdk");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Persistence.setStorageLocation(getFilesDir().getAbsolutePath(), "HueWear");
         setContentView(R.layout.activity_main);
 
         //SECTION: Initialize Building
@@ -49,8 +57,6 @@ public class MainActivity extends WearableActivity{
 
         mBuilding = new Building(this, "My House");
         mBuilding.addRoom(new Room(this, "Kitchen"));
-        mBuilding.addRoom(new Room(this, "Living Room"));
-        mBuilding.addRoom(new Room(this, "Dungeon"));
 
         //END SECTION
 
