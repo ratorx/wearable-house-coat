@@ -25,6 +25,7 @@ import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
+import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
@@ -50,12 +51,13 @@ public class MainActivity extends WearableActivity {
 
         Log.d("MainActivity", "This should be printed right?");
         //SECTION: Initialize Building
-        //TODO: Read in from somewhere (e.g web)
 
-        mBuilding = new Building(this, "My House");
-        mBuilding.addRoom(new Room(this, "Kitchen"));
-        mBuilding.addRoom(new Room(this, "Living Room"));
-        mBuilding.addRoom(new Room(this, "Dungeon"));
+        mBuilding = new Building(this, "Placeholder"); //Placeholder building
+
+        //Get building from store
+        ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+            mBuilding = config.getBuilding(this);
+        });
 
         //END SECTION
 

@@ -12,7 +12,10 @@
 * TODO
 
 ## Website
-* TODO
+* Clone project.
+* cd into web directory.
+* run `npm install` to download all dependencies
+* use `npm start` to start a node server and go to localhost:3000 if it does not happen automatically
 
 ## Connecting Hue in the Intel Lab
 This has only been tested on Windows 10, but does work. I'm sure a similar setup works for Mac.

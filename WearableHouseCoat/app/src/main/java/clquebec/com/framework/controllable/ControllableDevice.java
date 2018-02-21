@@ -1,5 +1,9 @@
 package clquebec.com.framework.controllable;
 
+import android.content.Context;
+
+import org.json.JSONObject;
+
 /**
  * WearableHouseCoat
  * Author: tom
