@@ -7,10 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import android.util.Log;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;

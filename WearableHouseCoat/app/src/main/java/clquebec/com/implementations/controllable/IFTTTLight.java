@@ -12,10 +12,8 @@ import java.util.List;
 
 import clquebec.com.framework.IFTTT;
 import clquebec.com.framework.controllable.ActionNotSupported;
-import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
-import clquebec.com.framework.location.Place;
 import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
 /**
@@ -25,6 +23,7 @@ import clquebec.com.wearablehousecoat.LightControlPanelActivity;
  */
 
 public class IFTTTLight implements ControllableLightDevice {
+    private static final String TAG = "IFTTTLight";
     private static final String EVENT_PREFIX = "light_";
 
     private String mLocation;
@@ -122,13 +121,13 @@ public class IFTTTLight implements ControllableLightDevice {
     @Override
     public boolean quickAction() {
         //Toggle the light on and off.
-        Log.d("IFTTTLight", "IFTTT quick action");
+        Log.d(TAG, "IFTTT quick action");
         return isEnabled() ? disable() : enable();
     }
 
     @Override
     public boolean extendedAction() {
-        Log.d("IFTTTLight", "IFTTT extended action");
+        Log.d(TAG, "IFTTT extended action");
         //More in-depth lighting controls
 
         Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);

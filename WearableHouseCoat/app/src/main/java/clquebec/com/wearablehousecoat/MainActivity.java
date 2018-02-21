@@ -30,6 +30,8 @@ import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
 public class MainActivity extends WearableActivity {
+    private final static String TAG = "MainActivity";
+
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
     private final static int POLLDELAYMILLIS = 5000;
 
@@ -49,7 +51,6 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("MainActivity", "This should be printed right?");
         //SECTION: Initialize Building
 
         mBuilding = new Building(this, "Placeholder"); //Placeholder building
@@ -115,7 +116,7 @@ public class MainActivity extends WearableActivity {
 
         // Set up location update
 
-        Log.d("LocationUpdater", "Using timer");
+        Log.d(TAG, "Using timer for location updater");
         mLocationUpdateHandler.post(new Runnable() {
             @Override
             public void run() {

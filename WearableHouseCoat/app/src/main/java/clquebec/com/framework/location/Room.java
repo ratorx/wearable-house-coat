@@ -22,9 +22,11 @@ import clquebec.com.framework.controllable.ControllableDeviceType;
  */
 
 public class Room extends Place {
+    private final static String TAG = "Room";
     private String mName;
     private Context mContext;
     private List<ControllableDevice> mDevices;
+
 
     public Room(Context context, JSONObject roomData) throws JSONException{
         //Only use LSB - for now
@@ -39,7 +41,7 @@ public class Room extends Place {
         if(roomData.has("devices")) {
             JSONArray deviceList = roomData.getJSONArray("devices");
 
-            Log.d("Room", deviceList.toString());
+            Log.d(TAG, deviceList.toString());
             for (int i = 0; i < deviceList.length(); i++) {
                 JSONObject deviceData = deviceList.getJSONObject(i);
                 //Load in device dynamically - Java reflection!
@@ -55,13 +57,13 @@ public class Room extends Place {
 
                     mDevices.add(device);
                 } catch (ClassNotFoundException e) {
-                    Log.e("Room", "Failed to create device " + deviceData.getString("type"));
+                    Log.e(TAG, "Failed to create device " + deviceData.getString("type"));
                 } catch (IllegalAccessException e) {
-                    Log.e("Room", "Do not have permissions to instantiate device " + deviceData.getString("type"));
+                    Log.e(TAG, "Do not have permissions to instantiate device " + deviceData.getString("type"));
                 } catch (ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-                    Log.e("Room", "Class is not a controllable device " + deviceData.getString("type"));
+                    Log.e(TAG, "Class is not a controllable device " + deviceData.getString("type"));
                 } catch (InstantiationException e) {
-                    Log.e("Room", "Class does not have a valid (Context, JSONObject) constructor");
+                    Log.e(TAG, "Class does not have a valid (Context, JSONObject) constructor");
                 }
             }
         }

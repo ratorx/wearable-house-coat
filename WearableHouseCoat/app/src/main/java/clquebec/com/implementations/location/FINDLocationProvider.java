@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -24,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.HTTPRequestQueue;
+import clquebec.com.framework.location.IndoorLocationProvider;
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
@@ -38,6 +37,8 @@ import clquebec.com.framework.people.Person;
  */
 
 public class FINDLocationProvider implements IndoorLocationProvider {
+    private static final String TAG = "FIND";
+
     public static final String GROUPID = "LULLINGLABRADOODLE";
     public static final String SERVERURL = "http://shell.srcf.net:8003/";
     public static final int POLLDELAYMILLIS = 5000;
@@ -73,7 +74,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
         JsonObjectRequest locationRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
                 response -> {
-                    Log.d("FIND", "Successfully Received Locations");
+                    Log.d(TAG, "Successfully Received Locations");
 
                     try {
                         //Iterate over response
@@ -92,10 +93,10 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                             person.setLocation(location);
                         }
                     } catch (JSONException e) {
-                        Log.e("FIND", "Cannot extract JSON");
+                        Log.e(TAG, "Cannot extract JSON");
                     }
                 },
-                error -> Log.e("FIND", "Failed to get locations, " + error.getMessage())
+                error -> Log.e(TAG, "Failed to get locations, " + error.getMessage())
         );
 
         mQueue.addToRequestQueue(locationRequest);
@@ -105,7 +106,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
         WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 
         if(wifiManager == null){
-            Log.e("FIND", "WiFi is not available");
+            Log.e(TAG, "WiFi is not available");
             return;
         }
 
@@ -131,7 +132,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
                             fingerprint.put(AP);
                         } catch (JSONException e) {
-                            Log.e("FIND", "Could not add information about AP to fingerprint, " + e.getMessage());
+                            Log.e(TAG, "Could not add information about AP to fingerprint, " + e.getMessage());
                         }
                     }
 
@@ -157,12 +158,12 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                 jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
                 jsonObject.put("wifi-fingerprint", fingerprint);
             } catch (JSONException e) {
-                Log.e("FIND", "Could not generate update request, " + e.getMessage());
+                Log.e(TAG, "Could not generate update request, " + e.getMessage());
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Succesfully updated fingerprint"),
-                    error -> Log.e("FIND", error.getMessage()));
+                    response -> Log.d(TAG, "Succesfully updated fingerprint"),
+                    error -> Log.e(TAG, error.getMessage()));
 
             mQueue.addToRequestQueue(trackRequest);
         });
@@ -182,13 +183,13 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                 jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
                 jsonObject.put("wifi-fingerprint", fingerprint);
             } catch (JSONException e) {
-                Log.e("FIND", "Could not generate update request, " + e.getMessage());
+                Log.e(TAG, "Could not generate update request, " + e.getMessage());
             }
 
-            Log.d("FIND", jsonObject.toString());
+            Log.d(TAG, jsonObject.toString());
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d("FIND", "Succesfully calibrated"),
-                    error -> Log.e("FIND", error.getMessage()));
+                    response -> Log.d(TAG, "Succesfully calibrated"),
+                    error -> Log.e(TAG, error.getMessage()));
 
             mQueue.addToRequestQueue(trackRequest);
         });
@@ -199,8 +200,8 @@ public class FINDLocationProvider implements IndoorLocationProvider {
     public boolean reset() {
         String url = SERVERURL + "database?group=" + GROUPID;
         StringRequest newRequest = new StringRequest(Request.Method.DELETE, url,
-                response -> Log.d("FIND", "Deleted group"),
-                error -> Log.e("FIND", error.getMessage())
+                response -> Log.d(TAG, "Deleted group"),
+                error -> Log.e(TAG, error.getMessage())
         );
         mQueue.addToRequestQueue(newRequest);
         return true;

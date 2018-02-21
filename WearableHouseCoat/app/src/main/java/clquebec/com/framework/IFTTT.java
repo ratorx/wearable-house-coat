@@ -5,9 +5,7 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +22,8 @@ import clquebec.com.environment.Keys;
  */
 
 public class IFTTT {
+    private static final String TAG = "IFTTT";
+
     private String mMakerKey;
     private HTTPRequestQueue mQueue;
 
@@ -62,7 +62,7 @@ public class IFTTT {
                 try {
                     json.put("values" + (i + 1), values.get(i));
                 } catch (JSONException e) {
-                    Log.d("IFTTT", "JSONException on value" + (i + 1));
+                    Log.d(TAG, "JSONException on value" + (i + 1));
                 }
             }
         }
@@ -70,11 +70,11 @@ public class IFTTT {
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,
                 response -> {
                     // response
-                    Log.d("IFTTT", "Response: " + response);
+                    Log.d(TAG, "Response: " + response);
                 },
                 error -> {
                     // error
-                    Log.d("IFTTT", "IFTTT Error: " + error.getMessage());
+                    Log.d(TAG, "IFTTT Error: " + error.getMessage());
                 }
         ) {
             @Override
