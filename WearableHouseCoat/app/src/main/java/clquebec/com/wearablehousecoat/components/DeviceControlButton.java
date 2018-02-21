@@ -122,12 +122,16 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         /* Draw a circle, with an icon on top. */
         if (mDevice == null || mDevice.isEnabled()) {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
-            if (mDevice != null) {
+
+            if (mDevice != null && mDevice.getName() != null) {
                 canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaint);
             }
         } else {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaintOff);
-            canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaintOff);
+
+            if(mDevice.getName() != null) {
+                canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaintOff);
+            }
         }
         if (mDeviceIcon != null) {
             mDeviceIcon.draw(canvas);
