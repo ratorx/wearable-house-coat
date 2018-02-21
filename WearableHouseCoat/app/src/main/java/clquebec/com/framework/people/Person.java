@@ -1,6 +1,11 @@
 package clquebec.com.framework.people;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +14,7 @@ import java.util.UUID;
 
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
+import clquebec.com.framework.storage.ConfigurationStore;
 
 /**
  * WearableHouseCoat
@@ -17,17 +23,33 @@ import clquebec.com.framework.location.Place;
  */
 
 public class Person {
+    private static final String TAG = "Person";
     private static final Map<UUID, Person> people = new HashMap<>();
 
-    private final String mName;
+    private static ConfigurationStore mConfigStore;
+
+    private String mName;
     private final UUID mUUID;
     private Place mLocation;
     private LocationChangeListener mListener;
 
-    public static Person getPerson(UUID id) {
+    //Used for production
+    public static Person getPerson(Context c, UUID id) {
+        if(mConfigStore == null) {
+            return getPerson(ConfigurationStore.getInstance(c), id);
+        }else {
+            return getPerson(mConfigStore, id);
+        }
+    }
+
+    //Mostly used for testing
+    public static Person getPerson(ConfigurationStore config, UUID id){
         if (people.containsKey(id)) {
             return people.get(id);
         }
+
+        //Update mConfigStore
+        mConfigStore = config;
 
         Person p = new Person(id);
         people.put(id, p);
@@ -35,9 +57,19 @@ public class Person {
     }
 
     private Person(UUID id) {
-        // TODO: Instantiate from Tom's fancy config store
         mUUID = id;
-        mName = "Test Person";
+        mName = "Unnamed";
+
+        //Load person information from configuration store
+        mConfigStore.onConfigAvailable(config -> {
+            JSONObject personData = config.getPersonInformation(id);
+
+            try{
+                mName = personData.getString("name");
+            }catch(JSONException | NullPointerException e){
+                Log.e(TAG, "Could not get person name for UID "+mUUID.toString());
+            }
+        });
     }
 
     public String getName() {
@@ -48,14 +80,13 @@ public class Person {
     @Override
     public final boolean equals(Object other) {
         return other instanceof Person
-                && Objects.equals(((Person) other).getUUID(), this.getUUID())
-                && Objects.equals(((Person) other).getName(), this.getName());
+                && Objects.equals(((Person) other).getUUID(), this.getUUID());
     }
 
     @Override
     public final int hashCode(){
         //A simple hashcode.
-        return Objects.hashCode(mUUID) + Objects.hashCode(mName);
+        return Objects.hashCode(mUUID);
     }
 
     public @Nullable

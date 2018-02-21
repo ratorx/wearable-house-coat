@@ -2,7 +2,6 @@ import android.content.Context;
 
 import junit.framework.TestCase;
 
-import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +16,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.storage.ConfigurationStore;
@@ -37,6 +35,8 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigurationStoreTest extends TestCase {
+
+    //Injected into mConfigurationStore
     @Mock(name="queue")
     private HTTPRequestQueue requestQueue;
 

@@ -81,7 +81,7 @@ public class MainActivity extends WearableActivity {
         mLocationNameView = findViewById(R.id.main_currentlocation);
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //Initialise location provider
-        Person me = Person.getPerson(UUID.randomUUID());
+        Person me = Person.getPerson(this, UUID.randomUUID());
         me.setLocationListener((user, oldLocation, newLocation) -> {
             if (mCurrentDisplayedRoom.equals(oldLocation)) {
                 setRoom(newLocation, false);

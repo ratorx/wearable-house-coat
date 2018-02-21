@@ -1,13 +1,25 @@
+import android.content.Context;
+
 import junit.framework.TestCase;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
+import clquebec.com.framework.HTTPRequestQueue;
 import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.people.Person;
+import clquebec.com.framework.storage.ConfigurationStore;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,31 +30,80 @@ import static org.mockito.Mockito.verify;
  * Creation Date: 19/02/18
  */
 
+@RunWith(MockitoJUnitRunner.class)
 public class PersonTest extends TestCase {
     private Person mPerson;
 
+    @Mock(name="c")
+    private Context mContext;
+
+    //For testing instantiation from configuration store
+    @Mock(name="queue")
+    private HTTPRequestQueue requestQueue;
+
+    @InjectMocks
+    private ConfigurationStore mConfigurationStore;
+
+    @Test
     public void testGetUUID(){
         //Instantiating with a UUID should yield that UUID
         UUID uuid = UUID.randomUUID();
-        mPerson = Person.getPerson(uuid);
+        mPerson = Person.getPerson(mContext, uuid);
         assertThat(mPerson.getUUID()).isEqualTo(uuid);
     }
 
+    @Test
+    public void testJSONInstantiation() throws JSONException{
+        //Put some Person data into configuration store
+        //(don't test the configuration store here!)
+        mConfigurationStore.setData(new JSONObject("{'people':[{'name':'testname', 'id':100}]}"));
+
+        //Instantiate a person
+        UUID uid = new UUID(0, 100);
+        mPerson = Person.getPerson(mConfigurationStore, uid);
+
+        //Person should have the given test name
+        assertThat(mPerson.getName()).isEqualTo("testname");
+    }
+
+    @Test
+    public void testSingleton(){
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+
+        //Instantiate a Person with id1
+        Person person1 = Person.getPerson(mContext, id1);
+
+        //Getting that ID again should be the same person
+        assertThat(Person.getPerson(mContext, id1)).isEqualTo(person1);
+
+        //Getting a different ID should not be the same person
+        assertThat(Person.getPerson(mContext, id2)).isNotEqualTo(person1);
+    }
+
+    @Test
     public void testEquality(){
         //Call EqualsVerifier
         Place place1 = mock(Place.class);
         Place place2 = mock(Place.class);
+
+        ConfigurationStore config1 = mock(ConfigurationStore.class);
+        ConfigurationStore config2 = mock(ConfigurationStore.class);
+
         EqualsVerifier.forClass(Person.class)
                 .withPrefabValues(Place.class, place1, place2)
+                .withPrefabValues(ConfigurationStore.class, config1, config2)
                 .withIgnoredFields("mLocation") //Don't do equality on locations for people - it's mutable
                 .withIgnoredFields("mListener") //Don't do equality on listeners - it's mutable
+                .withIgnoredFields("mName") //Don't do equality on name - UID is enough
                 .verify();
     }
 
+    @Test
     public void testGetLocation(){
         Place place1 = mock(Place.class);
         Place place2 = mock(Place.class);
-        mPerson = Person.getPerson(UUID.randomUUID());
+        mPerson = Person.getPerson(mContext, UUID.randomUUID());
 
         //Setting location then immediately getting it should yield that location
         mPerson.setLocation(place1);
@@ -53,8 +114,9 @@ public class PersonTest extends TestCase {
         assertThat(mPerson.getLocation()).isEqualTo(place2);
     }
 
+    @Test
     public void testLocationListener(){
-        mPerson = Person.getPerson(UUID.randomUUID());
+        mPerson = Person.getPerson(mContext, UUID.randomUUID());
         Place place1 = mock(Place.class);
         Place place2 = mock(Place.class);
 

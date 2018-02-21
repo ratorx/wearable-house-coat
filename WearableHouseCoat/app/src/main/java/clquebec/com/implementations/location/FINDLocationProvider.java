@@ -85,7 +85,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
                             //Get data
                             JSONArray userData = users.getJSONArray(user);
-                            Person person = Person.getPerson(UUID.fromString(user));
+                            Person person = Person.getPerson(mContext, UUID.fromString(user));
                             Place location = new Room(mContext, userData.getJSONObject(0).getString("location"));
 
                             //Update internal structure
