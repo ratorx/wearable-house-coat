@@ -14,6 +14,7 @@ import java.util.UUID;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.storage.ConfigurationStore;
+import clquebec.com.implementations.controllable.PhilipsHue;
 
 /**
  * WearableHouseCoat
@@ -64,10 +65,19 @@ public class Room extends Place {
         }
     }
 
+    private List<ControllableDevice> devices;
+
     public Room(Context context, String name) {
         super(UUID.randomUUID());
         mName = name;
         mDevices = new ArrayList<>();
+
+        devices = new ArrayList<>();
+
+        ControllableDevice myLight = new PhilipsHue(mContext);
+        myLight.setName("Philips Hue");
+
+        devices.add(myLight);
     }
 
     @Override
