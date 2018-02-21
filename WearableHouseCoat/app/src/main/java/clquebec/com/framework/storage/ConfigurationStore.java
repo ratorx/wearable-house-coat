@@ -1,6 +1,7 @@
 package clquebec.com.framework.storage;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -10,10 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -162,6 +161,25 @@ public class ConfigurationStore {
         }catch(JSONException | NullPointerException e){
             //Person does not exist
             return null;
+        }
+    }
+
+    @Nullable
+    public String getLocationServerAddress(){
+        try{
+            return mData.getString("server");
+        }catch(JSONException e){
+            //No address
+            return null;
+        }
+    }
+
+    public UUID getMyUUID(){
+        try{
+            return new UUID(0, mData.getInt("me"));
+        }catch(JSONException e){
+            //Return a default UUID
+            return new UUID(0, 0);
         }
     }
 }

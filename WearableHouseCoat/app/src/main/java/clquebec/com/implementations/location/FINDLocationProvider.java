@@ -29,6 +29,7 @@ import clquebec.com.framework.location.LocationChangeListener;
 import clquebec.com.framework.location.Place;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.people.Person;
+import clquebec.com.framework.storage.ConfigurationStore;
 
 /*
  * WearableHouseCoat
@@ -46,6 +47,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
     private Context mContext;
     private LocationChangeListener mListener;
     private HTTPRequestQueue mQueue; //For making HTTP requests
+    private String mServerLocation = SERVERURL;
 
     private interface FingerprintCallback {
         void onFingerprint(JSONArray fingerprint);
@@ -59,6 +61,13 @@ public class FINDLocationProvider implements IndoorLocationProvider {
         mLocationMap = new HashMap<>();
         mContext = c;
         mPerson = p;
+
+        //Get server URL from configuration store
+        ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
+            if(config.getLocationServerAddress() != null) {
+                mServerLocation = config.getLocationServerAddress();
+            }
+        });
     }
 
     @Nullable
@@ -69,7 +78,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
     @Override
     public void refreshLocations() {
-        String url = SERVERURL + "location?group=" + GROUPID;
+        String url = mServerLocation + "location?group=" + GROUPID;
 
         JsonObjectRequest locationRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null,
@@ -148,7 +157,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
     @Override
     public boolean update() {
         getFingerprint(fingerprint -> {
-            String url = SERVERURL + "track";
+            String url = mServerLocation + "track";
 
             JSONObject jsonObject = new JSONObject();
             try {
@@ -173,7 +182,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
     @Override
     public boolean calibrate(Place room) {
         getFingerprint(fingerprint -> {
-            String url = SERVERURL + "learn";
+            String url = mServerLocation + "learn";
 
             JSONObject jsonObject = new JSONObject();
             try {
@@ -198,7 +207,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
     @Override
     public boolean reset() {
-        String url = SERVERURL + "database?group=" + GROUPID;
+        String url = mServerLocation + "database?group=" + GROUPID;
         StringRequest newRequest = new StringRequest(Request.Method.DELETE, url,
                 response -> Log.d(TAG, "Deleted group"),
                 error -> Log.e(TAG, error.getMessage())

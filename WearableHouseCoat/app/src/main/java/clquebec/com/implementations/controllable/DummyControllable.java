@@ -22,6 +22,7 @@ public class DummyControllable implements ControllableDevice {
     private String mLocation;
 
     public DummyControllable(Context c, JSONObject config) throws JSONException{
+        //Test that the location string is given.
         mLocation = config.getString("location");
     }
 

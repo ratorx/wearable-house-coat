@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import clquebec.com.framework.location.Building;
@@ -55,9 +54,32 @@ public class MainActivity extends WearableActivity {
 
         mBuilding = new Building(this, "Placeholder"); //Placeholder building
 
-        //Get building from store
+        //Do things which require the configuration store
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
             mBuilding = config.getBuilding(this);
+
+            //Initialise "me"
+            Person me = Person.getPerson(this, config.getMyUUID());
+            me.setLocationListener((user, oldLocation, newLocation) -> {
+                if (mCurrentDisplayedRoom.equals(oldLocation)) {
+                    setRoom(newLocation, false);
+                }
+            });
+
+            //Initialise location provider
+            mLocationProvider = new FINDLocationProvider(this, me);
+
+            // Set up location update
+            Log.d(TAG, "Using timer for location updater");
+            mLocationUpdateHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mLocationProvider.refreshLocations();
+                    mLocationProvider.update();
+                    mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+                }
+            });
+
         });
 
         //END SECTION
@@ -80,14 +102,6 @@ public class MainActivity extends WearableActivity {
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
-        //Initialise location provider
-        Person me = Person.getPerson(this, UUID.randomUUID());
-        me.setLocationListener((user, oldLocation, newLocation) -> {
-            if (mCurrentDisplayedRoom.equals(oldLocation)) {
-                setRoom(newLocation, false);
-            }
-        });
-        mLocationProvider = new FINDLocationProvider(this, me);
 
         //END SECTION
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
@@ -112,18 +126,6 @@ public class MainActivity extends WearableActivity {
             //Pass room names as an extra
             intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
             MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
-        });
-
-        // Set up location update
-
-        Log.d(TAG, "Using timer for location updater");
-        mLocationUpdateHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mLocationProvider.refreshLocations();
-                mLocationProvider.update();
-                mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-            }
         });
 
         // Enables Always-on
