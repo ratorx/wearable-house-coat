@@ -44,30 +44,31 @@ import clquebec.com.wearablehousecoat.LightControlPanelActivity;
  */
 
 public class PhilipsHue implements ControllableLightDevice {
-    //TODO: Implement this.
+    private static final String TAG = "PhilipsHue";
+
     private static Bridge bridge = null;
     private boolean enabled = true;
     private Context mContext;
     private HeartbeatManager mHbm;
     private UUID mUUID;
-
+    private String mName;
 
     private BridgeConnectionCallback bridgeConnectionCallback = new BridgeConnectionCallback() {
         @Override
         public void onConnectionEvent(BridgeConnection bridgeConnection, ConnectionEvent connectionEvent) {
-            Log.d("Hue", "Connection event: " + connectionEvent);
-            if (connectionEvent.equals("AUTHENTICATED")) {
+            Log.d(TAG, "Connection event: " + connectionEvent);
+            if (connectionEvent.toString().equals("AUTHENTICATED")) {
                 HeartbeatManager hbm = bridgeConnection.getHeartbeatManager();
-                hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 100);
+                hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 1000);
                 mHbm = hbm;
 
-                Log.d("Hue", "Connected and authenticated to bridge");
+                Log.d(TAG, "Connected and authenticated to bridge");
             }
         }
 
         public void onConnectionError(BridgeConnection bridgeConnection, List<HueError> hueErrors){
             for (HueError error : hueErrors) {
-                Log.e("Hue", "Connection error: " + error.toString());
+                Log.e(TAG, "Connection error: " + error.toString());
             }
         }
     };
@@ -75,7 +76,7 @@ public class PhilipsHue implements ControllableLightDevice {
     private BridgeStateUpdatedCallback bridgeStateUpdatedCallback = new BridgeStateUpdatedCallback() {
         @Override
         public void onBridgeStateUpdated(Bridge bridge, BridgeStateUpdatedEvent bridgeStateUpdatedEvent) {
-            Log.i("Hue", "Bridge state updated event: " + bridgeStateUpdatedEvent);
+            Log.i(TAG, "Bridge state updated event: " + bridgeStateUpdatedEvent);
         }
     };
 
@@ -91,7 +92,7 @@ public class PhilipsHue implements ControllableLightDevice {
 
         //Initialise internal state.
         mContext = c;
-        //connect to bridge. This is currently hardcoded. Need to implement discovery
+        //TODO: Implement Hue bridge discovery
         if (bridge == null){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
@@ -111,7 +112,7 @@ public class PhilipsHue implements ControllableLightDevice {
 
     @Override
     public void setLightColor(int color) throws ActionNotSupported {
-        Log.d("Hue", "Running this");
+        Log.d(TAG, "Setting the colour of PhilipsHue");
         BridgeState bs = bridge.getBridgeState();
 
         List<LightPoint> lights = bs.getLights();
@@ -120,7 +121,6 @@ public class PhilipsHue implements ControllableLightDevice {
 
             final LightState lightState = new LightState();
 
-            //lightState.setOn(true);
             int r = Color.red(color);
             int g = Color.green(color);
             int b = Color.blue(color);
@@ -133,11 +133,11 @@ public class PhilipsHue implements ControllableLightDevice {
                 @Override
                 public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
                     if (returnCode == ReturnCode.SUCCESS) {
-                        Log.i("Hue", "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
+                        Log.d(TAG, "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
                     } else {
-                        Log.e("Hue", "Error changing hue of light " + light.getIdentifier());
+                        Log.e(TAG, "Error changing hue of light " + light.getIdentifier());
                         for (HueError error : errorList) {
-                            Log.e("Hue", error.toString());
+                            Log.e(TAG, error.toString());
                         }
                     }
                 }
@@ -195,11 +195,11 @@ public class PhilipsHue implements ControllableLightDevice {
                 @Override
                 public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
                     if (returnCode == ReturnCode.SUCCESS) {
-                        Log.i("Hue", "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
+                        Log.d(TAG, "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
                     } else {
-                        Log.e("Hue", "Error changing hue of light " + light.getIdentifier());
+                        Log.e(TAG, "Error changing hue of light " + light.getIdentifier());
                         for (HueError error : errorList) {
-                            Log.e("Hue", error.toString());
+                            Log.e(TAG, error.toString());
                         }
                     }
                 }
@@ -217,12 +217,16 @@ public class PhilipsHue implements ControllableLightDevice {
 
     @Override
     public void setName(String name) {
-
+        mName = name;
     }
 
     @Override
     public String getName() {
-        return "Philips Hue";
+        if(mName != null){
+            return mName;
+        }else {
+            return "Philips Hue";
+        }
     }
 
     @Override
@@ -244,6 +248,7 @@ public class PhilipsHue implements ControllableLightDevice {
     public boolean extendedAction() {
         Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
         lightControls.putExtra("DeviceType", "HueLight");
+        lightControls.putExtra(LightControlPanelActivity.ID_EXTRA, this.getID());
         mContext.startActivity(lightControls);
 
         return true;

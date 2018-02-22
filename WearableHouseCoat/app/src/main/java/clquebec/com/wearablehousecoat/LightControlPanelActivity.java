@@ -1,11 +1,9 @@
 package clquebec.com.wearablehousecoat;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +17,7 @@ import clquebec.com.implementations.controllable.PhilipsHue;
 
 public class LightControlPanelActivity extends WearableActivity {
     private final static int REQUEST_PICK_COLOR = 1;
+    public static final String ID_EXTRA = "DeviceID";
 
     private TextView mTextView;
     private ImageView mColourPreview;
