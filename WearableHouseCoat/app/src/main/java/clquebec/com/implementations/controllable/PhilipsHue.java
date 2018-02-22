@@ -3,7 +3,6 @@ package clquebec.com.implementations.controllable;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeConnection;
@@ -15,7 +14,6 @@ import com.philips.lighting.hue.sdk.wrapper.connection.BridgeStateUpdatedCallbac
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeStateUpdatedEvent;
 import com.philips.lighting.hue.sdk.wrapper.connection.ConnectionEvent;
 import com.philips.lighting.hue.sdk.wrapper.connection.HeartbeatManager;
-import com.philips.lighting.hue.sdk.wrapper.connection.LocalBridgeConnection;
 import com.philips.lighting.hue.sdk.wrapper.domain.Bridge;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeBuilder;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
@@ -29,6 +27,7 @@ import com.philips.lighting.hue.sdk.wrapper.utilities.HueColor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.UUID;
@@ -47,22 +46,18 @@ import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
 public class PhilipsHue implements ControllableLightDevice {
     //TODO: Implement this.
-    private static Bridge bridge = null;
-    private boolean enabled = true;
+    private static Bridge mbridge = null;
+    private static List<PhilipsHueListener> listeners = new ArrayList<>();
+    private static BridgeConnection connection;
     private Context mContext;
-    private HeartbeatManager mHbm;
     private UUID mUUID;
+
 
 
     private BridgeConnectionCallback bridgeConnectionCallback = new BridgeConnectionCallback() {
         @Override
         public void onConnectionEvent(BridgeConnection bridgeConnection, ConnectionEvent connectionEvent) {
             Log.d("Hue", "Connection event: " + connectionEvent);
-            if (connectionEvent.equals("AUTHENTICATED")) {
-                HeartbeatManager hbm = bridgeConnection.getHeartbeatManager();
-                hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 100);
-                mHbm = hbm;
-            }
         }
 
         public void onConnectionError(BridgeConnection bridgeConnection, List<HueError> hueErrors){
@@ -76,6 +71,19 @@ public class PhilipsHue implements ControllableLightDevice {
         @Override
         public void onBridgeStateUpdated(Bridge bridge, BridgeStateUpdatedEvent bridgeStateUpdatedEvent) {
             Log.i("Hue", "Bridge state updated event: " + bridgeStateUpdatedEvent);
+            if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.INITIALIZED){
+                HeartbeatManager hbm = connection.getHeartbeatManager();
+                if (hbm != null) {
+                    Log.d("Hue", "Starting heartbeats...");
+                    hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 1000);
+                }
+            } else {
+                mbridge.getBridgeState().refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.REMOTE_LOCAL);
+                for (PhilipsHueListener l : listeners){
+                    Log.d("Hue", "Attempting to run listeners");
+                    l.updateState(mbridge.getBridgeState());
+                }
+            }
         }
     };
 
@@ -91,17 +99,18 @@ public class PhilipsHue implements ControllableLightDevice {
 
         //Initialise internal state.
         mContext = c;
-        //connect to bridge. This is currently hardcoded. Need to implement discovery
-        if (bridge == null){
-            bridge = new BridgeBuilder("Wearable House Control", "CLWatch")
+        //connect to mbridge. This is currently hardcoded. Need to implement discovery
+        if (mbridge == null){
+            mbridge = new BridgeBuilder("Wearable House Control", "CLWatch-other")
                     .setIpAddress("192.168.14.220")
                     .setConnectionType(BridgeConnectionType.LOCAL)
                     .setBridgeConnectionCallback(bridgeConnectionCallback)
                     .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
                     .build();
 
-            Log.d("Hue", "Connected to bridge");
-            BridgeConnection connection = bridge.getBridgeConnection(BridgeConnectionType.LOCAL);
+            Log.d("Hue", "Connected to mbridge");
+            connection = mbridge.getBridgeConnection(BridgeConnectionType.LOCAL);
+            connection.getConnectionOptions().enableFastConnectionMode(mbridge.getIdentifier());
             connection.connect();
 
 
@@ -114,13 +123,14 @@ public class PhilipsHue implements ControllableLightDevice {
     @Override
     public void setLightColor(int color) throws ActionNotSupported {
         Log.d("Hue", "Running this");
-        BridgeState bs = bridge.getBridgeState();
+        BridgeState bs = mbridge.getBridgeState();
 
         List<LightPoint> lights = bs.getLights();
 
         for (LightPoint light : lights) {
 
-            final LightState lightState = new LightState();
+            final LightState lightState = light.getLightState();
+
 
             //lightState.setOn(true);
             int r = Color.red(color);
@@ -148,12 +158,12 @@ public class PhilipsHue implements ControllableLightDevice {
     }
 
     public int getColor() {
-            BridgeState bs = bridge.getBridgeState();
+            BridgeState bs = mbridge.getBridgeState();
             bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
             List<LightPoint> lights = bs.getLights();
 
             if (lights.size() > 0){
-               LightPoint testLight = lights.get(2);
+               LightPoint testLight = lights.get(0);
                 HueColor.RGB rgb = testLight.getLightState().getColor().getRGB();
 
                 return getIntFromColor(rgb.r, rgb.g, rgb.b);
@@ -170,29 +180,81 @@ public class PhilipsHue implements ControllableLightDevice {
         return 0xFF000000 | Red | Green | Blue; //0xFF000000 for 100% Alpha. Bitwise OR everything together.
     }
 
+    public int getBrightness(){
+        BridgeState bs = mbridge.getBridgeState();
+        bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
+        List<LightPoint> lights = bs.getLights();
+        if (lights.size() > 0) {
+            LightPoint testLight = lights.get(0);
+            return testLight.getLightState().getBrightness();
+        }
+
+        return 0;
+    }
+
+    public boolean setBrightness(int val) {
+        BridgeState bs = mbridge.getBridgeState();
+        List<LightPoint> lights = bs.getLights();
+
+        for (LightPoint light : lights){
+            final LightState lightState = light.getLightState();
+            lightState.setBrightness(val);
+            light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
+                @Override
+                public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
+                    if (returnCode == ReturnCode.SUCCESS) {
+                        Log.i("Hue", "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
+                    } else {
+                        Log.e("Hue", "Error changing hue of light " + light.getIdentifier());
+                        for (HueError error : errorList) {
+                            Log.e("Hue", error.toString());
+                        }
+                    }
+                }
+            });
+        }
+        return true;
+    }
+
 
     @Override
     public boolean enable() {
-        return false;
+        BridgeState bs = mbridge.getBridgeState();
+        List<LightPoint> lights = bs.getLights();
+
+        for (LightPoint light : lights){
+            final LightState lightState = light.getLightState();
+            lightState.setBrightness(255);
+            lightState.setOn(true);
+            light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
+                @Override
+                public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
+                    if (returnCode == ReturnCode.SUCCESS) {
+                        Log.i("Hue", "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
+                    } else {
+                        Log.e("Hue", "Error changing hue of light " + light.getIdentifier());
+                        for (HueError error : errorList) {
+                            Log.e("Hue", error.toString());
+                        }
+                    }
+                }
+            });
+        }
+        return true;
     }
 
 
 
     @Override
     public boolean disable() {
-        BridgeState bs = bridge.getBridgeState();
+        BridgeState bs = mbridge.getBridgeState();
 
         List<LightPoint> lights = bs.getLights();
 
         for (LightPoint light : lights) {
 
-            final LightState lightState = new LightState();
-
-            HueColor hc = new HueColor(new HueColor.RGB(0,255,0),
-                    light.getLightConfiguration().getModelIdentifier(),
-                    light.getLightConfiguration().getSwVersion());
-            lightState.setXY(hc.getXY().x,hc.getXY().y);
-
+            final LightState lightState = light.getLightState();
+            lightState.setOn(false);
             light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
                 @Override
                 public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
@@ -208,18 +270,28 @@ public class PhilipsHue implements ControllableLightDevice {
             });
 
         }
-        enabled = false;
         return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+       BridgeState bs = mbridge.getBridgeState();
+       List<LightPoint> lights = bs.getLights();
+
+       return lights.get(0).getLightState().isOn();
     }
 
     @Override
     public void setName(String name) {
 
+    }
+
+    public static void addListener(PhilipsHueListener o){
+        listeners.add(o);
+    }
+
+    public void removeListener(PhilipsHueListener o){
+        listeners.remove(o);
     }
 
     @Override

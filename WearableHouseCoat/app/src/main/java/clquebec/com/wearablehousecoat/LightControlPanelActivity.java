@@ -7,21 +7,29 @@ import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
+import com.philips.lighting.hue.sdk.wrapper.domain.device.light.LightPoint;
 
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.implementations.controllable.PhilipsHue;
+import clquebec.com.implementations.controllable.PhilipsHueListener;
 
-public class LightControlPanelActivity extends WearableActivity {
+public class LightControlPanelActivity extends WearableActivity implements PhilipsHueListener {
     private final static int REQUEST_PICK_COLOR = 1;
 
     private TextView mTextView;
     private ImageView mColourPreview;
+    private SeekBar mBrightnessBar;
+    private boolean changingBrightness = false;
     //This is temporary code to test the control of light colour and brightness
     private static PhilipsHue phTest;
 
@@ -34,6 +42,29 @@ public class LightControlPanelActivity extends WearableActivity {
         setAmbientEnabled();
 
         mColourPreview = findViewById(R.id.colourPreview);
+        mBrightnessBar = findViewById(R.id.brightnessBar);
+        mBrightnessBar.setMax(255);
+        mBrightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                changingBrightness = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                changingBrightness = false;
+                String dT = getIntent().getExtras().getString("DeviceType");
+                if (dT != null && dT.equals("HueLight")){
+                    phTest.setBrightness(seekBar.getProgress());
+
+                }
+            }
+        });
         mColourPreview.setOnClickListener(view -> {
             Intent intent = new ColorPickActivity.IntentBuilder().oldColor(((Integer) mColourPreview.getTag())).build(LightControlPanelActivity.this);
             startActivityForResult(intent, REQUEST_PICK_COLOR);
@@ -47,7 +78,10 @@ public class LightControlPanelActivity extends WearableActivity {
         if (dT != null && dT.equals("HueLight")){
             mColourPreview.setColorFilter(phTest.getColor());
             mColourPreview.setTag(phTest.getColor());
+            mBrightnessBar.setProgress(phTest.getBrightness());
         }
+
+        PhilipsHue.addListener(this);
 
     }
 
@@ -66,22 +100,23 @@ public class LightControlPanelActivity extends WearableActivity {
                     try{
                         phTest.setLightColor(pickedColor);
 
-                        Timer mHereTimer = new Timer();
-                        mHereTimer.schedule(new TimerTask() {
-                            public void run() {
-                                runOnUiThread(() -> {int c = phTest.getColor();
-                                Log.d("Hue", "Set color is " + pickedColor + ", get color is " + c);
-                                mColourPreview.setColorFilter(c);
-                                mColourPreview.setTag(c);});
-                            }
-                        }, 3000);
-
                     }catch (ActionNotSupported e){
                         Log.e("LightControl", "SHOULD NEVER GET HERE");
                         assert(false);
                     }
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void updateState(BridgeState bs) {
+        List<LightPoint> lights = bs.getLights();
+
+        if (lights.size() > 0 && !changingBrightness){
+            LightPoint l = lights.get(0);
+            mBrightnessBar.setProgress(l.getLightState().getBrightness());
+            Log.d("Hue", "Ran listener event");
         }
     }
 }
