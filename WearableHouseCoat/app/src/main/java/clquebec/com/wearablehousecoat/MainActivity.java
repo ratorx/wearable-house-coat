@@ -1,7 +1,12 @@
 package clquebec.com.wearablehousecoat;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.TextViewCompat;
@@ -28,7 +33,7 @@ import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.implementations.location.FINDLocationProvider;
 import clquebec.com.wearablehousecoat.components.DeviceTogglesAdapter;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity implements SensorEventListener{
     private final static String TAG = "MainActivity";
 
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
@@ -39,11 +44,13 @@ public class MainActivity extends WearableActivity {
     private BoxInsetLayout mContainerView;
     private FrameLayout mIAmHereWrapper;
     private FINDLocationProvider mLocationProvider;
-    private View mChangeLocationView;
     private final Handler mLocationUpdateHandler = new Handler();
 
     private Building mBuilding;
     private Place mCurrentDisplayedRoom;
+
+    private SensorManager mSensorManager;
+    private float mLastAccelSquare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,16 +77,31 @@ public class MainActivity extends WearableActivity {
             mLocationProvider = new FINDLocationProvider(this, me);
 
             // Set up location update
-            Log.d(TAG, "Using timer for location updater");
-            mLocationUpdateHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mLocationProvider.refreshLocations();
-                    mLocationProvider.update();
-                    mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
-                }
-            });
+            //Use the 'best' method for location update available:
+            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+            if(mSensorManager == null || mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) == null){
+                Log.d(TAG, "Using timer for location updater");
+                mLocationUpdateHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLocationProvider.refreshLocations();
+                        mLocationProvider.update();
+                        mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
+                    }
+                });
+            }else{
+                if(mSensorManager != null){
+                    Log.d(TAG, "Using accelerometer for location updater");
+
+                    mLastAccelSquare = 0;
+
+                    mSensorManager.registerListener(this,
+                            mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                            SensorManager.SENSOR_DELAY_NORMAL,
+                            0);
+                }
+            }
         });
 
         //END SECTION
@@ -192,4 +214,29 @@ public class MainActivity extends WearableActivity {
         mContainerView.setBackgroundColor(getResources().getColor(R.color.eerie_black, getTheme()));
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            //Calculate magnitude
+            float mag = 0;
+            for(float axis : sensorEvent.values){
+                mag += axis*axis;
+            }
+
+            //Compare with previous
+            if(Math.abs(mag - mLastAccelSquare) > 20){
+                //Do a location refresh on every step
+                Log.d(TAG, "Refreshing locations");
+                mLocationProvider.refreshLocations();
+                mLocationProvider.update();
+            }
+
+            mLastAccelSquare = mag;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        //Do nothing
+    }
 }
