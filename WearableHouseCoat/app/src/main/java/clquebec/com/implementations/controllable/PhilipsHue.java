@@ -29,12 +29,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
+import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
 
