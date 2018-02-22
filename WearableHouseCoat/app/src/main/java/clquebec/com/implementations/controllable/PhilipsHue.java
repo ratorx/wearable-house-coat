@@ -3,7 +3,6 @@ package clquebec.com.implementations.controllable;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Parcelable;
 import android.util.Log;
 
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeConnection;
@@ -15,7 +14,6 @@ import com.philips.lighting.hue.sdk.wrapper.connection.BridgeStateUpdatedCallbac
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeStateUpdatedEvent;
 import com.philips.lighting.hue.sdk.wrapper.connection.ConnectionEvent;
 import com.philips.lighting.hue.sdk.wrapper.connection.HeartbeatManager;
-import com.philips.lighting.hue.sdk.wrapper.connection.LocalBridgeConnection;
 import com.philips.lighting.hue.sdk.wrapper.domain.Bridge;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeBuilder;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
@@ -30,12 +28,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
+import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
 
@@ -62,6 +60,8 @@ public class PhilipsHue implements ControllableLightDevice {
                 HeartbeatManager hbm = bridgeConnection.getHeartbeatManager();
                 hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 100);
                 mHbm = hbm;
+
+                Log.d("Hue", "Connected and authenticated to bridge");
             }
         }
 
@@ -93,20 +93,18 @@ public class PhilipsHue implements ControllableLightDevice {
         mContext = c;
         //connect to bridge. This is currently hardcoded. Need to implement discovery
         if (bridge == null){
-            bridge = new BridgeBuilder("Wearable House Control", "CLWatch")
-                    .setIpAddress("192.168.14.220")
-                    .setConnectionType(BridgeConnectionType.LOCAL)
-                    .setBridgeConnectionCallback(bridgeConnectionCallback)
-                    .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
-                    .build();
+            //Load in parameters from configuration store
+            ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
+                bridge = new BridgeBuilder("Wearable House Control", config.getMyUUID().toString())
+                        .setIpAddress("192.168.14.220")
+                        .setConnectionType(BridgeConnectionType.LOCAL)
+                        .setBridgeConnectionCallback(bridgeConnectionCallback)
+                        .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
+                        .build();
 
-            Log.d("Hue", "Connected to bridge");
-            BridgeConnection connection = bridge.getBridgeConnection(BridgeConnectionType.LOCAL);
-            connection.connect();
-
-
-
-
+                BridgeConnection connection = bridge.getBridgeConnection(BridgeConnectionType.LOCAL);
+                connection.connect();
+            });
         }
 
     }
