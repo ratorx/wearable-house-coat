@@ -26,6 +26,9 @@ import com.philips.lighting.hue.sdk.wrapper.domain.device.light.LightPoint;
 import com.philips.lighting.hue.sdk.wrapper.domain.device.light.LightState;
 import com.philips.lighting.hue.sdk.wrapper.utilities.HueColor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import java.util.UUID;
@@ -48,6 +51,7 @@ public class PhilipsHue implements ControllableLightDevice {
     private boolean enabled = true;
     private Context mContext;
     private HeartbeatManager mHbm;
+    private UUID mUUID;
 
 
     private BridgeConnectionCallback bridgeConnectionCallback = new BridgeConnectionCallback() {
@@ -74,6 +78,11 @@ public class PhilipsHue implements ControllableLightDevice {
             Log.i("Hue", "Bridge state updated event: " + bridgeStateUpdatedEvent);
         }
     };
+
+    public PhilipsHue(Context c, UUID id, JSONObject config) throws JSONException{
+        this(c);
+        mUUID = id;
+    }
 
     public PhilipsHue(Context c) {
         //Scan for Hues on local network
@@ -225,7 +234,7 @@ public class PhilipsHue implements ControllableLightDevice {
 
     @Override
     public UUID getID() {
-        return UUID.randomUUID();
+        return mUUID;
     }
 
     @Override
