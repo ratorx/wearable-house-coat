@@ -8,54 +8,54 @@ import Help from './components/Help.js'
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 class App extends React.Component {
+	pages = [
+		{
+			name: "Overview",
+			component: null,
+			onPageLoad: function() { // Do NOT use () => {} syntax as it breaks binding.
+				this.component = <Overview/>
+			}
+		},
+		{
+			name: "Setup",
+			dropdown: [
+				{
+					name: "Rooms",
+					component: null,
+					onPageLoad: function() {
+						this.component = <SetRooms/>
+					}
+				},
+				{
+					name: "Devices",
+					component: null,
+					onPageLoad: function() {
+						this.component = <SetDevices/>
+					}
+				},
+				{
+					name: "Groups",
+					component: null,
+					onPageLoad: function() {
+						this.component = <SetGroups/>
+					}
+				}
+			]
+		},
+		{
+			name: "Help",
+			component: null,
+			onPageLoad: function() {
+				this.component = <Help/>
+			}
+		}
+	]
+
 	constructor(){
 		super();
 		this.state = {
-			pages: [
-				{
-					name: "Overview",
-					component: null,
-					onPageLoad: function() { // Do NOT use () => syntax as it breaks binding. (WTF?)
-						this.component = <Overview/>
-					}
-				},
-				{
-					name: "Setup",
-					dropdown: [
-						{
-							name: "Rooms",
-							component: null,
-							onPageLoad: function() {
-								this.component = <SetRooms/>
-							}
-						},
-						{
-							name: "Devices",
-							component: null,
-							onPageLoad: function() {
-								this.component = <SetDevices/>
-							}
-						},
-						{
-							name: "Groups",
-							component: null,
-							onPageLoad: function() {
-								this.component = <SetGroups/>
-							}
-						}
-					]
-				},
-				{
-					name: "Help",
-					component: null,
-					onPageLoad: function() {
-						this.component = <Help/>
-					}
-				}
-			],
-			currentPage: null
+			currentPage: this.pages[0]
 		};
-		this.state.currentPage = this.state.pages[0];
 		this.state.currentPage.onPageLoad.bind(this.state.currentPage).call();
 	}
 
@@ -66,17 +66,17 @@ class App extends React.Component {
 
 	render() {
 		return <div>
-			<Navbar fixedTop inverse collapseOnSelect className="navbar-left-no-margin">
+			<Navbar fixedTop inverse collapseOnSelect className="navbar-left-no-margin navbar-styled">
 				<Navbar.Header>
 					<Navbar.Brand>
-						<a onClick={() => {this.setCurrentPage(this.state.pages[0])}}>Wearable House Coat</a>
+						<a onClick={() => {this.setCurrentPage(this.pages[0])}}>Wearable House Coat</a>
 					</Navbar.Brand>
 					<Navbar.Toggle/>
 				</Navbar.Header>
 				<Navbar.Collapse>
 					<Nav>
 						{
-							this.state.pages.map((page, i) => {
+							this.pages.map((page, i) => {
 								if(typeof page.dropdown === "undefined") {
 									return <NavItem key={i} active={page.name === this.state.currentPage.name} onClick={() => {this.setCurrentPage(page)}}>{page.name}</NavItem>
 								} else {
@@ -93,9 +93,7 @@ class App extends React.Component {
 					</Nav>
 				</Navbar.Collapse>
 			</Navbar>
-			{
-				this.state.currentPage.component
-			}
+			{this.state.currentPage.component}
 		</div>
 	}
 }
