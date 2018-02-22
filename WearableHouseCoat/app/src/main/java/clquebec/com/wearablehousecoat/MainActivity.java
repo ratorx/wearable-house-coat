@@ -58,10 +58,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         setContentView(R.layout.activity_main);
 
         //SECTION: Initialize Building
+        mBuilding = new Building(this, "Loading"); //Placeholder building
+        //END SECTION
 
-        mBuilding = new Building(this, "Placeholder"); //Placeholder building
-
-        //Do things which require the configuration store
+        //SECTION: Load in from config store
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
             mBuilding = config.getBuilding(this);
 
@@ -80,7 +80,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             //Use the 'best' method for location update available:
             mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-            if(mSensorManager == null || mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) == null){
+            if(mSensorManager == null || mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) == null){
                 Log.d(TAG, "Using timer for location updater");
                 mLocationUpdateHandler.post(new Runnable() {
                     @Override
@@ -103,7 +103,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 }
             }
         });
-
         //END SECTION
 
         //SECTION: Initialize toggle button grid
@@ -113,19 +112,16 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //Set grid to have width 2
         mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
 
-        //Make a dummy Room with a light switch for testing
-        mCurrentDisplayedRoom = new Room(this, "Test Room");
-
         //Attach the adapter which automatically fills with controls for current Place
-        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(mCurrentDisplayedRoom);
+        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(null);
         mToggleButtons.setAdapter(mToggleAdapter); //Attach
         //END SECTION
 
         //SECTION: Initialize locations and location provider
         mLocationNameView = findViewById(R.id.main_currentlocation);
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
-
         //END SECTION
+
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
 
