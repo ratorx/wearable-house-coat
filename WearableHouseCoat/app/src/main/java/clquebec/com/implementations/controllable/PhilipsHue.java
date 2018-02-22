@@ -145,7 +145,8 @@ public class PhilipsHue implements ControllableLightDevice {
         }
     }
 
-    public int getColor() {
+    @Override
+    public int getLightColor() {
             BridgeState bs = bridge.getBridgeState();
             bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
             List<LightPoint> lights = bs.getLights();

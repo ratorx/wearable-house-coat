@@ -190,5 +190,7 @@ public class ConfigurationStoreTest extends TestCase {
         assertThat(d).isNotNull();
         assertThat(d).isInstanceOf(ControllableDevice.class);
         assertThat(d.getID()).isEqualTo(new UUID(0, 10));
+
+        //Check that getting the device again, gives the same device
     }
 }
