@@ -6,9 +6,15 @@ import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
+import com.philips.lighting.hue.sdk.wrapper.domain.device.light.LightPoint;
 
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -17,14 +23,16 @@ import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.storage.ConfigurationStore;
+import clquebec.com.implementations.controllable.PhilipsHueListener;
 
-public class LightControlPanelActivity extends WearableActivity {
+public class LightControlPanelActivity extends WearableActivity implements PhilipsHueListener {
     private final static String TAG = "LightControlPanelActivity";
-
     private final static int REQUEST_PICK_COLOR = 1;
     public static final String ID_EXTRA = "DeviceID";
 
     private ImageView mColourPreview;
+    private SeekBar mBrightnessBar;
+    private boolean changingBrightness = false;
 
     private ControllableLightDevice mLightDevice;
 
@@ -37,6 +45,29 @@ public class LightControlPanelActivity extends WearableActivity {
         setAmbientEnabled();
 
         mColourPreview = findViewById(R.id.colourPreview);
+        mBrightnessBar = findViewById(R.id.brightnessBar);
+        mBrightnessBar.setMax(255);
+        mBrightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                changingBrightness = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                changingBrightness = false;
+                String dT = getIntent().getExtras().getString("DeviceType");
+                if (dT != null && dT.equals("HueLight")){
+                    phTest.setBrightness(seekBar.getProgress());
+
+                }
+            }
+        });
         mColourPreview.setOnClickListener(view -> {
             Intent intent = new ColorPickActivity.IntentBuilder().oldColor(((Integer) mColourPreview.getTag())).build(LightControlPanelActivity.this);
             startActivityForResult(intent, REQUEST_PICK_COLOR);
@@ -50,10 +81,12 @@ public class LightControlPanelActivity extends WearableActivity {
 
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
             ControllableDevice device = config.getDevice(deviceID);
+        if (device == null ){
+            throw new IllegalArgumentException("LightControlPanelActivity must be given the ID to a valid device");
+        mBrightnessBar.setProgress(phTest.getBrightness());
+        }
 
-            if(device == null){
-                throw new IllegalArgumentException("LightControlPanelActivity must be given the ID to a valid device");
-            }
+        PhilipsHue.addListener(this);
 
             if(!(device instanceof ControllableLightDevice)){
                 throw new IllegalArgumentException("LightControlPanelActivity must be given the ID to a light device");
@@ -107,6 +140,17 @@ public class LightControlPanelActivity extends WearableActivity {
                     }
                 }
                 break;
+        }
+    }
+
+    @Override
+    public void updateState(BridgeState bs) {
+        List<LightPoint> lights = bs.getLights();
+
+        if (lights.size() > 0 && !changingBrightness){
+            LightPoint l = lights.get(0);
+            mBrightnessBar.setProgress(l.getLightState().getBrightness());
+            Log.d("Hue", "Ran listener event");
         }
     }
 }
