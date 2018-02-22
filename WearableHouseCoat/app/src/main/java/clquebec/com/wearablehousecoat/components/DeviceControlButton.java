@@ -214,21 +214,23 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     }
 
     public void attachDevice(ControllableDevice device) {
-        mDevice = device;
+        if(device != null) {
+            mDevice = device;
 
-        //Set the correct icon
-        mDeviceType = mDevice.getType();
-        if (mDeviceType.getIcon() != 0) {
-            mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
-            mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
+            //Set the correct icon
+            mDeviceType = mDevice.getType();
+            if (mDeviceType.getIcon() != 0) {
+                mDeviceIcon = getContext().getDrawable(mDeviceType.getIcon());
+                mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
+            }
+
+            //Re-calculate size
+            measure();
+
+            //Redraw view
+            measure();
+            invalidate();
         }
-
-        //Re-calculate size
-        measure();
-
-        //Redraw view
-        measure();
-        invalidate();
     }
 
     @Override

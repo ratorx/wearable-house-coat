@@ -7,14 +7,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
+import clquebec.com.framework.storage.ConfigurationStore;
+
 /**
  * WearableHouseCoat
  * Author: tom
@@ -24,15 +24,18 @@ import clquebec.com.framework.controllable.ControllableDeviceType;
 public class Room extends Place {
     private final static String TAG = "Room";
     private String mName;
-    private Context mContext;
     private List<ControllableDevice> mDevices;
 
+    //Used for production
+    public Room(Context context, JSONObject roomData) throws JSONException {
+        this(ConfigurationStore.getInstance(context), roomData);
+    }
 
-    public Room(Context context, JSONObject roomData) throws JSONException{
+    //Used for testing
+    public Room(ConfigurationStore configStore, JSONObject roomData) throws JSONException{
         //Only use LSB - for now
-        super(new UUID(0L, roomData.getLong("id")));
+        super(new UUID(0L, roomData.getLong("uid")));
 
-        mContext = context;
         mName = roomData.getString("name");
 
         //Instantiate devices
@@ -42,37 +45,28 @@ public class Room extends Place {
             JSONArray deviceList = roomData.getJSONArray("devices");
 
             Log.d(TAG, deviceList.toString());
-            for (int i = 0; i < deviceList.length(); i++) {
-                JSONObject deviceData = deviceList.getJSONObject(i);
-                //Load in device dynamically - Java reflection!
-                try {
-                    //Get device config
-                    JSONObject deviceConfig = deviceData.getJSONObject("config");
-                    deviceConfig.put("location", mName);
+            configStore.onConfigAvailable(config -> {
+                for (int i = 0; i < deviceList.length(); i++) {
+                    try {
+                        //Get device ID
+                        UUID deviceID = new UUID(0, deviceList.getLong(i));
 
-                    //Load class and call getDeviceInstance
-                    Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("type"));
-                    Constructor<?> getInstance = deviceClass.getConstructor(Context.class, JSONObject.class);
-                    ControllableDevice device = (ControllableDevice) getInstance.newInstance(mContext, deviceConfig);
-
-                    mDevices.add(device);
-                } catch (ClassNotFoundException e) {
-                    Log.e(TAG, "Failed to create device " + deviceData.getString("type"));
-                } catch (IllegalAccessException e) {
-                    Log.e(TAG, "Do not have permissions to instantiate device " + deviceData.getString("type"));
-                } catch (ClassCastException | NoSuchMethodException | InvocationTargetException e) {
-                    Log.e(TAG, "Class is not a controllable device " + deviceData.getString("type"));
-                } catch (InstantiationException e) {
-                    Log.e(TAG, "Class does not have a valid (Context, JSONObject) constructor");
+                        //Add device to list
+                        ControllableDevice device = config.getDevice(deviceID);
+                        if(device != null) {
+                            mDevices.add(device);
+                        }
+                    }catch(JSONException e){
+                        Log.e(TAG, "Could not parse JSON for Device "+i);
+                    }
                 }
-            }
+            });
         }
     }
 
     public Room(Context context, String name) {
         super(UUID.randomUUID());
         mName = name;
-        mContext = context;
         mDevices = new ArrayList<>();
     }
 

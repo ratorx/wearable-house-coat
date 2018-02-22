@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import clquebec.com.framework.HTTPRequestQueue;
+import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
 import clquebec.com.framework.storage.ConfigurationStore;
@@ -72,13 +73,13 @@ public class ConfigurationStoreTest extends TestCase {
         verify(callback, times(0)).onConfigurationAvailable(any());
 
         //Give some test data
-        mConfigurationStore.setData(new JSONObject("{}"));
+        mConfigurationStore.setData(mContext, new JSONObject("{}"));
 
         //Callback should have been run once
         verify(callback, times(1)).onConfigurationAvailable(mConfigurationStore);
 
         //Change data again
-        mConfigurationStore.setData(new JSONObject("{'name':'testname'}"));
+        mConfigurationStore.setData(mContext, new JSONObject( "{'data':{'name':'testname'}}"));
 
         //Callback should still have only been run once - it's a one-time thing
         verify(callback, times(1)).onConfigurationAvailable(mConfigurationStore);
@@ -90,11 +91,11 @@ public class ConfigurationStoreTest extends TestCase {
         verify(callback, times(2)).onConfigurationAvailable(mConfigurationStore);
 
         //Again, changing data should not call the callback:
-        mConfigurationStore.setData(new JSONObject("{'name':'testname', 'uid':1}"));
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'name':'testname', 'uid':1}}"));
         verify(callback, times(2)).onConfigurationAvailable(mConfigurationStore);
 
         //Reset data
-        mConfigurationStore.setData(null);
+        mConfigurationStore.setData(mContext, null);
 
         //Attach many callbacks
         Set<ConfigurationAvailableCallback> callbackSet = new HashSet<>();
@@ -110,7 +111,7 @@ public class ConfigurationStoreTest extends TestCase {
         }
 
         //Set some data - all callbacks should be run once:
-        mConfigurationStore.setData(new JSONObject("{}"));
+        mConfigurationStore.setData(mContext, new JSONObject("{}"));
         for(ConfigurationAvailableCallback c : callbackSet){
             verify(c, times(1)).onConfigurationAvailable(mConfigurationStore);
         }
@@ -120,29 +121,31 @@ public class ConfigurationStoreTest extends TestCase {
     public void testSetData() throws JSONException{
         //Setting data as null should be allowed
         //(Testing of callback behaviour is in testCallback)
-        mConfigurationStore.setData(null);
+        mConfigurationStore.setData(mContext, null);
 
         //Give some people data:
         UUID id1 = new UUID(0, 1);
         UUID id2 = new UUID(0, 2);
 
+        JSONObject configData = new JSONObject();
         JSONObject peopleData = new JSONObject();
         JSONArray peopleArray = new JSONArray();
 
         JSONObject person1 = new JSONObject();
         person1.put("name", "testname");
-        person1.put("id", 1);
+        person1.put("uid", 1);
 
         JSONObject person2 = new JSONObject();
         person2.put("name", "testname2");
-        person2.put("id", 2);
+        person2.put("uid", 2);
 
         peopleArray.put(person1);
         peopleArray.put(person2);
         peopleData.put("people", peopleArray);
+        configData.put("data", peopleData);
 
         //Set data
-        mConfigurationStore.setData(peopleData);
+        mConfigurationStore.setData(mContext, configData);
 
         //Check data is available
         assertThat(mConfigurationStore.getPersonInformation(id1)).isNotNull();
@@ -163,7 +166,7 @@ public class ConfigurationStoreTest extends TestCase {
     @Test
     public void testGetBuilding() throws JSONException{
         //Put in some building data:
-        mConfigurationStore.setData(new JSONObject("{'rooms':[{'name':'TestRoom', 'id':10}]}"));
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'rooms':[{'name':'TestRoom', 'uid':10}]}}"));
 
         //Check that building has 1 room with a name TestRoom
         Building building = mConfigurationStore.getBuilding(mContext);
@@ -173,5 +176,19 @@ public class ConfigurationStoreTest extends TestCase {
             assertThat(r.getName()).isEqualTo("TestRoom");
             assertThat(r.getID()).isEqualTo(new UUID(0, 10));
         }
+    }
+
+    public void testGetDevices() throws JSONException{
+        //Put in some device data
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'devices':[{'type':'DummyControllable', 'uid':10}]}}"));
+
+        //Check that a wrong ID returns null:
+        assertThat(mConfigurationStore.getDevice(new UUID(0, 0))).isNull();
+
+        //Check that we get our device back on the right ID
+        ControllableDevice d = mConfigurationStore.getDevice(new UUID(0, 10));
+        assertThat(d).isNotNull();
+        assertThat(d).isInstanceOf(ControllableDevice.class);
+        assertThat(d.getID()).isEqualTo(new UUID(0, 10));
     }
 }

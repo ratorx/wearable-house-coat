@@ -5,6 +5,8 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 
@@ -19,15 +21,11 @@ public class DummyControllable implements ControllableDevice {
     //Since Controllable classes are loaded dynamically, this is required.
     //Tests will probably fail if you remove this.
 
-    private String mLocation;
+    private UUID mUUID;
 
-    public DummyControllable(Context c, JSONObject config) throws JSONException{
+    public DummyControllable(Context c, UUID id, JSONObject config) throws JSONException{
         //Test that the location string is given.
-        mLocation = config.getString("location");
-    }
-
-    public String getLocation(){
-        return mLocation;
+        mUUID = id;
     }
 
     @Override
@@ -58,6 +56,11 @@ public class DummyControllable implements ControllableDevice {
     @Override
     public ControllableDeviceType getType() {
         return ControllableDeviceType.LIGHT;
+    }
+
+    @Override
+    public UUID getID() {
+        return mUUID;
     }
 
     @Override

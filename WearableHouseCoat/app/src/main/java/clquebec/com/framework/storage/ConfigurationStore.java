@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 import clquebec.com.environment.Keys;
 import clquebec.com.framework.HTTPRequestQueue;
+import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Building;
 import clquebec.com.framework.location.Room;
 
@@ -30,13 +33,14 @@ import clquebec.com.framework.location.Room;
 
 public class ConfigurationStore {
     private static final String TAG = "ConfigurationStore";
-    public static final String CONFIG_SERVER = "https://shell.srcf.net:3000/";
+    public static final String CONFIG_SERVER = "http://shell.srcf.net:3500/data.json";
     private static ConfigurationStore mInstance;
 
     private HTTPRequestQueue mQueue;
     private JSONObject mData;
     private Set<ConfigurationAvailableCallback> mCallbacks;
     private Map<UUID, JSONObject> mPersonDataMap;
+    private Map<UUID, ControllableDevice> mDeviceMap;
 
     public interface ConfigurationAvailableCallback{
         void onConfigurationAvailable(ConfigurationStore config);
@@ -53,14 +57,15 @@ public class ConfigurationStore {
 
         mCallbacks = new HashSet<>();
         mPersonDataMap = new HashMap<>();
+        mDeviceMap = new HashMap<>();
 
         Log.d(TAG, "Requesting config store");
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, CONFIG_SERVER, null,
-                this::setData,
+                response -> setData(c, response),
                 error -> {
                     try {
-                        setData(new JSONObject(Keys.ConfigJSON));
+                        setData(c, new JSONObject(Keys.ConfigJSON));
                     }catch(JSONException e){
                         Log.e(TAG, "Error creating default config, "+e.getMessage());
                     }
@@ -75,12 +80,16 @@ public class ConfigurationStore {
         }
     }
 
-    public void setData(JSONObject data) {
-        this.mData = data;
-
+    public void setData(Context context, JSONObject data) {
         if(data != null) {
             Log.d(TAG, "Received config store");
             Log.d(TAG, data.toString());
+
+            try {
+                this.mData = data.getJSONObject("data");
+            }catch(JSONException e){
+                this.mData = null;
+            }
 
             //Load in People as a UUID->JSONObject map
             try {
@@ -88,7 +97,7 @@ public class ConfigurationStore {
                 for (int i = 0; i < people.length(); i++) {
                     try {
                         JSONObject personData = people.getJSONObject(i);
-                        UUID id = new UUID(0, personData.getLong("id"));
+                        UUID id = new UUID(0, personData.getLong("uid"));
 
                         mPersonDataMap.put(id, personData);
                     } catch (JSONException e) {
@@ -99,6 +108,35 @@ public class ConfigurationStore {
                 Log.e(TAG, "No 'people' array: there will not be any users.");
             }
 
+            //Load in Devices as a UUID->ControllableDevice map
+            try {
+                JSONArray devices = mData.getJSONArray("devices");
+                for (int i = 0; i < devices.length(); i++) {
+                    try {
+                        JSONObject deviceData = devices.getJSONObject(i);
+                        UUID id = new UUID(0, deviceData.getLong("uid"));
+
+                        //Get device config
+                        JSONObject deviceConfig = deviceData.getJSONObject("config");
+
+                        //Load Device in dynamically!
+                        try {
+                            Class<?> deviceClass = Class.forName("clquebec.com.implementations.controllable." + deviceData.getString("type"));
+                            Constructor<?> getInstance = deviceClass.getConstructor(Context.class, UUID.class, JSONObject.class);
+                            ControllableDevice device = (ControllableDevice) getInstance.newInstance(context, id, deviceConfig);
+
+                            mDeviceMap.put(id, device);
+                        }catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
+                            Log.e(TAG, "Could not instantiate device "+deviceData.getString("type")+": "+e.getMessage());
+                        }
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Unable to parse JSON for Device " + i + ": " + e.getMessage());
+                    }
+                }
+            } catch (JSONException | NullPointerException e) {
+                Log.e(TAG, "No 'devices' array: there will not be any users.");
+            }
+
             //Call all the callbacks, and remove them so they're only called once.
             //Not thread safe ("synchronised" would help).
             Set<ConfigurationAvailableCallback> callbacks = new HashSet<>(mCallbacks);
@@ -106,6 +144,8 @@ public class ConfigurationStore {
                 callback.onConfigurationAvailable(this);
                 mCallbacks.remove(callback);
             }
+        }else{
+            mData = null;
         }
     }
 
@@ -164,6 +204,16 @@ public class ConfigurationStore {
         }
     }
 
+    public ControllableDevice getDevice(UUID id){
+        try {
+            //Perform a copy
+            return mDeviceMap.get(id);
+        }catch(NullPointerException e){
+            //Device does not exist
+            return null;
+        }
+    }
+
     @Nullable
     public String getLocationServerAddress(){
         try{
@@ -176,7 +226,7 @@ public class ConfigurationStore {
 
     public UUID getMyUUID(){
         try{
-            return new UUID(0, mData.getInt("me"));
+            return new UUID(0, mData.getLong("me"));
         }catch(JSONException e){
             //Return a default UUID
             return new UUID(0, 0);

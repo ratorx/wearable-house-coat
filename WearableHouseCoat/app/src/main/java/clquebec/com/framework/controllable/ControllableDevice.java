@@ -1,8 +1,6 @@
 package clquebec.com.framework.controllable;
 
-import android.content.Context;
-
-import org.json.JSONObject;
+import java.util.UUID;
 
 /**
  * WearableHouseCoat
@@ -29,6 +27,8 @@ public interface ControllableDevice {
 
     //Mostly used for icons, but also for type names
     ControllableDeviceType getType();
+
+    UUID getID();
 
     //The code that should be run in the case of a quick action.
     //Called by DeviceControlButton

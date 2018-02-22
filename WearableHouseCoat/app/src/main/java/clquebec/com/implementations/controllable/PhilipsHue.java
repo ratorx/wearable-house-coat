@@ -2,10 +2,9 @@ package clquebec.com.implementations.controllable;
 
 import android.content.Context;
 
-import org.json.JSONObject;
+import java.util.UUID;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
-import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 
@@ -59,6 +58,11 @@ public class PhilipsHue implements ControllableLightDevice {
     @Override
     public ControllableDeviceType getType() {
         return ControllableDeviceType.LIGHT;
+    }
+
+    @Override
+    public UUID getID() {
+        return UUID.randomUUID();
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import clquebec.com.framework.IFTTT;
 import clquebec.com.framework.controllable.ActionNotSupported;
@@ -26,28 +27,27 @@ public class IFTTTLight implements ControllableLightDevice {
     private static final String TAG = "IFTTTLight";
     private static final String EVENT_PREFIX = "light_";
 
-    private String mLocation;
     private String mName = null;
     private boolean mCurrentState;
     private IFTTT mIFTTT;
     private Context mContext;
+    private UUID mUUID;
 
-    public IFTTTLight(Context context, String locationName) {
-        init(context, locationName);
+    public IFTTTLight(Context context, UUID id) {
+        init(context, id);
     }
 
-    public IFTTTLight(Context context, JSONObject config) throws JSONException{
+    public IFTTTLight(Context context, UUID id, JSONObject config) throws JSONException{
         //Initialise dynamically from a JSON Object
-        String location = config.getString("location");
-        init(context, location);
 
+        init(context, id);
         setName(config.getString("name"));
     }
 
-    private void init(Context context, String locationName){
-        mLocation = locationName;
+    private void init(Context context, UUID id){
         mCurrentState = false; //Is there a good way to get this?
         mContext = context;
+        mUUID = id;
 
         //Setup IFTTT for web requests
         mIFTTT = IFTTT.getInstance(context);
@@ -58,7 +58,6 @@ public class IFTTTLight implements ControllableLightDevice {
         if (mName != null && mCurrentState) {
             List<String> params = new ArrayList<>();
             params.add(mName);
-            params.add(mLocation);
             params.add("#" + Integer.toHexString(color));
 
             mIFTTT.webhook(EVENT_PREFIX + "color", params);
@@ -72,7 +71,6 @@ public class IFTTTLight implements ControllableLightDevice {
 
             List<String> params = new ArrayList<>();
             params.add(mName);
-            params.add(mLocation);
             mIFTTT.webhook(EVENT_PREFIX + "on", params);
 
             return true;
@@ -88,7 +86,6 @@ public class IFTTTLight implements ControllableLightDevice {
 
             List<String> params = new ArrayList<>();
             params.add(mName);
-            params.add(mLocation);
 
             mIFTTT.webhook(EVENT_PREFIX + "off", params);
 
@@ -116,6 +113,11 @@ public class IFTTTLight implements ControllableLightDevice {
     @Override
     public ControllableDeviceType getType() {
         return ControllableDeviceType.LIGHT;
+    }
+
+    @Override
+    public UUID getID() {
+        return mUUID;
     }
 
     @Override

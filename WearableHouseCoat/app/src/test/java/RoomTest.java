@@ -6,13 +6,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
+import clquebec.com.framework.HTTPRequestQueue;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.location.Room;
+import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.implementations.controllable.DummyControllable;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
@@ -28,11 +31,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RoomTest extends TestCase {
     //Test the methods of Room
 
-    @Mock
+    @Mock(name="c")
     private Context mContext;
 
     private String mTestName = "TestRoom";
     private Room mRoom;
+
+    //Injected into mConfigurationStore
+    @Mock(name="queue")
+    private HTTPRequestQueue requestQueue;
+
+    @InjectMocks
+    private ConfigurationStore mConfigurationStore;
 
     @Test
     public void testEquals(){
@@ -53,9 +63,13 @@ public class RoomTest extends TestCase {
 
     @Test
     public void testGetDevices() throws JSONException {
+        //Make a configuration store with a device
+        mConfigurationStore.setData(mContext,
+                new JSONObject("{'data':{'devices':[{'uid':100,'type':'DummyControllable','config':{}}]}}"));
+
         //Instantiate a room from some JSON
-        mRoom = new Room(mContext, new JSONObject(
-                "{'name':'testroom', 'id': 1, 'devices':[{'type': 'DummyControllable', 'config': {}}]}"
+        mRoom = new Room(mConfigurationStore, new JSONObject(
+                "{'name':'testroom', 'uid': 1, 'devices':[100]}"
         ));
 
         //Check that all was instantiated correctly
@@ -67,7 +81,7 @@ public class RoomTest extends TestCase {
         assertThat(d).isInstanceOf(DummyControllable.class);
 
         //Check that the "location" string was passed through by Room correctly.
-        assertThat(((DummyControllable) d).getLocation()).isEqualTo("testroom");
+        assertThat(((DummyControllable) d).getID()).isEqualTo(new UUID(0,100));
     }
 
     @Test
