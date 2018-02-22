@@ -16,4 +16,4 @@ else
 fi
 
 scp -r "$crsid@shell.srcf.net:clquebec/environment" WearableHouseCoat/app/src/main/java/clquebec/com/environment
-# find WearableHouseCoat/app/src/main/java/clquebec/com/environment/* -type f -exec git update-index --assume-unchanged '{}' 2>/dev/null \;
+find WearableHouseCoat/app/src/main/java/clquebec/com/environment/* -type f -exec git update-index --assume-unchanged '{}' 2>/dev/null \;
