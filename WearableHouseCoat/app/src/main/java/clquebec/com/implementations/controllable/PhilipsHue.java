@@ -177,7 +177,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                xys[i][1] = lights.get(i).getLightState().getColor().getXY().y;
            }
            int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(0));
-            Log.d("Hue", "the colors are " + Arrays.toString(colors));
             return colors[0] | 0xFF000000;
         }
 

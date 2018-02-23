@@ -1,11 +1,14 @@
 package clquebec.com.wearablehousecoat;
 
 import android.content.Intent;
+import android.graphics.ColorFilter;
 import android.os.Bundle;
+import android.support.v4.graphics.ColorUtils;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity;
@@ -28,6 +31,7 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
     private ImageView mColourPreview;
     private SeekBar mBrightnessBar;
+    private ProgressBar mSpinningProgress;
     private boolean changingBrightness = false;
 
     private ControllableLightDevice mLightDevice;
@@ -42,6 +46,7 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
         mColourPreview = findViewById(R.id.colourPreview);
         mBrightnessBar = findViewById(R.id.brightnessBar);
+        mSpinningProgress = findViewById(R.id.spinningProgress);
         mBrightnessBar.setMax(255);
         mBrightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -56,7 +61,16 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                changingBrightness = false;
+                Timer mHereTimer = new Timer();
+                mHereTimer.schedule(new TimerTask() {
+                    public void run() {
+                        runOnUiThread(() -> {changingBrightness = false; try{
+                            mBrightnessBar.setProgress(mLightDevice.getBrightness());
+                        }catch (ActionNotSupported e) {
+                            Log.e(TAG, "Device does not support getting brightness");
+                        }});
+                    }
+                }, 500);
                 try {
                     mLightDevice.setBrightness(seekBar.getProgress());
                 }catch(ActionNotSupported e){
@@ -123,23 +137,8 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
                 if (mLightDevice != null){
                     try{
                         mLightDevice.setLightColor(pickedColor);
-
-                        //TODO: Test without this.
-                        Timer mHereTimer = new Timer();
-                        mHereTimer.schedule(new TimerTask() {
-                            public void run() {
-                                runOnUiThread(() -> {
-                                    try {
-                                        int c = mLightDevice.getLightColor();
-                                        Log.d(TAG, "Set color is " + pickedColor + ", get color is " + c);
-                                        mColourPreview.setColorFilter(c);
-                                        mColourPreview.setTag(c);
-                                    }catch(ActionNotSupported e){
-                                        Log.e(TAG, "Light device does not support getting colours");
-                                    }
-                                });
-                            }
-                        }, 3000);
+                        mSpinningProgress.setVisibility(View.VISIBLE);
+                        mColourPreview.setColorFilter(pickedColor);
 
                     }catch (ActionNotSupported e){
                         Log.e(TAG, "Light device does not support setting colours");
@@ -167,14 +166,21 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
             } catch (ActionNotSupported e) {
                 Log.e(TAG, "Light does not support brightness");
             }
-
-            try {
-                mColourPreview.setColorFilter(light.getLightColor());
-                mColourPreview.setTag(light.getLightColor());
-            } catch (ActionNotSupported e) {
-                Log.e(TAG, "Light does not support colours");
-            }
-            Log.d(TAG, "Ran listener event");
         }
+
+        try {
+            int c = light.getLightColor();
+            if (c != (Integer) mColourPreview.getTag()){
+                mColourPreview.setColorFilter(c);
+                mColourPreview.setTag(c);
+                mSpinningProgress.setVisibility(View.INVISIBLE);
+
+            }
+
+        } catch (ActionNotSupported e) {
+            Log.e(TAG, "Light does not support colours");
+        }
+        Log.d(TAG, "Ran listener event");
+
     }
 }
