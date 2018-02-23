@@ -12,8 +12,12 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.List;
+
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
+import clquebec.com.framework.listenable.DeviceChangeListener;
+import clquebec.com.framework.listenable.ListenableDevice;
 import clquebec.com.wearablehousecoat.R;
 
 /**
@@ -27,7 +31,7 @@ import clquebec.com.wearablehousecoat.R;
  * logging and calls to our preference learner.
  */
 
-public class DeviceControlButton extends AppCompatButton implements View.OnClickListener, View.OnLongClickListener {
+public class DeviceControlButton extends AppCompatButton implements View.OnClickListener, View.OnLongClickListener, DeviceChangeListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84); //Prussian Blue
     private static final float DEFAULT_PADDING = 5;
@@ -224,6 +228,10 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
                 mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
             }
 
+            if (mDevice instanceof ListenableDevice){
+                ((ListenableDevice) mDevice).addListener(this);
+            }
+
             //Re-calculate size
             measure();
 
@@ -251,5 +259,19 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
 
         //Did not capture event
         return false;
+    }
+
+    @Override
+    public void updateState(ListenableDevice device) {
+        this.invalidate();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (mDevice instanceof ListenableDevice){
+            ((ListenableDevice) mDevice).removeListener(this);
+        }
+
+        super.finalize();
     }
 }

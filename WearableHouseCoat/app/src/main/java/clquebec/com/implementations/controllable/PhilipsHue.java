@@ -112,7 +112,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
                 mbridge = new BridgeBuilder("Wearable House Control", config.getMyUUID().toString())
-                        .setIpAddress("192.168.14.220")
+                        .setIpAddress("192.168.14.243")
                         .setConnectionType(BridgeConnectionType.LOCAL)
                         .setBridgeConnectionCallback(bridgeConnectionCallback)
                         .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
