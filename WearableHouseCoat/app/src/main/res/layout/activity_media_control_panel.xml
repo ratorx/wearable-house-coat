@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/eerie_black"
+    android:padding="@dimen/box_inset_layout_padding"
+    tools:context="clquebec.com.wearablehousecoat.MediaControlPanelActivity"
+    tools:deviceIds="wear"
+    tools:ignore="Overdraw">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/inner_frame_layout_padding"
+        app:boxedEdges="all"
+        android:background="@drawable/layout_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_height="50dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"
+                        android:id="@+id/mediaLeft"/>
+
+                    <!-- Change the image source here depending on whether we're playing -->
+                    <!-- or paused.  -->
+                    <ImageView
+                        android:layout_height="50dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="0.7"
+                        android:id="@+id/mediaPlayPause"/>
+
+                    <ImageView
+                        android:layout_height="50dp"
+                        android:layout_width="0dp"
+                        android:layout_weight="0.5"/>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/volumeControlLayout">
+
+                    <!-- Need to stick a little speaker symbol here. -->
+                    <!-- Could go for a dynamic one, more waves = louder -->
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"/>
+
+                    <SeekBar
+                        android:id="@+id/volumeBar"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_height="40dp"/>
+
+                </LinearLayout>
+
+                <!-- Hide this if the playback doesn't have brightness -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/brightnessControlLayout">
+
+                    <!-- Brightness symbol here -->
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"/>
+
+                    <SeekBar
+                        android:id="@+id/brightnessBar"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_height="40dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+    </FrameLayout>
+
+</android.support.wear.widget.BoxInsetLayout>
