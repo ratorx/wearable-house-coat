@@ -161,17 +161,17 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
     public void updateState(ListenableDevice device) {
         ControllableLightDevice light = (ControllableLightDevice) device;
 
-        if (!changingBrightness){
+        if (!changingBrightness) {
             try {
                 mBrightnessBar.setProgress(light.getBrightness());
-            }catch(ActionNotSupported e){
+            } catch (ActionNotSupported e) {
                 Log.e(TAG, "Light does not support brightness");
             }
 
             try {
                 mColourPreview.setColorFilter(light.getLightColor());
                 mColourPreview.setTag(light.getLightColor());
-            }catch(ActionNotSupported e){
+            } catch (ActionNotSupported e) {
                 Log.e(TAG, "Light does not support colours");
             }
             Log.d(TAG, "Ran listener event");

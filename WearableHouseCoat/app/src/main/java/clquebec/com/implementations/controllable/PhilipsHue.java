@@ -75,7 +75,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private BridgeStateUpdatedCallback bridgeStateUpdatedCallback = new BridgeStateUpdatedCallback() {
         @Override
         public void onBridgeStateUpdated(Bridge bridge, BridgeStateUpdatedEvent bridgeStateUpdatedEvent) {
-            Log.i(TAG, "Bridge state updated event: " + bridgeStateUpdatedEvent);
+            Log.d(TAG, "Bridge state updated event: " + bridgeStateUpdatedEvent);
             if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.INITIALIZED){
                 HeartbeatManager hbm = connection.getHeartbeatManager();
                 if (hbm != null) {
@@ -85,6 +85,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             } else {
                 mbridge.getBridgeState().refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.REMOTE_LOCAL);
 
+                //TODO: Only call listeners on PhilipsHue lights that have actually changed
                 Log.d(TAG, "Attempting to run listeners");
                 for (DeviceChangeListener l : listeners.keySet()){
                     l.updateState(listeners.get(l));
@@ -106,6 +107,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         //Initialise internal state.
         mContext = c;
         //TODO: Implement Hue bridge discovery
+        //TODO: Allow addressing of specific Hue lights
         if (mbridge == null){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
@@ -162,16 +164,16 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
     @Override
     public int getLightColor() throws ActionNotSupported{
-            BridgeState bs = mbridge.getBridgeState();
-            bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
-            List<LightPoint> lights = bs.getLights();
+        BridgeState bs = mbridge.getBridgeState();
+        bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
+        List<LightPoint> lights = bs.getLights();
 
-            if (lights.size() > 0){
-               LightPoint testLight = lights.get(0);
-                HueColor.RGB rgb = testLight.getLightState().getColor().getRGB();
+        if (lights.size() > 0){
+           LightPoint testLight = lights.get(0);
+           HueColor.RGB rgb = testLight.getLightState().getColor().getRGB();
 
-                return getIntFromColor(rgb.r, rgb.g, rgb.b);
-            }
+           return getIntFromColor(rgb.r, rgb.g, rgb.b);
+        }
 
         return 20;
     }
@@ -331,7 +333,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     @Override
     public boolean extendedAction() {
         Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
-        lightControls.putExtra("DeviceType", "HueLight");
+        lightControls.putExtra("DeviceType", "HueLight"); //Deprecated - test without this
         lightControls.putExtra(LightControlPanelActivity.ID_EXTRA, this.getID());
         mContext.startActivity(lightControls);
 
