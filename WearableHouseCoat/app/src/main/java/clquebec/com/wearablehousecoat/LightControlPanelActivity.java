@@ -152,7 +152,9 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
         super.onDestroy();
 
         //Unregister listener
-        ((ListenableDevice) mLightDevice).removeListener(this);
+        if(mLightDevice instanceof ListenableDevice){
+            ((ListenableDevice) mLightDevice).removeListener(this);
+        }
     }
 
     @Override
