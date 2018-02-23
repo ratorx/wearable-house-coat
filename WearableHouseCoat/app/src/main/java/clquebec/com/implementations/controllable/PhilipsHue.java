@@ -3,6 +3,7 @@ package clquebec.com.implementations.controllable;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeConnection;
@@ -27,6 +28,7 @@ import com.philips.lighting.hue.sdk.wrapper.utilities.HueColor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,10 +171,14 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         List<LightPoint> lights = bs.getLights();
 
         if (lights.size() > 0){
-           LightPoint testLight = lights.get(0);
-           HueColor.RGB rgb = testLight.getLightState().getColor().getRGB();
-
-           return getIntFromColor(rgb.r, rgb.g, rgb.b);
+           double[][] xys = new double[lights.size()][2];
+           for (int i = 0; i < lights.size(); i++){
+               xys[i][0] = lights.get(i).getLightState().getColor().getXY().x;
+               xys[i][1] = lights.get(i).getLightState().getColor().getXY().y;
+           }
+           int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(0));
+            Log.d("Hue", "the colors are " + Arrays.toString(colors));
+            return colors[0] | 0xFF000000;
         }
 
         return 20;
