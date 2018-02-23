@@ -27,13 +27,16 @@ import com.philips.lighting.hue.sdk.wrapper.utilities.HueColor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.controllable.ControllableLightDevice;
+import clquebec.com.framework.listenable.DeviceChangeListener;
+import clquebec.com.framework.listenable.ListenableDevice;
 import clquebec.com.framework.storage.ConfigurationStore;
 import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
@@ -44,11 +47,11 @@ import clquebec.com.wearablehousecoat.LightControlPanelActivity;
  * Creation Date: 03/02/18
  */
 
-public class PhilipsHue implements ControllableLightDevice {
+public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private static final String TAG = "PhilipsHue";
 
     private static Bridge mbridge = null;
-    private static List<PhilipsHueListener> listeners = new ArrayList<>();
+    private static Map<DeviceChangeListener, PhilipsHue> listeners = new HashMap<>();
     private static BridgeConnection connection;
 
     private Context mContext;
@@ -81,9 +84,10 @@ public class PhilipsHue implements ControllableLightDevice {
                 }
             } else {
                 mbridge.getBridgeState().refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.REMOTE_LOCAL);
-                for (PhilipsHueListener l : listeners){
-                    Log.d(TAG, "Attempting to run listeners");
-                    l.updateState(mbridge.getBridgeState());
+
+                Log.d(TAG, "Attempting to run listeners");
+                for (DeviceChangeListener l : listeners.keySet()){
+                    l.updateState(listeners.get(l));
                 }
             }
         }
@@ -116,9 +120,6 @@ public class PhilipsHue implements ControllableLightDevice {
             connection = mbridge.getBridgeConnection(BridgeConnectionType.LOCAL);
             connection.getConnectionOptions().enableFastConnectionMode(mbridge.getIdentifier());
             connection.connect();
-
-
-
         }
 
     }
@@ -293,11 +294,13 @@ public class PhilipsHue implements ControllableLightDevice {
         mName = name;
     }
 
-    public static void addListener(PhilipsHueListener o){
-        listeners.add(o);
+    @Override
+    public void addListener(DeviceChangeListener o){
+        listeners.put(o, this);
     }
 
-    public static void removeListener(PhilipsHueListener o){
+    @Override
+    public void removeListener(DeviceChangeListener o){
         listeners.remove(o);
     }
 

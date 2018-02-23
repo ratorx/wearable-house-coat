@@ -8,12 +8,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
-import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
-import com.philips.lighting.hue.sdk.wrapper.domain.device.light.LightPoint;
-
 import org.jraf.android.androidwearcolorpicker.app.ColorPickActivity;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -21,11 +17,11 @@ import java.util.UUID;
 import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableLightDevice;
+import clquebec.com.framework.listenable.DeviceChangeListener;
+import clquebec.com.framework.listenable.ListenableDevice;
 import clquebec.com.framework.storage.ConfigurationStore;
-import clquebec.com.implementations.controllable.PhilipsHue;
-import clquebec.com.implementations.controllable.PhilipsHueListener;
 
-public class LightControlPanelActivity extends WearableActivity implements PhilipsHueListener {
+public class LightControlPanelActivity extends WearableActivity implements DeviceChangeListener {
     private final static String TAG = "LightControlPanelActivity";
     private final static int REQUEST_PICK_COLOR = 1;
     public static final String ID_EXTRA = "DeviceID";
@@ -92,8 +88,8 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
             mLightDevice = (ControllableLightDevice) device;
 
             //TODO: Be less device specific. Maybe we should have an Interface for this (ListenableControllable)?
-            if(mLightDevice instanceof PhilipsHue) {
-                PhilipsHue.addListener(this);
+            if(mLightDevice instanceof ListenableDevice) {
+                ((ListenableDevice) device).addListener(this);
             }
 
             try {
@@ -128,6 +124,7 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
                     try{
                         mLightDevice.setLightColor(pickedColor);
 
+                        //TODO: Test without this.
                         Timer mHereTimer = new Timer();
                         mHereTimer.schedule(new TimerTask() {
                             public void run() {
@@ -153,12 +150,30 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
     }
 
     @Override
-    public void updateState(BridgeState bs) {
-        List<LightPoint> lights = bs.getLights();
+    protected void onDestroy(){
+        super.onDestroy();
 
-        if (lights.size() > 0 && !changingBrightness){
-            LightPoint l = lights.get(0);
-            mBrightnessBar.setProgress(l.getLightState().getBrightness());
+        //Unregister listener
+        ((ListenableDevice) mLightDevice).removeListener(this);
+    }
+
+    @Override
+    public void updateState(ListenableDevice device) {
+        ControllableLightDevice light = (ControllableLightDevice) device;
+
+        if (!changingBrightness){
+            try {
+                mBrightnessBar.setProgress(light.getBrightness());
+            }catch(ActionNotSupported e){
+                Log.e(TAG, "Light does not support brightness");
+            }
+
+            try {
+                mColourPreview.setColorFilter(light.getLightColor());
+                mColourPreview.setTag(light.getLightColor());
+            }catch(ActionNotSupported e){
+                Log.e(TAG, "Light does not support colours");
+            }
             Log.d(TAG, "Ran listener event");
         }
     }
