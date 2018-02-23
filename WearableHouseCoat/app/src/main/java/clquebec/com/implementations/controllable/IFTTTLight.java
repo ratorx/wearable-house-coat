@@ -71,6 +71,16 @@ public class IFTTTLight implements ControllableLightDevice {
     }
 
     @Override
+    public boolean setBrightness(int brightness) throws ActionNotSupported {
+        return false;
+    }
+
+    @Override
+    public int getBrightness() throws ActionNotSupported {
+        return 0;
+    }
+
+    @Override
     public boolean enable() {
         if (mName != null && !mCurrentState) {
             mCurrentState = true;

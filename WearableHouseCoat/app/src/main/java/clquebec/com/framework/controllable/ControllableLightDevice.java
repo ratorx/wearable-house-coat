@@ -13,4 +13,8 @@ public interface ControllableLightDevice extends ControllableDevice {
     void setLightColor(int color) throws ActionNotSupported;
 
     int getLightColor() throws ActionNotSupported;
+
+    boolean setBrightness(int brightness) throws ActionNotSupported;
+
+    int getBrightness() throws ActionNotSupported;
 }

@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
 import com.philips.lighting.hue.sdk.wrapper.domain.device.light.LightPoint;
@@ -23,6 +22,7 @@ import clquebec.com.framework.controllable.ActionNotSupported;
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableLightDevice;
 import clquebec.com.framework.storage.ConfigurationStore;
+import clquebec.com.implementations.controllable.PhilipsHue;
 import clquebec.com.implementations.controllable.PhilipsHueListener;
 
 public class LightControlPanelActivity extends WearableActivity implements PhilipsHueListener {
@@ -61,10 +61,10 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 changingBrightness = false;
-                String dT = getIntent().getExtras().getString("DeviceType");
-                if (dT != null && dT.equals("HueLight")){
-                    phTest.setBrightness(seekBar.getProgress());
-
+                try {
+                    mLightDevice.setBrightness(seekBar.getProgress());
+                }catch(ActionNotSupported e){
+                    Log.e(TAG, "Device does not support setting brightness");
                 }
             }
         });
@@ -81,12 +81,9 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
 
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
             ControllableDevice device = config.getDevice(deviceID);
-        if (device == null ){
-            throw new IllegalArgumentException("LightControlPanelActivity must be given the ID to a valid device");
-        mBrightnessBar.setProgress(phTest.getBrightness());
-        }
-
-        PhilipsHue.addListener(this);
+            if (device == null ){
+                throw new IllegalArgumentException("LightControlPanelActivity must be given the ID to a valid device");
+            }
 
             if(!(device instanceof ControllableLightDevice)){
                 throw new IllegalArgumentException("LightControlPanelActivity must be given the ID to a light device");
@@ -94,12 +91,24 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
 
             mLightDevice = (ControllableLightDevice) device;
 
+            //TODO: Be less device specific. Maybe we should have an Interface for this (ListenableControllable)?
+            if(mLightDevice instanceof PhilipsHue) {
+                PhilipsHue.addListener(this);
+            }
+
             try {
                 mColourPreview.setColorFilter(mLightDevice.getLightColor());
                 mColourPreview.setTag(mLightDevice.getLightColor());
             }catch(ActionNotSupported e){
                 Log.e(TAG, "Light does not support colours");
                 mColourPreview.setVisibility(View.GONE);
+            }
+
+            try {
+                mBrightnessBar.setProgress(mLightDevice.getBrightness());
+            }catch(ActionNotSupported e){
+                Log.e(TAG, "Light does not support brightness");
+                mBrightnessBar.setVisibility(View.GONE);
             }
         });
     }
@@ -150,7 +159,7 @@ public class LightControlPanelActivity extends WearableActivity implements Phili
         if (lights.size() > 0 && !changingBrightness){
             LightPoint l = lights.get(0);
             mBrightnessBar.setProgress(l.getLightState().getBrightness());
-            Log.d("Hue", "Ran listener event");
+            Log.d(TAG, "Ran listener event");
         }
     }
 }
