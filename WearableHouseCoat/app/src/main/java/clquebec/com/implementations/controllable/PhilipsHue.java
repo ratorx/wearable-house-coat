@@ -3,7 +3,6 @@ package clquebec.com.implementations.controllable;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeConnection;
@@ -21,7 +20,6 @@ import com.philips.lighting.hue.sdk.wrapper.discovery.BridgeDiscoveryResult;
 import com.philips.lighting.hue.sdk.wrapper.domain.Bridge;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeBuilder;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
-import com.philips.lighting.hue.sdk.wrapper.domain.ClipAttribute;
 import com.philips.lighting.hue.sdk.wrapper.domain.HueError;
 import com.philips.lighting.hue.sdk.wrapper.domain.ReturnCode;
 import com.philips.lighting.hue.sdk.wrapper.domain.clip.ClipResponse;
@@ -32,7 +30,6 @@ import com.philips.lighting.hue.sdk.wrapper.utilities.HueColor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +91,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         public void onBridgeStateUpdated(Bridge bridge, BridgeStateUpdatedEvent bridgeStateUpdatedEvent) {
             Log.d(TAG, "Bridge state updated event: " + bridgeStateUpdatedEvent);
             if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.INITIALIZED){
-                
                 for (DeviceChangeListener l : listeners.keySet()){
                     l.updateState(listeners.get(l));
                 }
@@ -105,8 +101,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                     hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 1000);
                 }
             } else if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.LIGHTS_AND_GROUPS){
-               // mbridge.getBridgeState().refresh(BridgeStateCacheType.LIGHTS_AND_GROUPS, BridgeConnectionType.REMOTE_LOCAL);
-
                 //TODO: Only call listeners on PhilipsHue lights that have actually changed
                 Log.d(TAG, "Attempting to run listeners");
                 for (DeviceChangeListener l : listeners.keySet()){
@@ -122,13 +116,8 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     }
 
     public PhilipsHue(Context c) {
-        //Scan for Hues on local network
-
-        //Pick the right one(s)
-
-        //Initialise internal state.
         mContext = c;
-        //TODO: Allow addressing of specific Hue lights
+        //TODO: Allow addressing of specific Hue lights via JSON config
         if (mbridge == null){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
@@ -137,15 +126,15 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                     @Override
                     public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
                         if (list.size() == 0){
-                            Log.e("Hue", "No bridge found");
+                            Log.e(TAG, "No bridge found");
                             //TODO: Decide what to do here.
                         }else if (list.size() > 1){
-                            Log.e("Hue", "Multiple bridges found. WHC does not support" +
-                                    "multiple bridges");
+                            Log.e(TAG, "Multiple bridges found. WHC does not support multiple bridges");
+                            //TODO: Pick one?
                         }else{
                             BridgeDiscoveryResult bdr = list.get(0);
                             String ip = bdr.getIP();
-                            Log.d("Hue", "One bridge found. Connecting to bridge...");
+                            Log.d(TAG, "One bridge found. Connecting to bridge...");
                             mbridge = new BridgeBuilder("Wearable House Control", config.getMyUUID().toString())
                                     .setIpAddress(ip)
                                     .setConnectionType(BridgeConnectionType.LOCAL)
@@ -162,8 +151,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                 });
 
             });
-
-
         }
 
     }
@@ -255,10 +242,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             List<LightPoint> lights = bs.getLights();
 
             for (LightPoint light : lights) {
-
                 updateLight(light, SETTING_ON, 0);
-
-
             }
             return true;
         }
@@ -270,7 +254,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         final LightState lightState = light.getLightState();
         switch (option){
             case SETTING_ON:
-                lightState.setOn((val!=0));
+                lightState.setOn(val==1);
                 break;
 
             case SETTING_BRIGHTNESS:

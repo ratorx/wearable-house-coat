@@ -12,8 +12,6 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import java.util.List;
-
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
 import clquebec.com.framework.listenable.DeviceChangeListener;
@@ -32,8 +30,6 @@ import clquebec.com.wearablehousecoat.R;
  */
 
 public class DeviceControlButton extends AppCompatButton implements View.OnClickListener, View.OnLongClickListener, DeviceChangeListener {
-    private static String newline = System.getProperty("line.separator");
-
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84); //Prussian Blue
     public static final int DEFAULT_BACKGROUND_DISCONNECTED = Color.argb(255, 255, 0, 0);

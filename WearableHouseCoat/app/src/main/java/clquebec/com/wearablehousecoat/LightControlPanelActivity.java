@@ -1,9 +1,7 @@
 package clquebec.com.wearablehousecoat;
 
 import android.content.Intent;
-import android.graphics.ColorFilter;
 import android.os.Bundle;
-import android.support.v4.graphics.ColorUtils;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -64,11 +62,13 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
                 Timer brightnessTimer = new Timer();
                 brightnessTimer.schedule(new TimerTask() {
                     public void run() {
-                        runOnUiThread(() -> {changingBrightness = false; try{
-                            mBrightnessBar.setProgress(mLightDevice.getBrightness());
-                        }catch (ActionNotSupported e) {
-                            Log.e(TAG, "Device does not support getting brightness");
-                        }});
+                        runOnUiThread(() -> {
+                            changingBrightness = false;
+                            try{
+                                mBrightnessBar.setProgress(mLightDevice.getBrightness());
+                            }catch (ActionNotSupported e) {
+                                Log.e(TAG, "Device does not support getting brightness");
+                            }});
                     }
                 }, 500);
                 try {
@@ -101,7 +101,6 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
             mLightDevice = (ControllableLightDevice) device;
 
-            //TODO: Be less device specific. Maybe we should have an Interface for this (ListenableControllable)?
             if(mLightDevice instanceof ListenableDevice) {
                 ((ListenableDevice) device).addListener(this);
             }
