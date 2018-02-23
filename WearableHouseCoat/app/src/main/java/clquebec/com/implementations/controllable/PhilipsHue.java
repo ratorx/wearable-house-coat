@@ -21,6 +21,7 @@ import com.philips.lighting.hue.sdk.wrapper.discovery.BridgeDiscoveryResult;
 import com.philips.lighting.hue.sdk.wrapper.domain.Bridge;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeBuilder;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
+import com.philips.lighting.hue.sdk.wrapper.domain.ClipAttribute;
 import com.philips.lighting.hue.sdk.wrapper.domain.HueError;
 import com.philips.lighting.hue.sdk.wrapper.domain.ReturnCode;
 import com.philips.lighting.hue.sdk.wrapper.domain.clip.ClipResponse;
@@ -54,6 +55,9 @@ import clquebec.com.wearablehousecoat.LightControlPanelActivity;
 
 public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private static final String TAG = "PhilipsHue";
+    private static final int SETTING_BRIGHTNESS = 0;
+    private static final int SETTING_COLOR = 1;
+    private static final int SETTING_ON = 2;
 
     private static Bridge mbridge = null;
     private static Map<DeviceChangeListener, PhilipsHue> listeners = new HashMap<>();
@@ -68,6 +72,14 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         @Override
         public void onConnectionEvent(BridgeConnection bridgeConnection, ConnectionEvent connectionEvent) {
             Log.d(TAG, "Connection event: " + connectionEvent);
+
+            if (connectionEvent == ConnectionEvent.DISCONNECTED
+                    || connectionEvent == ConnectionEvent.CONNECTION_LOST
+                    || connectionEvent == ConnectionEvent.CONNECTION_RESTORED){
+                for (DeviceChangeListener l : listeners.keySet()){
+                    l.updateState(listeners.get(l));
+                }
+            }
         }
 
         public void onConnectionError(BridgeConnection bridgeConnection, List<HueError> hueErrors){
@@ -82,6 +94,11 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         public void onBridgeStateUpdated(Bridge bridge, BridgeStateUpdatedEvent bridgeStateUpdatedEvent) {
             Log.d(TAG, "Bridge state updated event: " + bridgeStateUpdatedEvent);
             if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.INITIALIZED){
+                
+                for (DeviceChangeListener l : listeners.keySet()){
+                    l.updateState(listeners.get(l));
+                }
+
                 HeartbeatManager hbm = connection.getHeartbeatManager();
                 if (hbm != null) {
                     Log.d(TAG, "Starting heartbeats...");
@@ -153,162 +170,151 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
     @Override
     public void setLightColor(int color) throws ActionNotSupported {
-        Log.d(TAG, "Setting the colour of PhilipsHue");
-        BridgeState bs = mbridge.getBridgeState();
+        if (mbridge != null) {
+            Log.d(TAG, "Setting the colour of PhilipsHue");
+            BridgeState bs = mbridge.getBridgeState();
 
-        List<LightPoint> lights = bs.getLights();
+            List<LightPoint> lights = bs.getLights();
 
-        for (LightPoint light : lights) {
-
-            final LightState lightState = light.getLightState();
-
-
-            int r = Color.red(color);
-            int g = Color.green(color);
-            int b = Color.blue(color);
-            HueColor hc = new HueColor(new HueColor.RGB(r,g,b),
-                    light.getLightConfiguration().getModelIdentifier(),
-                    light.getLightConfiguration().getSwVersion());
-            lightState.setXY(hc.getXY().x,hc.getXY().y);
-
-            light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
-                @Override
-                public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
-                    if (returnCode == ReturnCode.SUCCESS) {
-                        Log.d(TAG, "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
-                    } else {
-                        Log.e(TAG, "Error changing hue of light " + light.getIdentifier());
-                        for (HueError error : errorList) {
-                            Log.e(TAG, error.toString());
-                        }
-                    }
-                }
-            });
+            for (LightPoint light : lights) {
+                updateLight(light, SETTING_COLOR, color);
+            }
         }
     }
 
     @Override
     public int getLightColor() throws ActionNotSupported{
-        BridgeState bs = mbridge.getBridgeState();
-        bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
-        List<LightPoint> lights = bs.getLights();
+        if (mbridge != null) {
+            BridgeState bs = mbridge.getBridgeState();
+            bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
+            List<LightPoint> lights = bs.getLights();
 
-        if (lights.size() > 0){
-           double[][] xys = new double[lights.size()][2];
-           for (int i = 0; i < lights.size(); i++){
-               xys[i][0] = lights.get(i).getLightState().getColor().getXY().x;
-               xys[i][1] = lights.get(i).getLightState().getColor().getXY().y;
-           }
-           int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(0));
-            return colors[0] | 0xFF000000;
+            if (lights.size() > 0) {
+                double[][] xys = new double[lights.size()][2];
+                for (int i = 0; i < lights.size(); i++) {
+                    xys[i][0] = lights.get(i).getLightState().getColor().getXY().x;
+                    xys[i][1] = lights.get(i).getLightState().getColor().getXY().y;
+                }
+                int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(0));
+                return colors[0] | 0xFF000000;
+            }
         }
-
-        return 20;
+        return 0;
     }
 
 
     public int getBrightness(){
-        BridgeState bs = mbridge.getBridgeState();
-        bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
-        List<LightPoint> lights = bs.getLights();
-        if (lights.size() > 0) {
-            LightPoint testLight = lights.get(0);
-            return testLight.getLightState().getBrightness();
+        if (mbridge != null) {
+            BridgeState bs = mbridge.getBridgeState();
+            bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
+            List<LightPoint> lights = bs.getLights();
+            if (lights.size() > 0) {
+                LightPoint testLight = lights.get(0);
+                return testLight.getLightState().getBrightness();
+            }
         }
-
         return 0;
     }
 
     public boolean setBrightness(int val) {
-        BridgeState bs = mbridge.getBridgeState();
-        List<LightPoint> lights = bs.getLights();
+        if (mbridge != null){
+            BridgeState bs = mbridge.getBridgeState();
+            List<LightPoint> lights = bs.getLights();
 
-        for (LightPoint light : lights){
-            final LightState lightState = light.getLightState();
-            lightState.setBrightness(val);
-            light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
-                @Override
-                public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
-                    if (returnCode == ReturnCode.SUCCESS) {
-                        Log.i("Hue", "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
-                    } else {
-                        Log.e("Hue", "Error changing hue of light " + light.getIdentifier());
-                        for (HueError error : errorList) {
-                            Log.e("Hue", error.toString());
-                        }
-                    }
-                }
-            });
+            for (LightPoint light : lights){
+                updateLight(light, SETTING_BRIGHTNESS, val);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
 
     @Override
     public boolean enable() {
-        BridgeState bs = mbridge.getBridgeState();
-        List<LightPoint> lights = bs.getLights();
 
-        for (LightPoint light : lights){
-            final LightState lightState = light.getLightState();
-            lightState.setOn(true);
-            light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
-                @Override
-                public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
-                    if (returnCode == ReturnCode.SUCCESS) {
-                        Log.i("Hue", "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
-                    } else {
-                        Log.e("Hue", "Error changing hue of light " + light.getIdentifier());
-                        for (HueError error : errorList) {
-                            Log.e("Hue", error.toString());
-                        }
-                    }
-                }
-            });
+        if (mbridge != null){
+            BridgeState bs = mbridge.getBridgeState();
+            List<LightPoint> lights = bs.getLights();
+
+            for (LightPoint light : lights){
+                updateLight(light, SETTING_ON, 1);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
 
 
     @Override
     public boolean disable() {
-        BridgeState bs = mbridge.getBridgeState();
+        if (mbridge != null){
+            BridgeState bs = mbridge.getBridgeState();
 
-        List<LightPoint> lights = bs.getLights();
+            List<LightPoint> lights = bs.getLights();
 
-        for (LightPoint light : lights) {
+            for (LightPoint light : lights) {
 
-            final LightState lightState = light.getLightState();
-            lightState.setOn(false);
-            light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
-                @Override
-                public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
-                    if (returnCode == ReturnCode.SUCCESS) {
-                        Log.d(TAG, "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
-                    } else {
-                        Log.e(TAG, "Error changing hue of light " + light.getIdentifier());
-                        for (HueError error : errorList) {
-                            Log.e(TAG, error.toString());
-                        }
+                updateLight(light, SETTING_ON, 0);
+
+
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private void updateLight(LightPoint light, int option, int val){
+        final LightState lightState = light.getLightState();
+        switch (option){
+            case SETTING_ON:
+                lightState.setOn((val!=0));
+                break;
+
+            case SETTING_BRIGHTNESS:
+                lightState.setBrightness(val);
+                break;
+            case SETTING_COLOR:
+                int r = Color.red(val);
+                int g = Color.green(val);
+                int b = Color.blue(val);
+                HueColor hc = new HueColor(new HueColor.RGB(r,g,b),
+                        light.getLightConfiguration().getModelIdentifier(),
+                        light.getLightConfiguration().getSwVersion());
+                lightState.setXY(hc.getXY().x,hc.getXY().y);
+                break;
+        }
+
+        light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
+            @Override
+            public void handleCallback(Bridge bridge, ReturnCode returnCode, List<ClipResponse> list, List<HueError> errorList) {
+                if (returnCode == ReturnCode.SUCCESS) {
+                    Log.d(TAG, "Changed hue of light " + light.getIdentifier() + " to " + lightState.getHue());
+                } else {
+                    Log.e(TAG, "Error changing hue of light " + light.getIdentifier());
+                    for (HueError error : errorList) {
+                        Log.e(TAG, error.toString());
                     }
                 }
-            });
-
-        }
-        return true;
+            }
+        });
     }
 
     @Override
     public boolean isEnabled() {
-       BridgeState bs = mbridge.getBridgeState();
-       List<LightPoint> lights = bs.getLights();
+       if (mbridge != null){
+           BridgeState bs = mbridge.getBridgeState();
+           List<LightPoint> lights = bs.getLights();
 
-       if(lights.size() > 0) {
-           return lights.get(0).getLightState().isOn();
-       }else{
-           return false;
+           if(lights.size() > 0) {
+               return lights.get(0).getLightState().isOn();
+           }else{
+               return false;
+           }
        }
+        return false;
     }
 
     @Override
@@ -358,5 +364,13 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         mContext.startActivity(lightControls);
 
         return true;
+    }
+
+    public boolean isConnected() {
+        if (mbridge==null){
+            return false;
+        }else{
+            return mbridge.isConnected();
+        }
     }
 }

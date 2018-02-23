@@ -154,4 +154,10 @@ public class IFTTTLight implements ControllableLightDevice {
 
         return true;
     }
+
+    @Override
+    public boolean isConnected() {
+        //TODO: implement this
+        return true;
+    }
 }

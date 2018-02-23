@@ -99,4 +99,11 @@ public class Room extends Place {
         return new ArrayList<>(mDevices);
     }
 
+
+    //TODO: WTF????
+    @Override
+    public boolean isConnected() {
+        return true;
+    }
+
 }
