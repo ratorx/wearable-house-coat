@@ -61,8 +61,8 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Timer mHereTimer = new Timer();
-                mHereTimer.schedule(new TimerTask() {
+                Timer brightnessTimer = new Timer();
+                brightnessTimer.schedule(new TimerTask() {
                     public void run() {
                         runOnUiThread(() -> {changingBrightness = false; try{
                             mBrightnessBar.setProgress(mLightDevice.getBrightness());

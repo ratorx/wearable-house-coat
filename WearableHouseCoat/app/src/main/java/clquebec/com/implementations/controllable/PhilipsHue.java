@@ -15,6 +15,9 @@ import com.philips.lighting.hue.sdk.wrapper.connection.BridgeStateUpdatedCallbac
 import com.philips.lighting.hue.sdk.wrapper.connection.BridgeStateUpdatedEvent;
 import com.philips.lighting.hue.sdk.wrapper.connection.ConnectionEvent;
 import com.philips.lighting.hue.sdk.wrapper.connection.HeartbeatManager;
+import com.philips.lighting.hue.sdk.wrapper.discovery.BridgeDiscovery;
+import com.philips.lighting.hue.sdk.wrapper.discovery.BridgeDiscoveryCallback;
+import com.philips.lighting.hue.sdk.wrapper.discovery.BridgeDiscoveryResult;
 import com.philips.lighting.hue.sdk.wrapper.domain.Bridge;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeBuilder;
 import com.philips.lighting.hue.sdk.wrapper.domain.BridgeState;
@@ -84,8 +87,8 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                     Log.d(TAG, "Starting heartbeats...");
                     hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 1000);
                 }
-            } else {
-                mbridge.getBridgeState().refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.REMOTE_LOCAL);
+            } else if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.LIGHTS_AND_GROUPS){
+               // mbridge.getBridgeState().refresh(BridgeStateCacheType.LIGHTS_AND_GROUPS, BridgeConnectionType.REMOTE_LOCAL);
 
                 //TODO: Only call listeners on PhilipsHue lights that have actually changed
                 Log.d(TAG, "Attempting to run listeners");
@@ -108,22 +111,42 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
         //Initialise internal state.
         mContext = c;
-        //TODO: Implement Hue bridge discovery
         //TODO: Allow addressing of specific Hue lights
         if (mbridge == null){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
-                mbridge = new BridgeBuilder("Wearable House Control", config.getMyUUID().toString())
-                        .setIpAddress("192.168.14.243")
-                        .setConnectionType(BridgeConnectionType.LOCAL)
-                        .setBridgeConnectionCallback(bridgeConnectionCallback)
-                        .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
-                        .build();
+                BridgeDiscovery bridgeDiscovery = new BridgeDiscovery();
+                bridgeDiscovery.search(new BridgeDiscoveryCallback() {
+                    @Override
+                    public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
+                        if (list.size() == 0){
+                            Log.e("Hue", "No bridge found");
+                            //TODO: Decide what to do here.
+                        }else if (list.size() > 1){
+                            Log.e("Hue", "Multiple bridges found. WHC does not support" +
+                                    "multiple bridges");
+                        }else{
+                            BridgeDiscoveryResult bdr = list.get(0);
+                            String ip = bdr.getIP();
+                            Log.d("Hue", "One bridge found. Connecting to bridge...");
+                            mbridge = new BridgeBuilder("Wearable House Control", config.getMyUUID().toString())
+                                    .setIpAddress(ip)
+                                    .setConnectionType(BridgeConnectionType.LOCAL)
+                                    .setBridgeConnectionCallback(bridgeConnectionCallback)
+                                    .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
+                                    .build();
+
+                            connection = mbridge.getBridgeConnection(BridgeConnectionType.LOCAL);
+                            connection.getConnectionOptions().enableFastConnectionMode(mbridge.getIdentifier());
+                            connection.connect();
+                        }
+
+                    }
+                });
+
             });
 
-            connection = mbridge.getBridgeConnection(BridgeConnectionType.LOCAL);
-            connection.getConnectionOptions().enableFastConnectionMode(mbridge.getIdentifier());
-            connection.connect();
+
         }
 
     }
@@ -183,13 +206,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         return 20;
     }
 
-    private int getIntFromColor(int Red, int Green, int Blue){
-        Red = (Red << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
-        Green = (Green << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff
-        Blue = Blue & 0x000000FF; //Mask out anything not blue.
-
-        return 0xFF000000 | Red | Green | Blue; //0xFF000000 for 100% Alpha. Bitwise OR everything together.
-    }
 
     public int getBrightness(){
         BridgeState bs = mbridge.getBridgeState();
@@ -235,7 +251,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
         for (LightPoint light : lights){
             final LightState lightState = light.getLightState();
-            lightState.setBrightness(255);
             lightState.setOn(true);
             light.updateState(lightState, BridgeConnectionType.LOCAL, new BridgeResponseCallback() {
                 @Override
