@@ -31,7 +31,7 @@ class App extends React.Component {
 					name: "Devices",
 					component: null,
 					onPageLoad: (page) => {
-						page.component = <SetDevices devices={this.state.deviceInfo.info.devices.filter(dev => dev.type !== "DeviceGroup")} rooms={this.state.deviceInfo.info.rooms}/>
+						page.component = <SetDevices devices={this.state.deviceInfo.info.devices.filter(dev => dev.type !== "DeviceGroup")} rooms={this.state.deviceInfo.info.rooms} onDeleteDevice={this.deleteDevice.bind(this)}/>
 					}
 				},
 				{
@@ -55,15 +55,25 @@ class App extends React.Component {
 	constructor(){
 		super();
 		this.state = {
-			currentPage: this.pages[1].dropdown[1],
+			currentPage: undefined,
 			deviceInfo: new DeviceInfo()
 		};
+		this.state.currentPage = this.pages[1].dropdown[1]
 		this.state.currentPage.onPageLoad(this.state.currentPage);
 	}
 
 	setCurrentPage(page) {
 		this.setState(() => {return {currentPage: page}});
 		page.onPageLoad(page);
+	}
+
+	deleteDevice(device){
+		this.setState((prevState) => {
+			let deviceIndex = prevState.deviceInfo.info.devices.indexOf(device);
+			prevState.deviceInfo.info.devices.splice(deviceIndex, 1);
+			prevState.currentPage.onPageLoad(prevState.currentPage);
+			return prevState;
+		})
 	}
 
 	render() {

@@ -48,11 +48,12 @@ class SetDevices extends React.Component {
 	}
 
 	deleteDevice() {
-		this.setState((prevState) => {
-			let index = prevState.devices.indexOf(prevState.deleteDialog.device);
-			prevState.devices.splice(index, 1);
-			if(index === -1)
-				return {}
+		this.setState((prevState, props) => {
+			props.onDeleteDevice(prevState.deleteDialog.device);
+			// let index = prevState.devices.indexOf(prevState.deleteDialog.device);
+			// prevState.devices.splice(index, 1);
+			// if(index === -1)
+			// 	return {}
 			prevState.deleteDialog = {
 				shown: false,
 				device: null
@@ -164,6 +165,15 @@ class SetDevices extends React.Component {
 					room: newRoom,
 					name: prevState.editDevice.name
 				}
+			}
+		})
+	}
+
+	componentWillReceiveProps(newProps) {
+		this.setState(() => {
+			return {
+				devices: newProps.devices,
+				rooms: newProps.rooms
 			}
 		})
 	}
