@@ -150,7 +150,6 @@ public class ConfigurationStore {
     }
 
     public void onConfigAvailable(ConfigurationAvailableCallback callback){
-        Log.d(TAG, "onConfigAvailable added");
         if(mData != null) {
             callback.onConfigurationAvailable(this);
         }else{

@@ -44,7 +44,6 @@ public class Room extends Place {
         if(roomData.has("devices")) {
             JSONArray deviceList = roomData.getJSONArray("devices");
 
-            Log.d(TAG, deviceList.toString());
             configStore.onConfigAvailable(config -> {
                 for (int i = 0; i < deviceList.length(); i++) {
                     try {

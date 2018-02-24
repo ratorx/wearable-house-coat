@@ -178,19 +178,23 @@ public class ConfigurationStoreTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetDevices() throws JSONException{
         //Put in some device data
-        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'devices':[{'type':'DummyControllable', 'uid':10}]}}"));
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'devices':[{'type':'DummyControllable', 'uid':10, 'config':{}}]}}"));
 
         //Check that a wrong ID returns null:
         assertThat(mConfigurationStore.getDevice(new UUID(0, 0))).isNull();
 
+        UUID id = new UUID(0, 10);
+
         //Check that we get our device back on the right ID
-        ControllableDevice d = mConfigurationStore.getDevice(new UUID(0, 10));
+        ControllableDevice d = mConfigurationStore.getDevice(id);
         assertThat(d).isNotNull();
         assertThat(d).isInstanceOf(ControllableDevice.class);
-        assertThat(d.getID()).isEqualTo(new UUID(0, 10));
+        assertThat(d.getID()).isEqualTo(id);
 
-        //Check that getting the device again, gives the same device
+        //Check that getting the ID again results in the same Device
+        assertThat(mConfigurationStore.getDevice(id)).isSameAs(d);
     }
 }
