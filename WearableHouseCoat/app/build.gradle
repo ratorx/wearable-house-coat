@@ -35,6 +35,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.android.support:wear:26.1.0'
+    implementation 'com.google.firebase:firebase-messaging:11.8.0'
     compileOnly 'com.google.android.wearable:wearable:2.2.0'
 
     //For easy networking
@@ -53,3 +54,6 @@ dependencies {
     //For testing JSON
     testCompile 'org.json:json:20180130'
 }
+
+
+apply plugin: 'com.google.gms.google-services'
