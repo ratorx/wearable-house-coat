@@ -19,11 +19,11 @@ public interface ControllablePlaybackDevice extends ControllableDevice {
     boolean setVolume(float volume) throws ActionNotSupported;
 
     //Gets the volume
-    float getVolume() throws ActionNotSupported;
+    int getVolume() throws ActionNotSupported;
 
     //Sets the brightness
     boolean setBrightness(float brightness) throws ActionNotSupported;
 
     //Gets the brightness
-    float getBrightness() throws ActionNotSupported;
+    int getBrightness() throws ActionNotSupported;
 }

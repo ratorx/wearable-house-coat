@@ -14,6 +14,8 @@ import android.view.View;
 
 import clquebec.com.framework.controllable.ControllableDevice;
 import clquebec.com.framework.controllable.ControllableDeviceType;
+import clquebec.com.framework.listenable.DeviceChangeListener;
+import clquebec.com.framework.listenable.ListenableDevice;
 import clquebec.com.wearablehousecoat.R;
 
 /**
@@ -27,15 +29,17 @@ import clquebec.com.wearablehousecoat.R;
  * logging and calls to our preference learner.
  */
 
-public class DeviceControlButton extends AppCompatButton implements View.OnClickListener, View.OnLongClickListener {
+public class DeviceControlButton extends AppCompatButton implements View.OnClickListener, View.OnLongClickListener, DeviceChangeListener {
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84); //Prussian Blue
+    public static final int DEFAULT_BACKGROUND_DISCONNECTED = Color.argb(255, 255, 0, 0);
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
     private static final int DEFAULT_SIZE = 100;
 
     private int mBackgroundColor = DEFAULT_BACKGROUND;
     private int mBackgroundColorOff = DEFAULT_BACKGROUND_OFF;
+    private int mBackgroundColorDisconnected = DEFAULT_BACKGROUND_DISCONNECTED;
     private float mPadding = DEFAULT_PADDING;
     private ControllableDeviceType mDeviceType = DEFAULT_TYPE;
 
@@ -43,6 +47,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
 
     private Paint mBackgroundPaint;
     private Paint mBackgroundPaintOff;
+    private Paint mBackgroundPaintDisconnected;
     private TextPaint mTextPaint;
     private TextPaint mTextPaintOff;
     private Drawable mDeviceIcon = null;
@@ -95,6 +100,10 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         mBackgroundPaintOff.setStyle(Paint.Style.FILL);
         mBackgroundPaintOff.setColor(mBackgroundColorOff);
 
+        mBackgroundPaintDisconnected = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mBackgroundPaintDisconnected.setStyle(Paint.Style.FILL);
+        mBackgroundPaintDisconnected.setColor(mBackgroundColorDisconnected);
+
         mTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setColor(mBackgroundColorOff);
 
@@ -120,10 +129,17 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public void onDraw(Canvas canvas) {
         /* Draw a circle, with an icon on top. */
-        if (mDevice == null || mDevice.isEnabled()) {
+        if (mDevice == null || !mDevice.isConnected()) {
+            canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaintDisconnected);
+
+            if (mDevice != null && mDevice.getName() != null){
+                canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaintOff);
+            }
+
+        }else if (mDevice.isEnabled()) {
             canvas.drawCircle(mCenter[0], mCenter[1], mRadius, mBackgroundPaint);
 
-            if (mDevice != null && mDevice.getName() != null) {
+            if (mDevice.getName() != null) {
                 canvas.drawText(mDevice.getName(), mPadding * 4, mCenter[1] + mTextHeight / 2, mTextPaint);
             }
         } else {
@@ -224,6 +240,10 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
                 mDeviceIconOff = getContext().getDrawable(mDeviceType.getFadedIcon());
             }
 
+            if (mDevice instanceof ListenableDevice){
+                ((ListenableDevice) mDevice).addListener(this);
+            }
+
             //Re-calculate size
             measure();
 
@@ -236,7 +256,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public void onClick(View view) {
         //Call quickAction in the attached device
-        if (mDevice != null) {
+        if (mDevice != null && mDevice.isConnected()) {
             mDevice.quickAction();
         }
     }
@@ -244,12 +264,26 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public boolean onLongClick(View view) {
         //Call extendedAction in the attached device
-        if (mDevice != null) {
+        if (mDevice != null && mDevice.isConnected()) {
             mDevice.extendedAction();
             return true;
         }
 
         //Did not capture event
         return false;
+    }
+
+    @Override
+    public void updateState(ListenableDevice device) {
+        this.invalidate();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (mDevice instanceof ListenableDevice){
+            ((ListenableDevice) mDevice).removeListener(this);
+        }
+
+        super.finalize();
     }
 }

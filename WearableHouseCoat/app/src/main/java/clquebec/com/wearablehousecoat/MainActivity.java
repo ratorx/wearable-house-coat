@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.philips.lighting.hue.sdk.wrapper.Persistence;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -49,12 +51,18 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private Building mBuilding;
     private Place mCurrentDisplayedRoom;
 
+    //load HueSDK on startup
+    static {
+        System.loadLibrary("huesdk");
+    }
+
     private SensorManager mSensorManager;
     private float mLastAccelSquare;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Persistence.setStorageLocation(getFilesDir().getAbsolutePath(), "HueWear");
         setContentView(R.layout.activity_main);
 
         //SECTION: Initialize Building

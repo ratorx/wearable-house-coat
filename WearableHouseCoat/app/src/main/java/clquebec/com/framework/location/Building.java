@@ -71,6 +71,12 @@ public class Building extends Place {
         return devices;
     }
 
+    @Override
+    //TODO: WTF???
+    public boolean isConnected(){
+        return true;
+    }
+
 }
 
 
