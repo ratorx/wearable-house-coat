@@ -19,6 +19,7 @@
         android:background="@drawable/layout_bg">
 
         <SeekBar
+            android:id="@+id/brightnessBar"
             android:layout_width="match_parent"
             android:layout_height="44dp" />
 
@@ -32,6 +33,13 @@
             android:scaleType="fitCenter"
             android:src="@drawable/circle"
             android:contentDescription="@string/colourPreviewContentDescription" />
+
+        <ProgressBar
+            android:id="@+id/spinningProgress"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_gravity="bottom|end"
+            android:visibility="invisible" />
 
     </FrameLayout>
 

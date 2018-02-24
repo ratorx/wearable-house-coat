@@ -65,6 +65,22 @@ public class IFTTTLight implements ControllableLightDevice {
     }
 
     @Override
+    public int getLightColor() throws ActionNotSupported {
+        Log.e(TAG, "IFTTTLight does not know light state");
+        throw new ActionNotSupported();
+    }
+
+    @Override
+    public boolean setBrightness(int brightness) throws ActionNotSupported {
+        return false;
+    }
+
+    @Override
+    public int getBrightness() throws ActionNotSupported {
+        return 0;
+    }
+
+    @Override
     public boolean enable() {
         if (mName != null && !mCurrentState) {
             mCurrentState = true;
@@ -133,8 +149,15 @@ public class IFTTTLight implements ControllableLightDevice {
         //More in-depth lighting controls
 
         Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
+        lightControls.putExtra(LightControlPanelActivity.ID_EXTRA, mUUID);
         mContext.startActivity(lightControls);
 
+        return true;
+    }
+
+    @Override
+    public boolean isConnected() {
+        //TODO: implement this
         return true;
     }
 }

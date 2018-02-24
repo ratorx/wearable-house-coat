@@ -72,4 +72,9 @@ public class DummyControllable implements ControllableDevice {
     public boolean extendedAction() {
         return false;
     }
+
+    @Override
+    public boolean isConnected(){
+        return false;
+    }
 }

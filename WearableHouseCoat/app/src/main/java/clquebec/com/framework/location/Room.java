@@ -63,10 +63,14 @@ public class Room extends Place {
         }
     }
 
+    private List<ControllableDevice> devices;
+
     public Room(Context context, String name) {
         super(UUID.randomUUID());
         mName = name;
         mDevices = new ArrayList<>();
+
+        devices = new ArrayList<>();
     }
 
     @Override
@@ -92,6 +96,13 @@ public class Room extends Place {
     @Override
     public List<ControllableDevice> getDevices() {
         return new ArrayList<>(mDevices);
+    }
+
+
+    //TODO: WTF????
+    @Override
+    public boolean isConnected() {
+        return true;
     }
 
 }
