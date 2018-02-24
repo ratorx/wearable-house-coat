@@ -26,6 +26,12 @@ import com.clquebec.framework.people.Person;
 import com.clquebec.framework.storage.ConfigurationStore;
 import com.clquebec.implementations.location.FINDLocationProvider;
 import com.clquebec.wearablehousecoat.components.DeviceTogglesAdapter;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.philips.lighting.hue.sdk.wrapper.Persistence;
 
 import java.util.ArrayList;
@@ -38,6 +44,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private final static String TAG = "MainActivity";
 
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
+    private final static int GOOGLE_SIGN_IN_REQUEST = 1; //Request Google Sign-in
     private final static int POLLDELAYMILLIS = 5000;
 
     private RecyclerView mToggleButtons;
@@ -58,11 +65,22 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private SensorManager mSensorManager;
     private float mLastAccelSquare;
 
+    private GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInAccount mAccount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Persistence.setStorageLocation(getFilesDir().getAbsolutePath(), "HueWear");
         setContentView(R.layout.activity_main);
+
+        //SECTION: Google Sign-In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
 
         //SECTION: Initialize Building
         mBuilding = new Building(this, "Loading"); //Placeholder building
@@ -158,6 +176,22 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     @Override
+    protected void onStart(){
+        super.onStart();
+
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        GoogleSignInAccount mAccount = GoogleSignIn.getLastSignedInAccount(this);
+
+        if(mAccount == null){
+            //Start Google Sign-In flow
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
+        }else{
+            Log.d(TAG, "Signed in with "+mAccount.getEmail());
+        }
+    }
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ROOM_CHANGE_REQUEST) {
             //If a result was given, get the Room name, and call setRoom with the Room.
@@ -171,6 +205,15 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
                     setRoom(chosenRoom);
                 }
+            }
+        }else if(requestCode == GOOGLE_SIGN_IN_REQUEST){
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+
+            try{
+                mAccount = task.getResult(ApiException.class);
+            }catch(ApiException e){
+                Log.e(TAG, "signInResult:failed code=" + e.getStatusCode());
+                //TODO: Show an error / exit app.
             }
         }
     }
