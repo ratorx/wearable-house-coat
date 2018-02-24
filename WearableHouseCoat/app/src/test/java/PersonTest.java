@@ -1,5 +1,11 @@
 import android.content.Context;
 
+import com.clquebec.framework.HTTPRequestQueue;
+import com.clquebec.framework.location.LocationChangeListener;
+import com.clquebec.framework.location.Place;
+import com.clquebec.framework.people.Person;
+import com.clquebec.framework.storage.ConfigurationStore;
+
 import junit.framework.TestCase;
 
 import org.json.JSONException;
@@ -12,11 +18,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
-import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.location.LocationChangeListener;
-import clquebec.com.framework.location.Place;
-import clquebec.com.framework.people.Person;
-import clquebec.com.framework.storage.ConfigurationStore;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;

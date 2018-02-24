@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="clquebec.com.wearablehousecoat">
+    package="com.clquebec.wearablehousecoat">
 
     <uses-feature android:name="android.hardware.type.watch" />
     <uses-feature android:name="android.hardware.wifi" />
@@ -31,7 +31,7 @@
             android:value="true" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.clquebec.wearablehousecoat.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,10 +40,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LightControlPanelActivity"
+            android:name="com.clquebec.wearablehousecoat.LightControlPanelActivity"
             android:label="@string/title_activity_light_control_panel" />
         <activity
-            android:name=".RoomSelectionActivity"
+            android:name="com.clquebec.wearablehousecoat.RoomSelectionActivity"
             android:label="@string/title_activity_room_selection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,14 +52,14 @@
             </intent-filter>
         </activity>
 
-        <service android:name="clquebec.com.framework.automations.GetInstanceId">
+        <service android:name="com.clquebec.framework.automations.GetInstanceId">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
         <service
-            android:name="clquebec.com.framework.automations.AutomationMessageHandler"
+            android:name="com.clquebec.framework.automations.AutomationMessageHandler"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

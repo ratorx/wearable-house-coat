@@ -1,5 +1,11 @@
 import android.content.Context;
 
+import com.clquebec.framework.HTTPRequestQueue;
+import com.clquebec.framework.controllable.ControllableDevice;
+import com.clquebec.framework.location.Room;
+import com.clquebec.framework.storage.ConfigurationStore;
+import com.clquebec.implementations.controllable.DummyControllable;
+
 import junit.framework.TestCase;
 
 import org.json.JSONException;
@@ -12,11 +18,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
-import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.controllable.ControllableDevice;
-import clquebec.com.framework.location.Room;
-import clquebec.com.framework.storage.ConfigurationStore;
-import clquebec.com.implementations.controllable.DummyControllable;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;

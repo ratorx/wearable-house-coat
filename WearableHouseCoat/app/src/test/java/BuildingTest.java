@@ -1,5 +1,9 @@
 import android.content.Context;
 
+import com.clquebec.framework.controllable.ControllableDevice;
+import com.clquebec.framework.location.Building;
+import com.clquebec.framework.location.Room;
+
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -7,10 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import clquebec.com.framework.controllable.ControllableDevice;
-import clquebec.com.framework.location.Building;
-import clquebec.com.framework.location.Room;
-import clquebec.com.framework.people.Person;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import static org.assertj.core.api.Assertions.assertThat;

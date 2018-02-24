@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@color/eerie_black"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context="clquebec.com.wearablehousecoat.MainActivity"
+    tools:context="com.clquebec.wearablehousecoat.MainActivity"
     tools:deviceIds="wear">
     
     <!-- Scrollable wrapper for buttons -->

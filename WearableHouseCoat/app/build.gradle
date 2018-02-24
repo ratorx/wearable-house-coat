@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "clquebec.com.wearablehousecoat"
+        applicationId "com.clquebec.wearablehousecoat"
         minSdkVersion 25
         //noinspection OldTargetApi
         targetSdkVersion 26
@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.android.support:wear:26.1.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
+    compile 'com.google.android.gms:play-services-auth:11.8.0'
     compileOnly 'com.google.android.wearable:wearable:2.2.0'
 
     //For easy networking

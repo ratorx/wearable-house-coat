@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/eerie_black"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context="clquebec.com.wearablehousecoat.MediaControlPanelActivity"
+    tools:context="com.clquebec.wearablehousecoat.MediaControlPanelActivity"
     tools:deviceIds="wear"
     tools:ignore="Overdraw">
 

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/eerie_black"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context="clquebec.com.wearablehousecoat.RoomSelectionActivity"
+    tools:context="com.clquebec.wearablehousecoat.RoomSelectionActivity"
     tools:deviceIds="wear">
 
     <FrameLayout

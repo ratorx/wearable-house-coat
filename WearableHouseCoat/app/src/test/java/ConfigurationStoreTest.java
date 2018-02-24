@@ -1,5 +1,12 @@
 import android.content.Context;
 
+import com.clquebec.framework.HTTPRequestQueue;
+import com.clquebec.framework.controllable.ControllableDevice;
+import com.clquebec.framework.location.Building;
+import com.clquebec.framework.location.Room;
+import com.clquebec.framework.storage.ConfigurationStore;
+import com.clquebec.framework.storage.ConfigurationStore.ConfigurationAvailableCallback;
+
 import junit.framework.TestCase;
 
 import org.json.JSONArray;
@@ -14,13 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import clquebec.com.framework.HTTPRequestQueue;
-import clquebec.com.framework.controllable.ControllableDevice;
-import clquebec.com.framework.location.Building;
-import clquebec.com.framework.location.Room;
-import clquebec.com.framework.storage.ConfigurationStore;
-import clquebec.com.framework.storage.ConfigurationStore.ConfigurationAvailableCallback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
