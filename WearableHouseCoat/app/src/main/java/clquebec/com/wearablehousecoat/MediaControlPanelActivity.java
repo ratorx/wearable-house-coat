@@ -34,6 +34,9 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
         setAmbientEnabled();
 
         mVolumeBar = findViewById(R.id.volumeBar);
+        mVolumeBar.setMax(255);
+        mBrightnessBar = findViewById(R.id.brightnessBar);
+        mBrightnessBar.setMax(255);
 
         if(getIntent().getExtras() == null){
             throw new IllegalArgumentException("LightControlPanelActivity must be given a Device ID");
@@ -56,10 +59,17 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
             }
 
             try {
-                mBrightnessBar.setProgress((int) mPlaybackDevice.getBrightness());
+                mVolumeBar.setProgress(mPlaybackDevice.getVolume());
+            }catch(ActionNotSupported e){
+                Log.e(TAG, "Playback device does not support volume");
+                mVolumeWrapper.setVisibility(View.GONE);
+            }
+
+            try {
+                mBrightnessBar.setProgress(mPlaybackDevice.getBrightness());
             }catch(ActionNotSupported e){
                 Log.e(TAG, "Playback device does not support brightness");
-                mBrightnessBar.setVisibility(View.GONE);
+                mBrightnessWrapper.setVisibility(View.GONE);
             }
         });
 
