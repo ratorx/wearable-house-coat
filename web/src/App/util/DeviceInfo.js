@@ -1,7 +1,6 @@
 class DeviceInfo {
-	getInfo() {
-		// Placeholder
-		return {
+	constructor() {
+		this.info = {
 			server: "http://shell.srcf.net:8003/",
 			name: "tom",
 			uid: 1,
@@ -37,9 +36,9 @@ class DeviceInfo {
 				{
 					name: "Intel Lab",
 					uid: 2,
-					devices: [1, 4]
+					devices: [/*1, */4]
 				}, {
-					name: "The Street"
+					name: "The Street",
 					uid: 3,
 					devices: [2, 4]
 				}, {
@@ -51,7 +50,13 @@ class DeviceInfo {
 		}
 	}
 
-	updateInfo(obj) {
+	updateInfo() {
+		// TODO
+	}
+
+	saveInfo() {
 		// TODO
 	}
 }
+
+export default DeviceInfo

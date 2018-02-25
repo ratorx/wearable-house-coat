@@ -1,3 +1,12 @@
 .navbar-left-no-margin .container {
-	margin-left: 0px
+	margin-left: 0px;
+}
+
+.content {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.col-center {
+	text-align: center;
 }

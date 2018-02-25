@@ -1,9 +1,11 @@
 import React from 'react';
+import './Settings.css';
+import { PageHeader } from 'react-bootstrap';
 import Lorem from './Lorem.js';
 
 const SetGroups = (props) =>
 	<div>
-		<h2>SetGroups</h2>
+		<PageHeader>Configure Device Groups</PageHeader>
 		<Lorem/>
 	</div>
 

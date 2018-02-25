@@ -6,14 +6,15 @@ import SetDevices from './components/SetDevices.js'
 import SetGroups from './components/SetGroups.js'
 import Help from './components/Help.js'
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import DeviceInfo from "./util/DeviceInfo.js"
 
 class App extends React.Component {
 	pages = [
 		{
 			name: "Overview",
 			component: null,
-			onPageLoad: function() { // Do NOT use () => {} syntax as it breaks binding.
-				this.component = <Overview/>
+			onPageLoad: (page) => {
+				page.component = <Overview/>
 			}
 		},
 		{
@@ -22,22 +23,22 @@ class App extends React.Component {
 				{
 					name: "Rooms",
 					component: null,
-					onPageLoad: function() {
-						this.component = <SetRooms/>
+					onPageLoad: (page) => {
+						page.component = <SetRooms/>
 					}
 				},
 				{
 					name: "Devices",
 					component: null,
-					onPageLoad: function() {
-						this.component = <SetDevices/>
+					onPageLoad: (page) => {
+						page.component = <SetDevices devices={this.state.deviceInfo.info.devices.filter(dev => dev.type !== "DeviceGroup")} rooms={this.state.deviceInfo.info.rooms} onDeleteDevice={this.deleteDevice.bind(this)}/>
 					}
 				},
 				{
 					name: "Groups",
 					component: null,
-					onPageLoad: function() {
-						this.component = <SetGroups/>
+					onPageLoad: (page) => {
+						page.component = <SetGroups/>
 					}
 				}
 			]
@@ -45,8 +46,8 @@ class App extends React.Component {
 		{
 			name: "Help",
 			component: null,
-			onPageLoad: function() {
-				this.component = <Help/>
+			onPageLoad: (page) => {
+				page.component = <Help/>
 			}
 		}
 	]
@@ -54,14 +55,25 @@ class App extends React.Component {
 	constructor(){
 		super();
 		this.state = {
-			currentPage: this.pages[0]
+			currentPage: undefined,
+			deviceInfo: new DeviceInfo()
 		};
-		this.state.currentPage.onPageLoad.bind(this.state.currentPage).call();
+		this.state.currentPage = this.pages[1].dropdown[1]
+		this.state.currentPage.onPageLoad(this.state.currentPage);
 	}
 
 	setCurrentPage(page) {
 		this.setState(() => {return {currentPage: page}});
-		page.onPageLoad.bind(page)();
+		page.onPageLoad(page);
+	}
+
+	deleteDevice(device){
+		this.setState((prevState) => {
+			let deviceIndex = prevState.deviceInfo.info.devices.indexOf(device);
+			prevState.deviceInfo.info.devices.splice(deviceIndex, 1);
+			prevState.currentPage.onPageLoad(prevState.currentPage);
+			return prevState;
+		})
 	}
 
 	render() {
@@ -93,7 +105,9 @@ class App extends React.Component {
 					</Nav>
 				</Navbar.Collapse>
 			</Navbar>
-			{this.state.currentPage.component}
+			<div className="content">
+				{this.state.currentPage.component}
+			</div>
 		</div>
 	}
 }
