@@ -32,8 +32,9 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
     private ControllablePlaybackDevice mPlaybackDevice;
     private boolean changingVolume = false;
     private boolean changingBrightness = false;
-
-    private boolean currentlyPlaying;
+    private boolean currentlyPlaying = false;
+    private boolean hasNext;
+    private boolean hasPrevious;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -84,12 +85,61 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
 
         // Play/Pause button
         mPlayPauseButton = findViewById(R.id.mediaPlayPause);
+        try{
+            currentlyPlaying = mPlaybackDevice.getPlaying();
+            if(currentlyPlaying){
+                mPlayPauseButton.setImageResource(R.drawable.ic_pause_button);
+            }
+        }catch(ActionNotSupported ans){
+            Log.e(TAG, "PB device does not support playing status check");
+        }
+        mPlayPauseButton.setOnClickListener((view) -> {
+            if(currentlyPlaying){
+                if(mPlaybackDevice.setPlaying(false)){
+                    currentlyPlaying = false;
+                    mPlayPauseButton.setImageResource(R.drawable.ic_play_button);
+                }
+                else{
+                    Log.e(TAG,"Failed to disable device playback");
+                }
+            }
+            else{
+                if(mPlaybackDevice.setPlaying(true)){
+                    currentlyPlaying = true;
+                    mPlayPauseButton.setImageResource(R.drawable.ic_pause_button);
+                }
+                else{
+                    Log.e(TAG,"Failed to enable device playback");
+                }
+            }
+        });
 
+        /* TODO:
+                Add functionality for enabling/disabling buttons based on availability
+                Means updating when a new item is added to the queue (could be done by
+                another user or device)
+        */
         // Previous button
         mPreviousButton = findViewById(R.id.mediaLeft);
+        mPreviousButton.setOnClickListener((view) -> {
+            try{
+                mPlaybackDevice.skipPrevious();
+            }
+            catch(ActionNotSupported ans){
+                Log.e(TAG,"PB device does not support backwards skip");
+            }
+        });
 
         // Next button
         mNextButton = findViewById(R.id.mediaRight);
+        mNextButton.setOnClickListener((view) -> {
+            try{
+                mPlaybackDevice.skipNext();
+            }
+            catch(ActionNotSupported ans){
+                Log.e(TAG, "PB device does not support forwards skip");
+            }
+        });
 
         if(getIntent().getExtras() == null){
             throw new IllegalArgumentException("LightControlPanelActivity must be given a Device ID");

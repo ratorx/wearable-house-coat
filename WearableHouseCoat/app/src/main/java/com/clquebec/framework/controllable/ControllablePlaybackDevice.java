@@ -30,18 +30,16 @@ public interface ControllablePlaybackDevice extends ControllableDevice {
     boolean skipPrevious() throws ActionNotSupported;
 
     // Pauses/resumes playback
-    boolean setPlaying() throws ActionNotSupported;
+    boolean setPlaying(boolean enabled);
 
     //Gets whether the device is currently playing
-    boolean getPlaying();
+    boolean getPlaying() throws ActionNotSupported;
 
     // Sets the volume
     boolean setVolume(float volume) throws ActionNotSupported;
 
     //Gets the volume
     int getVolume() throws ActionNotSupported;
-
-
 
     //Sets the brightness
     boolean setBrightness(float brightness) throws ActionNotSupported;
