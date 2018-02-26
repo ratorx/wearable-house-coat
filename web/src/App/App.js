@@ -24,7 +24,7 @@ class App extends React.Component {
 					name: "Rooms",
 					component: null,
 					onPageLoad: (page) => {
-						page.component = <SetRooms/>
+						page.component = <SetRooms devices={this.state.deviceInfo.info.devices/*.filter(dev => dev.type !== "DeviceGroup")*/} rooms={this.state.deviceInfo.info.rooms}/>
 					}
 				},
 				{
@@ -58,7 +58,7 @@ class App extends React.Component {
 			currentPage: undefined,
 			deviceInfo: new DeviceInfo()
 		};
-		this.state.currentPage = this.pages[1].dropdown[1]
+		this.state.currentPage = this.pages[1].dropdown[0]
 		this.state.currentPage.onPageLoad(this.state.currentPage);
 	}
 
