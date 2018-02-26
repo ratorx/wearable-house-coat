@@ -13,10 +13,10 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.clquebec.framework.HTTPRequestQueue;
+import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.IndoorLocationProvider;
 import com.clquebec.framework.location.LocationChangeListener;
 import com.clquebec.framework.location.Place;
-import com.clquebec.framework.location.Room;
 import com.clquebec.framework.people.Person;
 import com.clquebec.framework.storage.ConfigurationStore;
 
@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /*
  * WearableHouseCoat
@@ -54,6 +55,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
     private Person mPerson; // Use for calibration and update
     private Map<Person, Place> mLocationMap;
+    private Building mBuilding;
 
     public FINDLocationProvider(Context c, Person p) {
         mQueue = HTTPRequestQueue.getRequestQueue(c);
@@ -61,11 +63,10 @@ public class FINDLocationProvider implements IndoorLocationProvider {
         mContext = c;
         mPerson = p;
 
-        //Get server URL from configuration store
+        //Get server URL and building from configuration store
         ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
-            if(config.getLocationServerAddress() != null) {
-                mServerLocation = config.getLocationServerAddress();
-            }
+            mServerLocation = config.getServer();
+            mBuilding = config.getBuilding(c);
         });
     }
 
@@ -89,16 +90,32 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                         JSONObject users = response.getJSONObject("users");
                         Iterator<String> keys = users.keys();
                         while (keys.hasNext()) {
-                            String user = keys.next();
+                            try {
+                                String user = keys.next();
 
-                            //Get data
-                            JSONArray userData = users.getJSONArray(user);
-                            Person person = Person.getPerson(mContext, UUID.fromString(user));
-                            Place location = new Room(mContext, userData.getJSONObject(0).getString("location"));
+                                //Get data
+                                JSONArray userData = users.getJSONArray(user);
+                                Person person = Person.getPerson(mContext, UUID.fromString(user));
+                                String roomName = userData
+                                        .getJSONObject(0).getString("location")
+                                        .toLowerCase();
 
-                            //Update internal structure
-                            mLocationMap.put(person, location);
-                            person.setLocation(location);
+                                //get room matching name
+                                List<Place> candidates = mBuilding
+                                        .getRooms().stream().filter(
+                                                r -> r.getName().toLowerCase()
+                                                        .equals(roomName))
+                                        .collect(Collectors.toList());
+                                if(candidates.size() > 0) {
+                                    Place location = candidates.get(0);
+
+                                    //Update internal structure
+                                    mLocationMap.put(person, location);
+                                    person.setLocation(location);
+                                }
+                            }catch(IllegalArgumentException e){
+                                Log.e(TAG, "Username is not a valid UID: "+e.getMessage());
+                            }
                         }
                     } catch (JSONException e) {
                         Log.e(TAG, "Cannot extract JSON");
@@ -118,7 +135,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
             return;
         }
 
-        if (!wifiManager.isWifiEnabled()) { // TODO: Deal with potential NullPointerException
+        if (!wifiManager.isWifiEnabled()) {
             //Forcefully enable wifi
             wifiManager.setWifiEnabled(true);
         }
@@ -146,6 +163,9 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
                     //Call private method to send update
                     callback.onFingerprint(fingerprint);
+
+                    //Unbind this receiver
+                    c.unregisterReceiver(this);
                 }
             }
         }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -161,7 +181,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("group", GROUPID);
-                jsonObject.put("username", mPerson.getName());
+                jsonObject.put("username", mPerson.getUUID().toString());
                 //jsonObject.put("location", getCurrentLocation(mPerson));
                 jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
                 jsonObject.put("wifi-fingerprint", fingerprint);
@@ -170,8 +190,33 @@ public class FINDLocationProvider implements IndoorLocationProvider {
             }
 
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d(TAG, "Succesfully updated fingerprint"),
-                    error -> Log.e(TAG, error.getMessage()));
+                    response -> {
+                        try {
+                            String roomName = response.getString("location")
+                                    .toLowerCase();
+                            //get room matching name
+                            List<Place> candidates = mBuilding
+                                    .getRooms().stream().filter(
+                                            r -> r.getName().toLowerCase()
+                                                    .equals(roomName))
+                                    .collect(Collectors.toList());
+
+                            if (candidates.size() > 0) {
+                                Place location = candidates.get(0);
+
+                                //Update internal structure
+                                mLocationMap.put(mPerson, location);
+                                mPerson.setLocation(location);
+                            }
+                        }catch(JSONException e){
+                            Log.e(TAG, "Unable to get location string after track");
+                        }
+                    },
+                    error -> {
+                        if(error.getMessage() != null){
+                            Log.e(TAG, error.getMessage());
+                        }
+                    });
 
             mQueue.addToRequestQueue(trackRequest);
         });
@@ -186,7 +231,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("group", GROUPID);
-                jsonObject.put("username", mPerson.getName());
+                jsonObject.put("username", mPerson.getUUID().toString());
                 jsonObject.put("location", room.getName());
                 jsonObject.put("time", System.currentTimeMillis() / 1000); //TODO: time zones
                 jsonObject.put("wifi-fingerprint", fingerprint);

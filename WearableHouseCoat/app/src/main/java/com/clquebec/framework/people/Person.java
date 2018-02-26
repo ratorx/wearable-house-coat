@@ -107,5 +107,9 @@ public class Person {
 
     public void setLocationListener(LocationChangeListener listener) {
         mListener = listener;
+
+        if(listener != null && mLocation != null) {
+            listener.onLocationChanged(this, null, mLocation);
+        }
     }
 }

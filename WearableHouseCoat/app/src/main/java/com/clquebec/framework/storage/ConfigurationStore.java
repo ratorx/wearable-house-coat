@@ -1,7 +1,6 @@
 package com.clquebec.framework.storage;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -224,16 +223,6 @@ public class ConfigurationStore {
             return mDeviceMap.get(id);
         }catch(NullPointerException e){
             //Device does not exist
-            return null;
-        }
-    }
-
-    @Nullable
-    public String getLocationServerAddress(){
-        try{
-            return mData.getString("server");
-        }catch(JSONException e){
-            //No address
             return null;
         }
     }
