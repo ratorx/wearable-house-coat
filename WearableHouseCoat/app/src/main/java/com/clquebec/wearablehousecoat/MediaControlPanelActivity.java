@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
@@ -20,11 +21,19 @@ import java.util.UUID;
 public class MediaControlPanelActivity extends WearableActivity implements DeviceChangeListener {
     private final static String TAG = "MediaControlPanelActivity";
     public static final String ID_EXTRA = "DeviceID";
+
     private LinearLayout mVolumeWrapper;
     private LinearLayout mBrightnessWrapper;
     private SeekBar mVolumeBar;
     private SeekBar mBrightnessBar;
+    private ImageView mPreviousButton;
+    private ImageView mPlayPauseButton;
+    private ImageView mNextButton;
     private ControllablePlaybackDevice mPlaybackDevice;
+    private boolean changingVolume = false;
+    private boolean changingBrightness = false;
+
+    private boolean currentlyPlaying;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -33,10 +42,54 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
 
         setAmbientEnabled();
 
+        // Binding UI elements to useful variables
+
+        // Volume slider
         mVolumeBar = findViewById(R.id.volumeBar);
         mVolumeBar.setMax(255);
+        mVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {}
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        // Brightness slider
         mBrightnessBar = findViewById(R.id.brightnessBar);
         mBrightnessBar.setMax(255);
+        mBrightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        // Play/Pause button
+        mPlayPauseButton = findViewById(R.id.mediaPlayPause);
+
+        // Previous button
+        mPreviousButton = findViewById(R.id.mediaLeft);
+
+        // Next button
+        mNextButton = findViewById(R.id.mediaRight);
 
         if(getIntent().getExtras() == null){
             throw new IllegalArgumentException("LightControlPanelActivity must be given a Device ID");
@@ -58,20 +111,23 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                 ((ListenableDevice) device).addListener(this);
             }
 
+            // A messy way of checking if we have volume and brightness enabled.
             try {
                 mVolumeBar.setProgress(mPlaybackDevice.getVolume());
             }catch(ActionNotSupported e){
-                Log.e(TAG, "Playback device does not support volume");
+                Log.e(TAG, "PB device does not support volume get");
                 mVolumeWrapper.setVisibility(View.GONE);
             }
 
             try {
                 mBrightnessBar.setProgress(mPlaybackDevice.getBrightness());
             }catch(ActionNotSupported e){
-                Log.e(TAG, "Playback device does not support brightness");
+                Log.e(TAG, "PB device does not support brightness get");
                 mBrightnessWrapper.setVisibility(View.GONE);
             }
         });
+
+
 
     }
 
