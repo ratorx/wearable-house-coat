@@ -189,6 +189,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
         }else{
             Log.d(TAG, "Signed in with "+mAccount.getEmail());
+            ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
         }
     }
     @Override
@@ -211,6 +212,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             try{
                 mAccount = task.getResult(ApiException.class);
+                ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
             }catch(ApiException e){
                 Log.e(TAG, "signInResult:failed code=" + e.getStatusCode());
                 //TODO: Show an error / exit app.

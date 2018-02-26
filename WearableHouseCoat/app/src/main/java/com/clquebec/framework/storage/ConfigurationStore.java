@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.clquebec.environment.Keys;
 import com.clquebec.framework.HTTPRequestQueue;
 import com.clquebec.framework.controllable.ControllableDevice;
@@ -250,7 +251,31 @@ public class ConfigurationStore {
         return mUserEmail;
     }
 
+    public void setMyEmail(String email){
+        mUserEmail = email;
+        tryAndSendFBIdToServer();
+    }
+
+    private void tryAndSendFBIdToServer(){
+        if(mUserEmail != null && mFBInstanceId != null){
+            String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUserEmail;
+            mQueue.addToRequestQueue(new StringRequest(Request.Method.GET, url,
+                    response -> Log.d(TAG, response),
+                    error -> Log.e(TAG, error.getMessage())
+            ));
+        }
+    }
+
+    public String getServer(){
+        try{
+            return mData.getString("server");
+        }catch(JSONException e){
+            return CONFIG_SERVER;
+        }
+    }
+
     public void setMyInstanceId(String instance){
         mFBInstanceId = instance;
+        tryAndSendFBIdToServer();
     }
 }
