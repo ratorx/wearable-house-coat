@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/WearableHouseCoat.iml" filepath="$PROJECT_DIR$/WearableHouseCoat.iml" />
-      <module fileurl="file://C:\Dmp\1B\Group_Project\wearable-house-coat\WearableHouseCoat\WearableHouseCoat.iml" filepath="C:\Dmp\1B\Group_Project\wearable-house-coat\WearableHouseCoat\WearableHouseCoat.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Dmp\1B\Group_Project\wearable-house-coat\WearableHouseCoat\app\app.iml" filepath="C:\Dmp\1B\Group_Project\wearable-house-coat\WearableHouseCoat\app\app.iml" />
     </modules>
   </component>
 </project>
