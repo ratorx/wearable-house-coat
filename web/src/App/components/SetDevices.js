@@ -1,3 +1,7 @@
+// Can mutate the references to each of the devices but requires a separate
+// onDeleteDevice event passed in props to remove the device from
+// a parent component's list of devices
+
 import React from 'react';
 import './Settings.css';
 import { PageHeader, ListGroup, ListGroupItem, Row, Col, FormControl, Button } from 'react-bootstrap';
@@ -16,9 +20,9 @@ class SetDevices extends React.Component {
 				device: null
 			},
 			editDevice: {
-				device: null,
-				room: null,
-				name: null
+				device: null, // Reference to original device, do not change unless confirmed
+				room: null, // Room during editing. Change the reference but not its value
+				name: null // Name during editing
 			}
 		}
 	}
@@ -50,10 +54,6 @@ class SetDevices extends React.Component {
 	deleteDevice() {
 		this.setState((prevState, props) => {
 			props.onDeleteDevice(prevState.deleteDialog.device);
-			// let index = prevState.devices.indexOf(prevState.deleteDialog.device);
-			// prevState.devices.splice(index, 1);
-			// if(index === -1)
-			// 	return {}
 			prevState.deleteDialog = {
 				shown: false,
 				device: null
@@ -73,10 +73,7 @@ class SetDevices extends React.Component {
 	preFinishEditing(prevState) {
 		if(prevState.editDevice.device == null)
 			return;
-		let deviceIndex = prevState.devices.indexOf(prevState.editDevice.device);
-		if(deviceIndex === -1)
-			return;
-		prevState.devices[deviceIndex].config.name = prevState.editDevice.name;
+		prevState.editDevice.device.config.name = prevState.editDevice.name;
 
 		if(prevState.editDevice.room != null) {
 			let oldRoomIndex;
@@ -176,6 +173,12 @@ class SetDevices extends React.Component {
 				rooms: newProps.rooms
 			}
 		})
+	}
+
+	componentWillUnmount() {
+		// setState does not execute inside componentWillUnmount
+		// simply update the references stored in the state
+		this.preFinishEditing(this.state);
 	}
 
 	render() {
