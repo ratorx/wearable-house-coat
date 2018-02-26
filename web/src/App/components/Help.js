@@ -1,9 +1,10 @@
 import React from 'react';
+import { PageHeader } from 'react-bootstrap';
 import Lorem from './Lorem.js';
 
 const Help = (props) =>
 	<div>
-		<h2>Help</h2>
+		<PageHeader>Help</PageHeader>
 		<Lorem/>
 	</div>
 

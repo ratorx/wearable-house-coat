@@ -1,9 +1,11 @@
 import React from 'react';
+import './Settings.css';
+import { PageHeader } from 'react-bootstrap';
 import Lorem from './Lorem.js';
 
 const SetRooms = (props) =>
 	<div>
-		<h2>SetRooms</h2>
+		<PageHeader>Configure Rooms</PageHeader>
 		<Lorem/>
 	</div>
 
