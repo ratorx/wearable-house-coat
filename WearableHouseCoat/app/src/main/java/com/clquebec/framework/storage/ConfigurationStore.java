@@ -11,6 +11,8 @@ import com.clquebec.framework.HTTPRequestQueue;
 import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.Room;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +34,7 @@ import java.util.UUID;
 
 public class ConfigurationStore {
     private static final String TAG = "ConfigurationStore";
-    public static final String CONFIG_SERVER = "http://shell.srcf.net:3500/data.json";
+    public static final String CONFIG_SERVER = "http://clquebec.soc.srcf.net/data.json";
     private static ConfigurationStore mInstance;
 
     private HTTPRequestQueue mQueue;
@@ -41,6 +43,9 @@ public class ConfigurationStore {
     private Map<UUID, JSONObject> mPersonDataMap;
     private Map<UUID, ControllableDevice> mDeviceMap;
 
+    private String mUserEmail;
+    private String mFBInstanceId;
+
     public interface ConfigurationAvailableCallback{
         void onConfigurationAvailable(ConfigurationStore config);
     }
@@ -48,6 +53,11 @@ public class ConfigurationStore {
     //Used for production
     private ConfigurationStore(Context c){
         this(c, HTTPRequestQueue.getRequestQueue(c));
+
+        GoogleSignInAccount mAccount = GoogleSignIn.getLastSignedInAccount(c);
+        if(mAccount != null) {
+            mUserEmail = mAccount.getEmail();
+        }
     }
 
     //This constructor is mostly used for testing
@@ -88,6 +98,7 @@ public class ConfigurationStore {
                 this.mData = data.getJSONObject("data");
             }catch(JSONException e){
                 this.mData = null;
+                return;
             }
 
             //Load in People as a UUID->JSONObject map
@@ -96,7 +107,7 @@ public class ConfigurationStore {
                 for (int i = 0; i < people.length(); i++) {
                     try {
                         JSONObject personData = people.getJSONObject(i);
-                        UUID id = new UUID(0, personData.getLong("uid"));
+                        UUID id = UUID.fromString(personData.getString("uid"));
 
                         mPersonDataMap.put(id, personData);
                     } catch (JSONException e) {
@@ -113,7 +124,7 @@ public class ConfigurationStore {
                 for (int i = 0; i < devices.length(); i++) {
                     try {
                         JSONObject deviceData = devices.getJSONObject(i);
-                        UUID id = new UUID(0, deviceData.getLong("uid"));
+                        UUID id = UUID.fromString(deviceData.getString("uid"));
 
                         //Get device config
                         JSONObject deviceConfig = deviceData.getJSONObject("config");
@@ -124,6 +135,10 @@ public class ConfigurationStore {
                             Constructor<?> getInstance = deviceClass.getConstructor(Context.class, UUID.class, JSONObject.class);
                             ControllableDevice device = (ControllableDevice) getInstance.newInstance(context, id, deviceConfig);
 
+                            //Set device name
+                            device.setName(deviceData.getString("name"));
+
+                            //Put device into map
                             mDeviceMap.put(id, device);
                         }catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
                             Log.e(TAG, "Could not instantiate device "+deviceData.getString("type")+": "+e.getMessage());
@@ -224,10 +239,18 @@ public class ConfigurationStore {
 
     public UUID getMyUUID(){
         try{
-            return new UUID(0, mData.getLong("me"));
+            return UUID.fromString(mData.getString("me"));
         }catch(JSONException e){
             //Return a default UUID
             return new UUID(0, 0);
         }
+    }
+
+    public String getMyEmail(){
+        return mUserEmail;
+    }
+
+    public void setMyInstanceId(String instance){
+        mFBInstanceId = instance;
     }
 }
