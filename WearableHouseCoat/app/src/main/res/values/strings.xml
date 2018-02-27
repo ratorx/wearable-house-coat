@@ -8,6 +8,7 @@
 
     <string name="title_activity_light_control_panel">LightControlPanel</string>
     <string name="title_activity_room_selection">RoomSelectionActivity</string>
+    <string name="title_activity_media_control_panel">MediaControlPanel</string>
     <string name="colourPreviewContentDescription">A preview of the light\'s colour</string>
     <string name="selectroom_content_description">A down-arrow which shows room selection on click.</string>
     <string name="iamhere_text">I am here!</string>
