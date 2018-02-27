@@ -11,6 +11,7 @@ import com.clquebec.framework.HTTPRequestQueue;
 import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.Room;
+import com.clquebec.framework.people.Person;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -23,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,6 +47,7 @@ public class ConfigurationStore {
 
     private String mUserEmail;
     private String mFBInstanceId;
+    private UUID mUUID;
 
     public interface ConfigurationAvailableCallback{
         void onConfigurationAvailable(ConfigurationStore config);
@@ -114,6 +117,11 @@ public class ConfigurationStore {
                     try {
                         JSONObject personData = people.getJSONObject(i);
                         UUID id = UUID.fromString(personData.getString("uid"));
+
+                        if(Objects.equals(mUserEmail, personData.getString("email"))){
+                            //Set my UUID to this one
+                            mUUID = id;
+                        }
 
                         mPersonDataMap.put(id, personData);
                     } catch (JSONException e) {
@@ -234,11 +242,10 @@ public class ConfigurationStore {
     }
 
     public UUID getMyUUID(){
-        try{
-            return UUID.fromString(mData.getString("me"));
-        }catch(JSONException e){
-            //Return a default UUID
+        if(mUUID == null){
             return new UUID(0, 0);
+        }else{
+            return mUUID;
         }
     }
 
@@ -249,6 +256,16 @@ public class ConfigurationStore {
     public void setMyEmail(String email){
         mUserEmail = email;
         tryAndSendFBIdToServer();
+
+        if(mData != null){
+            //Try and find "me"
+            for(UUID personID : mPersonDataMap.keySet()){
+                Person p = Person.getPerson(this, personID);
+                if(Objects.equals(mUserEmail, p.getEmail())){
+                    mUUID = personID;
+                }
+            }
+        }
     }
 
     private void tryAndSendFBIdToServer(){
