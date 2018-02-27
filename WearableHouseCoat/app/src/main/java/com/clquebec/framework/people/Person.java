@@ -72,7 +72,7 @@ public class Person {
             }
 
             try{
-                mName = personData.getString("email");
+                mEmail = personData.getString("email");
             }catch(JSONException | NullPointerException e){
                 Log.e(TAG, "Could not get person email for UID "+mUUID.toString());
             }

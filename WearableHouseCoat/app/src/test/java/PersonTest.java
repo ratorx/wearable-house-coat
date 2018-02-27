@@ -58,7 +58,7 @@ public class PersonTest extends TestCase {
         //Put some Person data into configuration store
         //(don't test the configuration store here!)
         UUID uid = new UUID(0, 100);
-        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'people':[{'name':'testname', 'uid':'"+uid.toString()+"'}]}}"));
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'people':[{'name':'testname', 'uid':'"+uid.toString()+"', 'email':'test@example.org'}]}}"));
 
         //Instantiate a person
         mPerson = Person.getPerson(mConfigurationStore, uid);
@@ -97,6 +97,7 @@ public class PersonTest extends TestCase {
                 .withIgnoredFields("mLocation") //Don't do equality on locations for people - it's mutable
                 .withIgnoredFields("mListener") //Don't do equality on listeners - it's mutable
                 .withIgnoredFields("mName") //Don't do equality on name - UID is enough
+                .withIgnoredFields("mEmail") //Don't do equality on email
                 .verify();
     }
 

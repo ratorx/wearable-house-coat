@@ -134,10 +134,12 @@ public class ConfigurationStoreTest extends TestCase {
         JSONObject person1 = new JSONObject();
         person1.put("name", "testname");
         person1.put("uid", id1.toString());
+        person1.put("email", "test@example.org");
 
         JSONObject person2 = new JSONObject();
         person2.put("name", "testname2");
         person2.put("uid", id2.toString());
+        person2.put("email", "test2@example.org");
 
         peopleArray.put(person1);
         peopleArray.put(person2);
