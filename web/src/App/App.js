@@ -22,13 +22,13 @@ class App extends React.Component {
 	constructor(){
 		super();
 
-  let devInfo = new DeviceInfo(this);
-  console.log(devInfo.info);
-  devInfo.updateInfo(function(){
-      this.setState({
-        deviceInfo: devInfo
-      });
-    }, this);
+		let devInfo = new DeviceInfo(this);
+		console.log(devInfo.info);
+		devInfo.updateInfo(function(){
+			this.setState({
+				deviceInfo: devInfo
+			});
+		}, this);
 
 		this.state = {
 			currentPage: this.pages[1].dropdown[0],
@@ -54,7 +54,7 @@ class App extends React.Component {
 			}
 			let deviceIndex = prevState.deviceInfo.info.data.devices.indexOf(device);
 			prevState.deviceInfo.info.data.devices.splice(deviceIndex, 1);
-      prevState.deviceInfo.saveInfo();
+			prevState.deviceInfo.saveInfo();
 			return {};
 		})
 	}
@@ -72,7 +72,7 @@ class App extends React.Component {
 					}
 					room.devices.push(device.uid);
 				}
-        prevState.deviceInfo.saveInfo();
+				prevState.deviceInfo.saveInfo();
 				return {}
 			});
 		}
@@ -83,8 +83,8 @@ class App extends React.Component {
 			let roomIndex = prevState.deviceInfo.info.data.rooms.indexOf(room);
 			if(roomIndex !== -1){
 				prevState.deviceInfo.info.data.rooms.splice(roomIndex, 1);
-        prevState.deviceInfo.saveInfo();
-      }
+				prevState.deviceInfo.saveInfo();
+			}
 			return {};
 		})
 	}
@@ -97,7 +97,7 @@ class App extends React.Component {
 		};
 		this.setState((prevState) => {
 			prevState.deviceInfo.info.data.rooms.push(newRoom);
-      prevState.deviceInfo.saveInfo();
+			prevState.deviceInfo.saveInfo();
 			return {}
 		});
 		return newRoom
@@ -108,7 +108,7 @@ class App extends React.Component {
 			this.setState((prevState) => {
 				room.name = name
 				room.devices = devices
-        prevState.deviceInfo.saveInfo();
+				prevState.deviceInfo.saveInfo();
 				return {}
 			});
 		}
