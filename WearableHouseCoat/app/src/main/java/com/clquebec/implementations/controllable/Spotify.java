@@ -1,6 +1,7 @@
 package com.clquebec.implementations.controllable;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -11,6 +12,9 @@ import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.controllable.ControllableDeviceType;
 import com.clquebec.framework.controllable.ControllablePlaybackDevice;
 import com.clquebec.framework.listenable.PlaybackListener;
+import com.clquebec.framework.listenable.Track;
+import com.clquebec.wearablehousecoat.LightControlPanelActivity;
+import com.clquebec.wearablehousecoat.MediaControlPanelActivity;
 
 import org.json.JSONObject;
 
@@ -37,12 +41,13 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public void getResource(PlaybackListener pl) {
-
+        pl.updateResource(new Track("blobby", "Mr Blobby", "blobby blobby blobby blobby blobby blobby blobby blobby"));
     }
 
     @Override
     public boolean skipNext() throws ActionNotSupported {
-        SpotifyJsonRequest skip = new SpotifyJsonRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/next", null,
+        Log.d("Spotify", "Running get next");
+        SpotifyJsonRequest skip = new SpotifyJsonRequest(JsonObjectRequest.Method.POST, "https://api.spotify.com/v1/me/player/next", null,
                 response -> Log.d("Spotify", "Response is " + response.toString()),
                 error -> Log.d("Spotify", "Error is " + error.getMessage())){
 
@@ -84,7 +89,7 @@ public class Spotify implements ControllablePlaybackDevice {
     }
 
     @Override
-    public boolean setVolume(float volume) throws ActionNotSupported {
+    public boolean setVolume(int volume) throws ActionNotSupported {
         return false;
     }
 
@@ -94,8 +99,7 @@ public class Spotify implements ControllablePlaybackDevice {
     }
 
     @Override
-    public String getArtLocation(PlaybackListener pl) {
-        return null;
+    public void getArtLocation(PlaybackListener pl) {
     }
 
     @Override
@@ -142,7 +146,11 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public boolean extendedAction() {
-        return false;
+        Intent soundControls = new Intent(mContext, MediaControlPanelActivity.class);
+        soundControls.putExtra(MediaControlPanelActivity.ID_EXTRA, this.getID());
+        mContext.startActivity(soundControls);
+
+        return true;
     }
 
     @Override
