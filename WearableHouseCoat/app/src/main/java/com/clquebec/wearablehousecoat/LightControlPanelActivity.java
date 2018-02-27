@@ -70,7 +70,7 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
                                 Log.e(TAG, "Device does not support getting brightness");
                             }});
                     }
-                }, 500);
+                }, 1000);
                 try {
                     mLightDevice.setBrightness(seekBar.getProgress());
                 }catch(ActionNotSupported e){

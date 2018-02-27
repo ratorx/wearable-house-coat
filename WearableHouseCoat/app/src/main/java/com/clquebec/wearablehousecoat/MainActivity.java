@@ -218,7 +218,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if(mAccount == null){
             //Start Google Sign-In flow
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
+            //startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
         }else{
             Log.d(TAG, "Signed in with "+mAccount.getEmail());
             ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
