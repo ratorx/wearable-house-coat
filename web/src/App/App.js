@@ -22,18 +22,22 @@ class App extends React.Component {
 	constructor(){
 		super();
 
-    //Testing DeviceInfo
-    let devInfo = new DeviceInfo();
-    console.log(devInfo.info);
-    devInfo.updateInfo()
-    /*
-    console.log(devInfo.info);
-    devInfo.saveInfo(devInfo.info)
-    */
-    //End
+  let devInfo = new DeviceInfo(this);
+  console.log(devInfo.info);
+  devInfo.updateInfo(function(){
+      this.setState({
+        deviceInfo: devInfo
+      });
+
+      //Test putting config
+      console.log(devInfo.info);
+      console.log(JSON.stringify(devInfo.info));
+      devInfo.saveInfo();
+    }, this);
+
 		this.state = {
 			currentPage: this.pages[1].dropdown[0],
-			deviceInfo: new DeviceInfo(),
+			deviceInfo: devInfo,
 		};
 	}
 
