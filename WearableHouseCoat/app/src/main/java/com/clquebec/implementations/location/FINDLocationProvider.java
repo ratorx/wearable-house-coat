@@ -214,6 +214,7 @@ public class FINDLocationProvider implements IndoorLocationProvider {
                     },
                     error -> {
                         if(error.getMessage() != null){
+                            Log.e(TAG, url);
                             Log.e(TAG, error.getMessage());
                         }
                     });

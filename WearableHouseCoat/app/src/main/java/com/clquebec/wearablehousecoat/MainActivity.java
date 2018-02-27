@@ -175,13 +175,24 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mChangeLocationView.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
 
-            //Get room names as strings
-            List<CharSequence> roomNames = mBuilding.getRooms().stream()
-                    .map(Room::getName).collect(Collectors.toList());
+            //Try and re-get the configuration store
+            if (mBuilding.getRooms().size() == 0) {
+                ConfigurationStore.getInstance(this).tryGetConfigFromServer(this);
+            }
 
-            //Pass room names as an extra
-            intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
-            MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+            //Get room names as strings
+            ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+                if (mBuilding.getRooms().size() == 0) {
+                    mBuilding = config.getBuilding(this);
+                }
+
+                List<CharSequence> roomNames = mBuilding.getRooms().stream()
+                        .map(Room::getName).collect(Collectors.toList());
+
+                //Pass room names as an extra
+                intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
+                MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+            });
         });
 
         View mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);

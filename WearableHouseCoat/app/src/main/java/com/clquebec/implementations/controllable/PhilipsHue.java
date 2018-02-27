@@ -152,7 +152,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
                     }
                 });
-
             });
         }
 

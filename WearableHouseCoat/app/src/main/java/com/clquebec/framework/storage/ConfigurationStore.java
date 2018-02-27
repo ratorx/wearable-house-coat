@@ -34,7 +34,7 @@ import java.util.UUID;
 
 public class ConfigurationStore {
     private static final String TAG = "ConfigurationStore";
-    public static final String CONFIG_SERVER = "http://clquebec.soc.srcf.net/data.json";
+    public static final String CONFIG_SERVER = "http://shell.srcf.net:8003/";
     private static ConfigurationStore mInstance;
 
     private HTTPRequestQueue mQueue;
@@ -68,9 +68,20 @@ public class ConfigurationStore {
         mPersonDataMap = new HashMap<>();
         mDeviceMap = new HashMap<>();
 
-        Log.d(TAG, "Requesting config store");
+        tryGetConfigFromServer(c);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, CONFIG_SERVER, null,
+        //Required for testing - so that the singleton can be instantiated
+        if(mInstance == null){
+            mInstance = this;
+        }
+    }
+
+    public void tryGetConfigFromServer(Context c){
+        String url = getServer() + "config";
+
+        Log.d(TAG, "Requesting config store: "+url);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> setData(c, response),
                 error -> {
                     try {
@@ -82,11 +93,6 @@ public class ConfigurationStore {
         );
 
         mQueue.addToRequestQueue(request);
-
-        //Required for testing - so that the singleton can be instantiated
-        if(mInstance == null){
-            mInstance = this;
-        }
     }
 
     public void setData(Context context, JSONObject data) {
@@ -247,6 +253,7 @@ public class ConfigurationStore {
 
     private void tryAndSendFBIdToServer(){
         if(mUserEmail != null && mFBInstanceId != null){
+            Log.d(TAG, "Sending FBID to server with email: "+mUserEmail+" ID: "+mFBInstanceId);
             String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUserEmail;
             mQueue.addToRequestQueue(new StringRequest(Request.Method.GET, url,
                     response -> Log.d(TAG, response),
@@ -258,7 +265,7 @@ public class ConfigurationStore {
     public String getServer(){
         try{
             return mData.getString("server");
-        }catch(JSONException e){
+        }catch(Exception e){
             return CONFIG_SERVER;
         }
     }
