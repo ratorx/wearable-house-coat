@@ -57,10 +57,10 @@ public class PersonTest extends TestCase {
     public void testJSONInstantiation() throws JSONException{
         //Put some Person data into configuration store
         //(don't test the configuration store here!)
-        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'people':[{'name':'testname', 'uid':100}]}}"));
+        UUID uid = new UUID(0, 100);
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'people':[{'name':'testname', 'uid':'"+uid.toString()+"', 'email':'test@example.org'}]}}"));
 
         //Instantiate a person
-        UUID uid = new UUID(0, 100);
         mPerson = Person.getPerson(mConfigurationStore, uid);
 
         //Person should have the given test name
@@ -97,6 +97,7 @@ public class PersonTest extends TestCase {
                 .withIgnoredFields("mLocation") //Don't do equality on locations for people - it's mutable
                 .withIgnoredFields("mListener") //Don't do equality on listeners - it's mutable
                 .withIgnoredFields("mName") //Don't do equality on name - UID is enough
+                .withIgnoredFields("mEmail") //Don't do equality on email
                 .verify();
     }
 

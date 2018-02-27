@@ -39,9 +39,7 @@ public class IFTTTLight implements ControllableLightDevice {
 
     public IFTTTLight(Context context, UUID id, JSONObject config) throws JSONException{
         //Initialise dynamically from a JSON Object
-
         init(context, id);
-        setName(config.getString("name"));
     }
 
     private void init(Context context, UUID id){

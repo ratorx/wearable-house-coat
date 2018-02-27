@@ -24,7 +24,7 @@ public class AutomationMessageHandler extends FirebaseMessagingService {
     private static final String PARAMETERKEY = "parameters";
     private static final String ARGUMENTKEY = "arguments";
 
-    private static final String ACTIONLISTKEY = "Actions";
+    private static final String ACTIONLISTKEY = "actions";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -81,7 +81,7 @@ public class AutomationMessageHandler extends FirebaseMessagingService {
                             Log.e(TAG, "Problem unmarshalling action: "+e.getMessage());
                         }
                     }
-                }catch(JSONException e){
+                }catch(JSONException | NullPointerException e){
                     Log.e(TAG, "Problem unmarshalling Action list "+e.getMessage());
                 } catch (InstantiationException e) {
                     Log.e(TAG, "Could not instantiate a parameter: " + e.getMessage());
@@ -101,8 +101,5 @@ public class AutomationMessageHandler extends FirebaseMessagingService {
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
 }
