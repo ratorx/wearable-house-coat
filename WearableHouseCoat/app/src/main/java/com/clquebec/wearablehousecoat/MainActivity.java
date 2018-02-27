@@ -24,6 +24,7 @@ import com.clquebec.framework.location.Place;
 import com.clquebec.framework.location.Room;
 import com.clquebec.framework.people.Person;
 import com.clquebec.framework.storage.ConfigurationStore;
+import com.clquebec.implementations.controllable.Spotify;
 import com.clquebec.implementations.location.FINDLocationProvider;
 import com.clquebec.wearablehousecoat.components.DeviceTogglesAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -79,7 +80,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 .requestEmail()
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+       // mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
         //SECTION: Initialize Building
@@ -171,6 +172,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
 
+
+        Spotify test = new Spotify(this);
+
         // Enables Always-on
         setAmbientEnabled();
     }
@@ -185,8 +189,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         if(mAccount == null){
             //Start Google Sign-In flow
-            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
+            //Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            //startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
         }else{
             Log.d(TAG, "Signed in with "+mAccount.getEmail());
         }
