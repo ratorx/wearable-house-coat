@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.Place;
 import com.clquebec.framework.location.Room;
@@ -206,6 +207,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
 
         Spotify test = new Spotify(this);
+        try{
+            test.skipNext();
+        }catch (ActionNotSupported e){
+            Log.e("Spotify", "Uh oh");
+        }
 
         // Enables Always-on
         setAmbientEnabled();

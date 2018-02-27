@@ -1,6 +1,8 @@
 package com.clquebec.implementations.controllable;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -10,8 +12,8 @@ import com.clquebec.framework.controllable.ControllableDeviceType;
 import com.clquebec.framework.controllable.ControllablePlaybackDevice;
 import com.clquebec.framework.listenable.PlaybackListener;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.json.JSONObject;
+
 import java.util.UUID;
 
 /**
@@ -19,12 +21,18 @@ import java.util.UUID;
  */
 
 public class Spotify implements ControllablePlaybackDevice {
-    public static final String AUTH_TOKEN = "BQDjoHcPjdD35XPGnlw9Epoxjg_LXCSeMCnkOqfkVDWAW8rjodMlaSkyZ24_Oec8gm5iU23OO5XPDx_cnc_zw0WmMyp2wpLRn-LE6b28UnkdNDD4_iqm9m7lQyLgXD8GQNr6BccoiJxMMZJOtlSXalt7bg";
-    private boolean isPlaying;
+    public static final String AUTH_TOKEN = "BQCwUuLpiIRyAXPgkDNz_xHrJcMoyOl98wegmTltlVjK_gGqzxvA9FX8dyy8W61LJkXPDW0ObvSigTbVuREVP8j5COquvBKgb8-R_iG2194AnaCxs2r4xtpl-tKjsrA7Lg9dQEFpjfONBm-wVAjrBIAJQw";
+    private boolean isPlaying = false;
     private Context mContext;
+    private UUID mUUID;
 
     public Spotify(Context c){
         mContext = c;
+    }
+
+    public Spotify(Context c, UUID id, JSONObject config){
+        mContext = c;
+        mUUID = id;
     }
 
     @Override
@@ -34,7 +42,14 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public boolean skipNext() throws ActionNotSupported {
-        return false;
+        SpotifyJsonRequest skip = new SpotifyJsonRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/next", null,
+                response -> Log.d("Spotify", "Response is " + response.toString()),
+                error -> Log.d("Spotify", "Error is " + error.getMessage())){
+
+        };
+        HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(skip);
+
+        return true;
     }
 
     @Override
@@ -95,7 +110,7 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return isPlaying;
     }
 
     @Override
@@ -105,22 +120,24 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public String getName() {
-        return null;
+        return "Spotify Controller";
     }
 
     @Override
     public ControllableDeviceType getType() {
-        return null;
+        return ControllableDeviceType.SOUND;
     }
 
     @Override
     public UUID getID() {
-        return null;
+        return mUUID;
     }
 
     @Override
     public boolean quickAction() {
-        return false;
+        isPlaying = !isPlaying;
+        setPlaying(isPlaying);
+        return true;
     }
 
     @Override
@@ -130,7 +147,10 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public boolean isConnected() {
-        return false;
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }
