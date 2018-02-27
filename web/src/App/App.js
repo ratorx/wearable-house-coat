@@ -54,6 +54,16 @@ class App extends React.Component {
 
 	constructor(){
 		super();
+
+    //Testing DeviceInfo
+    let devInfo = new DeviceInfo();
+    console.log(devInfo.info);
+    devInfo.updateInfo()
+    /*
+    console.log(devInfo.info);
+    devInfo.saveInfo(devInfo.info)
+    */
+    //End
 		this.state = {
 			currentPage: undefined,
 			deviceInfo: new DeviceInfo()
