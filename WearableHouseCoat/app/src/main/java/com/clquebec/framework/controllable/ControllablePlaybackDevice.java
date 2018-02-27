@@ -1,5 +1,7 @@
 package com.clquebec.framework.controllable;
 
+import com.clquebec.framework.listenable.PlaybackListener;
+
 /**
  * WearableHouseCoat
  * Author: tom
@@ -10,20 +12,30 @@ package com.clquebec.framework.controllable;
 
 public interface ControllablePlaybackDevice extends ControllableDevice {
 
-    //Sets the currently playing resource
-    void setResource(String resource);
-
     //Gets the currently playing resource
-    String getResource();
+    void getResource(PlaybackListener pl);
 
-    boolean setVolume(float volume) throws ActionNotSupported;
+    // Returns true if there's another item queued for playing (so the skip button can
+    // do something worthwhile).
+
+    // Skips to the next item (song/video)
+    boolean skipNext() throws ActionNotSupported;
+
+    // Returns to the previous item
+    boolean skipPrevious() throws ActionNotSupported;
+
+    // Pauses/resumes playback
+    boolean setPlaying(boolean enabled);
+
+    //Gets whether the device is currently playing
+    void getPlaying(PlaybackListener pl) throws ActionNotSupported;
+
+    // Sets the volume
+    boolean setVolume(int volume) throws ActionNotSupported;
 
     //Gets the volume
-    int getVolume() throws ActionNotSupported;
+    void getVolume(PlaybackListener pl) throws ActionNotSupported;
 
-    //Sets the brightness
-    boolean setBrightness(float brightness) throws ActionNotSupported;
+    void getArtLocation(PlaybackListener pl);
 
-    //Gets the brightness
-    int getBrightness() throws ActionNotSupported;
 }

@@ -31,7 +31,8 @@
                         android:layout_height="50dp"
                         android:layout_width="0dp"
                         android:layout_weight="0.5"
-                        android:id="@+id/mediaLeft"/>
+                        android:id="@+id/mediaLeft"
+                        android:src="@drawable/ic_skip_prev"/>
 
                     <!-- Change the image source here depending on whether we're playing -->
                     <!-- or paused.  -->
@@ -39,12 +40,15 @@
                         android:layout_height="50dp"
                         android:layout_width="0dp"
                         android:layout_weight="0.7"
-                        android:id="@+id/mediaPlayPause"/>
+                        android:id="@+id/mediaPlayPause"
+                        android:src="@drawable/ic_play_button"/>
 
                     <ImageView
                         android:layout_height="50dp"
                         android:layout_width="0dp"
-                        android:layout_weight="0.5"/>
+                        android:layout_weight="0.5"
+                        android:id="@+id/mediaRight"
+                        android:src="@drawable/ic_skip_next"/>
 
                 </LinearLayout>
 
@@ -52,14 +56,17 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/volumeControlLayout">
+                    android:id="@+id/volumeControlLayout"
+                    android:paddingLeft="5dp">
 
                     <!-- Need to stick a little speaker symbol here. -->
                     <!-- Could go for a dynamic one, more waves = louder -->
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:layout_gravity="center_vertical"/>
+                        android:layout_gravity="center_vertical"
+                        android:id="@+id/volumeIcon"
+                        android:src="@drawable/ic_volume_off"/>
 
                     <SeekBar
                         android:id="@+id/volumeBar"
@@ -68,24 +75,49 @@
                         android:layout_height="40dp"/>
 
                 </LinearLayout>
-
-                <!-- Hide this if the playback doesn't have brightness -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/brightnessControlLayout">
+                    android:layout_height="45dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp">
 
-                    <!-- Brightness symbol here -->
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center_vertical"/>
+                        android:id="@+id/albumArt"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="start"
+                        android:src="@android:drawable/ic_delete" />
 
-                    <SeekBar
-                        android:id="@+id/brightnessBar"
-                        android:layout_width="match_parent"
-                        android:layout_gravity="bottom"
-                        android:layout_height="40dp" />
+                    <LinearLayout
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/trackName"
+                            android:layout_width="95dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center_vertical"
+                            android:ellipsize="marquee"
+                            android:textColor="@color/white"
+                            android:singleLine="true"
+                            android:marqueeRepeatLimit="marquee_forever"
+                            android:scrollHorizontally="true"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"/>
+
+                        <TextView
+                            android:id="@+id/artistAlbumName"
+                            android:layout_width="95dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="center_vertical"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:textColor="@color/white" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
