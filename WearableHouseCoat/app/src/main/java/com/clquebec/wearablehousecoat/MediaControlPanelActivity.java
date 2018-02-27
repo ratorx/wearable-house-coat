@@ -35,6 +35,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
     private ImageView mVolumeIcon;
     private ImageView mAlbumArt;
     private TextView mTrackName;
+    private TextView mArtistAlbumName;
 
     private ControllablePlaybackDevice mPlaybackDevice;
 
@@ -56,6 +57,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mVolumeWrapper = findViewById(R.id.volumeControlLayout);
         mAlbumArt = findViewById(R.id.albumArt);
         mTrackName = findViewById(R.id.trackName);
+        mArtistAlbumName = findViewById(R.id.artistAlbumName);
 
         mTrackName.setSelected(true);
 
@@ -214,8 +216,10 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
     @Override
     public void updateResource(Track resource) {
-        runOnUiThread(() -> mTrackName.setText(String.format("%s\n%s --- %s",
-                resource.trackName,resource.artist,resource.album)));
+        runOnUiThread(() -> {
+            mTrackName.setText(resource.trackName);
+            mArtistAlbumName.setText(String.format("%s -- %s",resource.artist,resource.album));
+        });
     }
 
     @Override
