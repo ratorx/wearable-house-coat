@@ -2,9 +2,9 @@ package com.clquebec.wearablehousecoat;
 
 
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -15,6 +15,7 @@ import com.clquebec.framework.controllable.ControllablePlaybackDevice;
 import com.clquebec.framework.listenable.PlaybackListener;
 import com.clquebec.framework.storage.ConfigurationStore;
 
+import android.net.Uri;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -29,14 +30,15 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
     private ImageView mPlayPauseButton;
     private ImageView mNextButton;
     private ImageView mVolumeIcon;
+    private ImageView mAlbumArt;
 
     private ControllablePlaybackDevice mPlaybackDevice;
 
     private boolean changingVolume = false;
     private boolean currentlyPlaying = false;
-    private float currentVolume = 0;
+    private int currentVolume = 0;
 
-    private static final int barMax = 255;
+    private static final int barMax = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -48,6 +50,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         // Binding UI elements to useful variables
         mVolumeIcon = findViewById(R.id.volumeIcon);
         mVolumeWrapper = findViewById(R.id.volumeControlLayout);
+        mAlbumArt = findViewById(R.id.albumArt);
 
         // Volume slider
         mVolumeBar = findViewById(R.id.volumeBar);
@@ -55,8 +58,6 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                // If this doesn't work on a listener update, copy this into the listener
-                // and introduce a check here for user input (on boolean b)
                 double prog = seekBar.getProgress() / barMax;
                 if(prog == 0){
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_off);
@@ -79,6 +80,14 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                try {
+                    currentVolume = seekBar.getProgress();
+                    mPlaybackDevice.setVolume(currentVolume);
+                }
+                catch(ActionNotSupported e){
+                    Log.e(TAG, "Device does not support setting volume");
+                    return;
+                }
                 Timer volumeTimer = new Timer();
                 volumeTimer.schedule(new TimerTask() {
                     public void run() {
@@ -94,18 +103,13 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
                     }
                 }, 500);
 
-                try {
-                    mPlaybackDevice.setVolume(seekBar.getProgress());
-                }catch(ActionNotSupported e){
-                    Log.e(TAG, "Device does not support setting volume");
-                }
             }
         });
 
         // Play/Pause button
         mPlayPauseButton = findViewById(R.id.mediaPlayPause);
         // TODO: Fix this to work with new update/get system.
-        /*
+
         mPlayPauseButton.setOnClickListener((view) -> {
             if(currentlyPlaying){
                 if(mPlaybackDevice.setPlaying(false)){
@@ -125,7 +129,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
                     Log.d(TAG,"Failed to enable device playback");
                 }
             }
-        });*/
+        });
 
 
         // Previous button
@@ -169,20 +173,14 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
             mPlaybackDevice = (ControllablePlaybackDevice) device;
 
-            /*if(mPlaybackDevice instanceof ListenableDevice) {
-                ((ListenableDevice) device).addListener(this);
+            // A messy way of checking if we have volume enabled.
+            try {
+                mPlaybackDevice.getVolume(MediaControlPanelActivity.this);
             }
-            else{
-
-            }*/
-
-            // A messy way of checking if we have volume and brightness enabled.
-            /*try {
-                mVolumeBar.setProgress(mPlaybackDevice.getVolume());
-            }catch(ActionNotSupported e){
+            catch(ActionNotSupported e){
                 Log.e(TAG, "PB device does not support volume get");
                 mVolumeWrapper.setVisibility(View.GONE);
-            }*/
+            }
         });
 
         Timer updateScheduler = new Timer();
@@ -203,7 +201,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
                     Log.d(TAG, "PB Device does not support getting volume");
                 }
             }
-        },0,30000);
+        },0,10000);
 
     }
 
@@ -219,11 +217,14 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
     @Override
     public void updateVolume(float volume) {
-
+        if(!changingVolume){
+            // ALL YOUR INT ARE BELONG TO US
+            mVolumeBar.setProgress((int) volume);
+        }
     }
 
     @Override
     public void updateArtLocation(String location) {
-
+        mAlbumArt.setImageURI(Uri.parse(location));
     }
 }

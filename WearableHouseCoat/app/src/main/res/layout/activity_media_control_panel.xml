@@ -77,7 +77,7 @@
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/albumArt"
                     android:layout_width="match_parent"
                     android:layout_height="80px"
                     android:layout_weight="1"
