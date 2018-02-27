@@ -65,14 +65,14 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mVolumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                double prog = seekBar.getProgress() / barMax;
+                int prog = seekBar.getProgress();
                 if(prog == 0){
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_off);
                 }
-                else if(prog < 0.3){
+                else if(prog < 30){
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_low);
                 }
-                else if(prog < 0.8){
+                else if(prog < 80){
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_med);
                 }
                 else{
@@ -213,8 +213,10 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
     @Override
     public void updateResource(Track resource) {
-        mTrackName.setText(resource.trackName);
-        mArtistName.setText(resource.artist + " --- " + resource.album);
+        runOnUiThread(() -> {
+            mTrackName.setText(resource.trackName);
+            mArtistName.setText(String.format("%s --- %s",resource.artist, resource.album));
+        });
     }
 
     @Override
