@@ -6,11 +6,11 @@ package com.clquebec.framework.listenable;
 
 public interface PlaybackListener {
 
-    void updateResource(String resource);
+    void updateResource(Track resource);
 
-    void updateIsPlaying(String resource);
+    void updateIsPlaying(boolean playing);
 
-    void updateVolume(float volume);
+    void updateVolume(int volume);
 
     void updateArtLocation(String location);
 }

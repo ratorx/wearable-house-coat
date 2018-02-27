@@ -31,11 +31,11 @@ public interface ControllablePlaybackDevice extends ControllableDevice {
     void getPlaying(PlaybackListener pl) throws ActionNotSupported;
 
     // Sets the volume
-    boolean setVolume(float volume) throws ActionNotSupported;
+    boolean setVolume(int volume) throws ActionNotSupported;
 
     //Gets the volume
     void getVolume(PlaybackListener pl) throws ActionNotSupported;
 
-    String getArtLocation(PlaybackListener pl);
+    void getArtLocation(PlaybackListener pl);
 
 }

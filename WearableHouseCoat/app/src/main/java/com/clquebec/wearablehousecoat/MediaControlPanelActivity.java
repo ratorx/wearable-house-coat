@@ -13,9 +13,12 @@ import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.controllable.ControllablePlaybackDevice;
 import com.clquebec.framework.listenable.PlaybackListener;
+import com.clquebec.framework.listenable.Track;
 import com.clquebec.framework.storage.ConfigurationStore;
 
 import android.net.Uri;
+import android.widget.TextView;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -31,6 +34,8 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
     private ImageView mNextButton;
     private ImageView mVolumeIcon;
     private ImageView mAlbumArt;
+    private TextView mTrackName;
+    private TextView mArtistName;
 
     private ControllablePlaybackDevice mPlaybackDevice;
 
@@ -51,6 +56,8 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mVolumeIcon = findViewById(R.id.volumeIcon);
         mVolumeWrapper = findViewById(R.id.volumeControlLayout);
         mAlbumArt = findViewById(R.id.albumArt);
+        mTrackName = findViewById(R.id.trackName);
+        mArtistName = findViewById(R.id.artistAlbumName);
 
         // Volume slider
         mVolumeBar = findViewById(R.id.volumeBar);
@@ -108,7 +115,6 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
         // Play/Pause button
         mPlayPauseButton = findViewById(R.id.mediaPlayPause);
-        // TODO: Fix this to work with new update/get system.
 
         mPlayPauseButton.setOnClickListener((view) -> {
             if(currentlyPlaying){
@@ -201,25 +207,33 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
                     Log.d(TAG, "PB Device does not support getting volume");
                 }
             }
-        },0,10000);
+        },0,5000);
 
     }
 
     @Override
-    public void updateResource(String resource) {
-
+    public void updateResource(Track resource) {
+        mTrackName.setText(resource.trackName);
+        mArtistName.setText(resource.artist + " --- " + resource.album);
     }
 
     @Override
-    public void updateIsPlaying(String resource) {
-
+    public void updateIsPlaying(boolean playing) {
+        // If the server says we're playing but we don't think we are
+        if(playing && !currentlyPlaying){
+            currentlyPlaying = true;
+            mPlayPauseButton.setImageResource(R.drawable.ic_pause_button);
+        }
+        else if(!playing && currentlyPlaying){
+            currentlyPlaying = false;
+            mPlayPauseButton.setImageResource(R.drawable.ic_play_button);
+        }
     }
 
     @Override
-    public void updateVolume(float volume) {
+    public void updateVolume(int volume) {
         if(!changingVolume){
-            // ALL YOUR INT ARE BELONG TO US
-            mVolumeBar.setProgress((int) volume);
+            mVolumeBar.setProgress(volume);
         }
     }
 
