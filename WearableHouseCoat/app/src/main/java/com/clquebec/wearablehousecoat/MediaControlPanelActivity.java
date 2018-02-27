@@ -59,6 +59,9 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mTrackName = findViewById(R.id.trackName);
         mArtistName = findViewById(R.id.artistAlbumName);
 
+        //mTrackName.setSelected(true);
+        mArtistName.setSelected(true);
+
         // Volume slider
         mVolumeBar = findViewById(R.id.volumeBar);
         mVolumeBar.setMax(barMax);
@@ -235,7 +238,21 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
     @Override
     public void updateVolume(int volume) {
         if(!changingVolume){
-            mVolumeBar.setProgress(volume);
+            runOnUiThread(() -> {
+                mVolumeBar.setProgress(volume);
+                if(volume == 0){
+                    mVolumeIcon.setImageResource(R.drawable.ic_volume_off);
+                }
+                else if(volume < 30){
+                    mVolumeIcon.setImageResource(R.drawable.ic_volume_low);
+                }
+                else if(volume < 80){
+                    mVolumeIcon.setImageResource(R.drawable.ic_volume_med);
+                }
+                else{
+                    mVolumeIcon.setImageResource(R.drawable.ic_volume_high);
+                }
+            });
         }
     }
 
