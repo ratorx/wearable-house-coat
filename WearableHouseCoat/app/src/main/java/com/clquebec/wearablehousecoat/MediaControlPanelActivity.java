@@ -1,6 +1,9 @@
 package com.clquebec.wearablehousecoat;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
@@ -15,10 +18,12 @@ import com.clquebec.framework.controllable.ControllablePlaybackDevice;
 import com.clquebec.framework.listenable.PlaybackListener;
 import com.clquebec.framework.listenable.Track;
 import com.clquebec.framework.storage.ConfigurationStore;
+import com.clquebec.implementations.controllable.Spotify;
 
 import android.net.Uri;
 import android.widget.TextView;
 
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -146,6 +151,8 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mPreviousButton.setOnClickListener((view) -> {
             try{
                 mPlaybackDevice.skipPrevious();
+                updateAll();
+
             }
             catch(ActionNotSupported actionNotSupported){
                 mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
@@ -158,6 +165,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mNextButton.setOnClickListener((view) -> {
             try{
                 mPlaybackDevice.skipNext();
+                updateAll();
             }
             catch(ActionNotSupported actionNotSupported){
                 mNextButton.setImageResource(R.drawable.ic_next_disabled);
@@ -195,23 +203,31 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         Timer updateScheduler = new Timer();
         updateScheduler.scheduleAtFixedRate(new TimerTask(){
             public void run(){
-                mPlaybackDevice.getResource(MediaControlPanelActivity.this);
-                mPlaybackDevice.getArtLocation(MediaControlPanelActivity.this);
-                try {
-                    mPlaybackDevice.getPlaying(MediaControlPanelActivity.this);
-                }
-                catch(ActionNotSupported actionNotSupported){
-                    Log.d(TAG,"PB Device does not support playing status");
-                }
-                try{
-                    mPlaybackDevice.getVolume(MediaControlPanelActivity.this);
-                }
-                catch(ActionNotSupported actionNotSupported){
-                    Log.d(TAG, "PB Device does not support getting volume");
-                }
+                updateAll();
             }
-        },0,5000);
+        },0,10000);
 
+    }
+
+    private void updateAll() {
+        if (mPlaybackDevice instanceof Spotify) {
+            ((Spotify) mPlaybackDevice).getAll(MediaControlPanelActivity.this);
+        }else{
+            mPlaybackDevice.getResource(MediaControlPanelActivity.this);
+            mPlaybackDevice.getArtLocation(MediaControlPanelActivity.this);
+            try {
+                mPlaybackDevice.getPlaying(MediaControlPanelActivity.this);
+            }
+            catch(ActionNotSupported actionNotSupported){
+                Log.d(TAG,"PB Device does not support playing status");
+            }
+            try{
+                mPlaybackDevice.getVolume(MediaControlPanelActivity.this);
+            }
+            catch(ActionNotSupported actionNotSupported){
+                Log.d(TAG, "PB Device does not support getting volume");
+            }
+        }
     }
 
     @Override
@@ -258,6 +274,31 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
 
     @Override
     public void updateArtLocation(String location) {
-        mAlbumArt.setImageURI(Uri.parse(location));
+        new DownloadImageTask(mAlbumArt).execute(location);
+    }
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
+
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 }
+
