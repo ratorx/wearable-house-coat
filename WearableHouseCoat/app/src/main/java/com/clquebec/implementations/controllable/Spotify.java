@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 
 public class Spotify implements ControllablePlaybackDevice {
-    private static final String AUTH_TOKEN = "BQBv_EtwurPlg7j13PTPgzvuFlKtubN3lUlLUNF-YRG3rQ-B4cAkG8wRk1GYAIs589oXNSjaiwjSom-YuY78uUIlOGMSgOK1f34_epigRpFqszR5DB9mG-ZaZ-tdZExtt8hS-j9ScPXnUMfymoAExaO4Fg";
+    public static final String AUTH_TOKEN = "BQDjoHcPjdD35XPGnlw9Epoxjg_LXCSeMCnkOqfkVDWAW8rjodMlaSkyZ24_Oec8gm5iU23OO5XPDx_cnc_zw0WmMyp2wpLRn-LE6b28UnkdNDD4_iqm9m7lQyLgXD8GQNr6BccoiJxMMZJOtlSXalt7bg";
     private boolean isPlaying;
     private Context mContext;
 
@@ -45,39 +45,23 @@ public class Spotify implements ControllablePlaybackDevice {
     @Override
     public boolean setPlaying(boolean enabled) {
         if (enabled){
-            JsonObjectRequest play = new JsonObjectRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/play", null,
+            SpotifyJsonRequest play = new SpotifyJsonRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/play", null,
                     response -> Log.d("Spotify", "Response is " + response.toString()),
                     error -> Log.d("Spotify", "Error is " + error.getMessage())){
-                @Override
-                public Map<String, String> getHeaders(){
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Accept", "application/json");
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Authorization", "Bearer " + AUTH_TOKEN);
-                    return headers;
-                }
+
             };
             HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(play);
 
         }else{
-            JsonObjectRequest pause = new JsonObjectRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/pause", null,
+            SpotifyJsonRequest pause = new SpotifyJsonRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/pause", null,
                     response -> Log.d("Spotify", "Response is " + response.toString()),
                     error -> Log.d("Spotify", "Error is " + error.getMessage())){
-                @Override
-                public Map<String, String> getHeaders(){
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Accept", "application/json");
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Authorization", "Bearer " + AUTH_TOKEN);
-                    return headers;
-                }
             };
             HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(pause);
         }
 
         return true;
     }
-
 
     @Override
     public void getPlaying(PlaybackListener pl) throws ActionNotSupported {
@@ -148,4 +132,5 @@ public class Spotify implements ControllablePlaybackDevice {
     public boolean isConnected() {
         return false;
     }
+
 }
