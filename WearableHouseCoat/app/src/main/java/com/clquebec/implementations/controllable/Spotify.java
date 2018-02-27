@@ -8,6 +8,7 @@ import com.clquebec.framework.HTTPRequestQueue;
 import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.controllable.ControllableDeviceType;
 import com.clquebec.framework.controllable.ControllablePlaybackDevice;
+import com.clquebec.framework.listenable.PlaybackListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +20,12 @@ import java.util.UUID;
 
 public class Spotify implements ControllablePlaybackDevice {
     private static final String AUTH_TOKEN = "BQBv_EtwurPlg7j13PTPgzvuFlKtubN3lUlLUNF-YRG3rQ-B4cAkG8wRk1GYAIs589oXNSjaiwjSom-YuY78uUIlOGMSgOK1f34_epigRpFqszR5DB9mG-ZaZ-tdZExtt8hS-j9ScPXnUMfymoAExaO4Fg";
-
+    private boolean isPlaying;
 
     public Spotify(Context c){
         JsonObjectRequest getDevices = new JsonObjectRequest(JsonObjectRequest.Method.GET, "https://api.spotify.com/v1/me/player/devices", null,
-                        response -> Log.d("Spotify", response.toString()),
-                        error -> Log.d("Spotify", error.getMessage())){
+                        response -> Log.d("Spotify", "Response is " + response.toString()),
+                        error -> Log.d("Spotify", "Error is " + error.getMessage())){
             @Override
             public Map<String, String> getHeaders(){
                Map<String, String> headers = new HashMap<>();
@@ -37,15 +38,29 @@ public class Spotify implements ControllablePlaybackDevice {
         HTTPRequestQueue.getRequestQueue(c).addToRequestQueue(getDevices);
     }
 
-
     @Override
-    public void setResource(String resource) {
+    public void getResource(PlaybackListener pl) {
 
     }
 
     @Override
-    public String getResource() {
-        return null;
+    public boolean skipNext() throws ActionNotSupported {
+        return false;
+    }
+
+    @Override
+    public boolean skipPrevious() throws ActionNotSupported {
+        return false;
+    }
+
+    @Override
+    public boolean togglePlaying() {
+        return false;
+    }
+
+    @Override
+    public void getPlaying(PlaybackListener pl) throws ActionNotSupported {
+
     }
 
     @Override
@@ -54,18 +69,13 @@ public class Spotify implements ControllablePlaybackDevice {
     }
 
     @Override
-    public int getVolume() throws ActionNotSupported {
-        return 0;
+    public void getVolume(PlaybackListener pl) throws ActionNotSupported {
+
     }
 
     @Override
-    public boolean setBrightness(float brightness) throws ActionNotSupported {
-        return false;
-    }
-
-    @Override
-    public int getBrightness() throws ActionNotSupported {
-        return 0;
+    public String getArtLocation(PlaybackListener pl) {
+        return null;
     }
 
     @Override
