@@ -65,16 +65,18 @@ public class RoomTest extends TestCase {
     @Test
     public void testGetDevices() throws JSONException {
         //Make a configuration store with a device
+        UUID deviceID = new UUID(0,100);
         mConfigurationStore.setData(mContext,
-                new JSONObject("{'data':{'devices':[{'uid':100,'type':'DummyControllable','config':{}}]}}"));
+                new JSONObject("{'data':{'devices':[{'uid':'"+deviceID.toString()+"','type':'DummyControllable','name':'Dummy','config':{}}]}}"));
 
         //Instantiate a room from some JSON
+        UUID id = new UUID(0, 1);
         mRoom = new Room(mConfigurationStore, new JSONObject(
-                "{'name':'testroom', 'uid': 1, 'devices':[100]}"
+                "{'name':'testroom', 'uid': '"+id.toString()+"', 'devices':['"+deviceID.toString()+"']}"
         ));
 
         //Check that all was instantiated correctly
-        assertThat(mRoom.getID()).isEqualTo(new UUID(0, 1));
+        assertThat(mRoom.getID()).isEqualTo(id);
         assertThat(mRoom.getName()).isEqualTo("testroom");
         assertThat(mRoom.getDevices().size()).isEqualTo(1);
 
@@ -82,7 +84,7 @@ public class RoomTest extends TestCase {
         assertThat(d).isInstanceOf(DummyControllable.class);
 
         //Check that the "location" string was passed through by Room correctly.
-        assertThat(((DummyControllable) d).getID()).isEqualTo(new UUID(0,100));
+        assertThat(((DummyControllable) d).getID()).isEqualTo(deviceID);
     }
 
     @Test

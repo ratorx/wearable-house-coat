@@ -57,10 +57,10 @@ public class PersonTest extends TestCase {
     public void testJSONInstantiation() throws JSONException{
         //Put some Person data into configuration store
         //(don't test the configuration store here!)
-        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'people':[{'name':'testname', 'uid':100}]}}"));
+        UUID uid = new UUID(0, 100);
+        mConfigurationStore.setData(mContext, new JSONObject("{'data':{'people':[{'name':'testname', 'uid':'"+uid.toString()+"'}]}}"));
 
         //Instantiate a person
-        UUID uid = new UUID(0, 100);
         mPerson = Person.getPerson(mConfigurationStore, uid);
 
         //Person should have the given test name

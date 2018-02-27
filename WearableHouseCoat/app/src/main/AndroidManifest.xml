@@ -6,6 +6,7 @@
     <uses-feature android:name="android.hardware.wifi" />
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -42,6 +43,9 @@
         <activity
             android:name="com.clquebec.wearablehousecoat.LightControlPanelActivity"
             android:label="@string/title_activity_light_control_panel" />
+        <activity
+            android:name="com.clquebec.wearablehousecoat.MediaControlPanelActivity"
+            android:label="@string/title_activity_media_control_panel" />
         <activity
             android:name="com.clquebec.wearablehousecoat.RoomSelectionActivity"
             android:label="@string/title_activity_room_selection">

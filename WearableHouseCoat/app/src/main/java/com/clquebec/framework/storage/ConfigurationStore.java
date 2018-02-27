@@ -1,16 +1,19 @@
 package com.clquebec.framework.storage;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.clquebec.environment.Keys;
 import com.clquebec.framework.HTTPRequestQueue;
 import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.Room;
+import com.clquebec.framework.people.Person;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,7 +36,7 @@ import java.util.UUID;
 
 public class ConfigurationStore {
     private static final String TAG = "ConfigurationStore";
-    public static final String CONFIG_SERVER = "http://shell.srcf.net:3500/data.json";
+    public static final String CONFIG_SERVER = "http://shell.srcf.net:8003/";
     private static ConfigurationStore mInstance;
 
     private HTTPRequestQueue mQueue;
@@ -41,6 +45,10 @@ public class ConfigurationStore {
     private Map<UUID, JSONObject> mPersonDataMap;
     private Map<UUID, ControllableDevice> mDeviceMap;
 
+    private String mUserEmail;
+    private String mFBInstanceId;
+    private UUID mUUID;
+
     public interface ConfigurationAvailableCallback{
         void onConfigurationAvailable(ConfigurationStore config);
     }
@@ -48,6 +56,11 @@ public class ConfigurationStore {
     //Used for production
     private ConfigurationStore(Context c){
         this(c, HTTPRequestQueue.getRequestQueue(c));
+
+        GoogleSignInAccount mAccount = GoogleSignIn.getLastSignedInAccount(c);
+        if(mAccount != null) {
+            mUserEmail = mAccount.getEmail();
+        }
     }
 
     //This constructor is mostly used for testing
@@ -58,9 +71,20 @@ public class ConfigurationStore {
         mPersonDataMap = new HashMap<>();
         mDeviceMap = new HashMap<>();
 
-        Log.d(TAG, "Requesting config store");
+        tryGetConfigFromServer(c);
 
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, CONFIG_SERVER, null,
+        //Required for testing - so that the singleton can be instantiated
+        if(mInstance == null){
+            mInstance = this;
+        }
+    }
+
+    public void tryGetConfigFromServer(Context c){
+        String url = getServer() + "config";
+
+        Log.d(TAG, "Requesting config store: "+url);
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> setData(c, response),
                 error -> {
                     try {
@@ -72,11 +96,6 @@ public class ConfigurationStore {
         );
 
         mQueue.addToRequestQueue(request);
-
-        //Required for testing - so that the singleton can be instantiated
-        if(mInstance == null){
-            mInstance = this;
-        }
     }
 
     public void setData(Context context, JSONObject data) {
@@ -88,6 +107,7 @@ public class ConfigurationStore {
                 this.mData = data.getJSONObject("data");
             }catch(JSONException e){
                 this.mData = null;
+                return;
             }
 
             //Load in People as a UUID->JSONObject map
@@ -96,7 +116,12 @@ public class ConfigurationStore {
                 for (int i = 0; i < people.length(); i++) {
                     try {
                         JSONObject personData = people.getJSONObject(i);
-                        UUID id = new UUID(0, personData.getLong("uid"));
+                        UUID id = UUID.fromString(personData.getString("uid"));
+
+                        if(Objects.equals(mUserEmail, personData.getString("email"))){
+                            //Set my UUID to this one
+                            mUUID = id;
+                        }
 
                         mPersonDataMap.put(id, personData);
                     } catch (JSONException e) {
@@ -113,7 +138,7 @@ public class ConfigurationStore {
                 for (int i = 0; i < devices.length(); i++) {
                     try {
                         JSONObject deviceData = devices.getJSONObject(i);
-                        UUID id = new UUID(0, deviceData.getLong("uid"));
+                        UUID id = UUID.fromString(deviceData.getString("uid"));
 
                         //Get device config
                         JSONObject deviceConfig = deviceData.getJSONObject("config");
@@ -124,6 +149,10 @@ public class ConfigurationStore {
                             Constructor<?> getInstance = deviceClass.getConstructor(Context.class, UUID.class, JSONObject.class);
                             ControllableDevice device = (ControllableDevice) getInstance.newInstance(context, id, deviceConfig);
 
+                            //Set device name
+                            device.setName(deviceData.getString("name"));
+
+                            //Put device into map
                             mDeviceMap.put(id, device);
                         }catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
                             Log.e(TAG, "Could not instantiate device "+deviceData.getString("type")+": "+e.getMessage());
@@ -212,22 +241,54 @@ public class ConfigurationStore {
         }
     }
 
-    @Nullable
-    public String getLocationServerAddress(){
-        try{
-            return mData.getString("server");
-        }catch(JSONException e){
-            //No address
-            return null;
+    public UUID getMyUUID(){
+        if(mUUID == null){
+            return new UUID(0, 0);
+        }else{
+            return mUUID;
         }
     }
 
-    public UUID getMyUUID(){
-        try{
-            return new UUID(0, mData.getLong("me"));
-        }catch(JSONException e){
-            //Return a default UUID
-            return new UUID(0, 0);
+    public String getMyEmail(){
+        return mUserEmail;
+    }
+
+    public void setMyEmail(String email){
+        mUserEmail = email;
+        tryAndSendFBIdToServer();
+
+        if(mData != null){
+            //Try and find "me"
+            for(UUID personID : mPersonDataMap.keySet()){
+                Person p = Person.getPerson(this, personID);
+                if(Objects.equals(mUserEmail, p.getEmail())){
+                    mUUID = personID;
+                }
+            }
         }
+    }
+
+    private void tryAndSendFBIdToServer(){
+        if(mUserEmail != null && mFBInstanceId != null){
+            Log.d(TAG, "Sending FBID to server with email: "+mUserEmail+" ID: "+mFBInstanceId);
+            String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUserEmail;
+            mQueue.addToRequestQueue(new StringRequest(Request.Method.GET, url,
+                    response -> Log.d(TAG, response),
+                    error -> Log.e(TAG, error.getMessage())
+            ));
+        }
+    }
+
+    public String getServer(){
+        try{
+            return mData.getString("server");
+        }catch(Exception e){
+            return CONFIG_SERVER;
+        }
+    }
+
+    public void setMyInstanceId(String instance){
+        mFBInstanceId = instance;
+        tryAndSendFBIdToServer();
     }
 }

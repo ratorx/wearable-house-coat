@@ -29,6 +29,7 @@ public class Person {
     private static ConfigurationStore mConfigStore;
 
     private String mName;
+    private String mEmail;
     private final UUID mUUID;
     private Place mLocation;
     private LocationChangeListener mListener;
@@ -69,6 +70,12 @@ public class Person {
             }catch(JSONException | NullPointerException e){
                 Log.e(TAG, "Could not get person name for UID "+mUUID.toString());
             }
+
+            try{
+                mName = personData.getString("email");
+            }catch(JSONException | NullPointerException e){
+                Log.e(TAG, "Could not get person email for UID "+mUUID.toString());
+            }
         });
     }
 
@@ -76,6 +83,7 @@ public class Person {
         return mName;
     }
     public UUID getUUID(){ return mUUID; }
+    public String getEmail(){ return mEmail; }
 
     @Override
     public final boolean equals(Object other) {
@@ -107,5 +115,9 @@ public class Person {
 
     public void setLocationListener(LocationChangeListener listener) {
         mListener = listener;
+
+        if(listener != null && mLocation != null) {
+            listener.onLocationChanged(this, null, mLocation);
+        }
     }
 }

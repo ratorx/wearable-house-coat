@@ -1,6 +1,9 @@
 package com.clquebec.implementations.controllable;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.android.volley.toolbox.JsonObjectRequest;
@@ -9,9 +12,12 @@ import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.controllable.ControllableDeviceType;
 import com.clquebec.framework.controllable.ControllablePlaybackDevice;
 import com.clquebec.framework.listenable.PlaybackListener;
+import com.clquebec.framework.listenable.Track;
+import com.clquebec.wearablehousecoat.LightControlPanelActivity;
+import com.clquebec.wearablehousecoat.MediaControlPanelActivity;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.json.JSONObject;
+
 import java.util.UUID;
 
 /**
@@ -19,22 +25,36 @@ import java.util.UUID;
  */
 
 public class Spotify implements ControllablePlaybackDevice {
-    private static final String AUTH_TOKEN = "BQBv_EtwurPlg7j13PTPgzvuFlKtubN3lUlLUNF-YRG3rQ-B4cAkG8wRk1GYAIs589oXNSjaiwjSom-YuY78uUIlOGMSgOK1f34_epigRpFqszR5DB9mG-ZaZ-tdZExtt8hS-j9ScPXnUMfymoAExaO4Fg";
-    private boolean isPlaying;
+    public static final String AUTH_TOKEN = "BQCwUuLpiIRyAXPgkDNz_xHrJcMoyOl98wegmTltlVjK_gGqzxvA9FX8dyy8W61LJkXPDW0ObvSigTbVuREVP8j5COquvBKgb8-R_iG2194AnaCxs2r4xtpl-tKjsrA7Lg9dQEFpjfONBm-wVAjrBIAJQw";
+    private boolean isPlaying = false;
     private Context mContext;
+    private UUID mUUID;
 
     public Spotify(Context c){
         mContext = c;
     }
 
+    public Spotify(Context c, UUID id, JSONObject config){
+        mContext = c;
+        mUUID = id;
+    }
+
     @Override
     public void getResource(PlaybackListener pl) {
-
+        pl.updateResource(new Track("blobby", "Mr Blobby", "blobby blobby blobby blobby blobby blobby blobby blobby"));
     }
 
     @Override
     public boolean skipNext() throws ActionNotSupported {
-        return false;
+        Log.d("Spotify", "Running get next");
+        SpotifyJsonRequest skip = new SpotifyJsonRequest(JsonObjectRequest.Method.POST, "https://api.spotify.com/v1/me/player/next", null,
+                response -> Log.d("Spotify", "Response is " + response.toString()),
+                error -> Log.d("Spotify", "Error is " + error.getMessage())){
+
+        };
+        HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(skip);
+
+        return true;
     }
 
     @Override
@@ -45,32 +65,17 @@ public class Spotify implements ControllablePlaybackDevice {
     @Override
     public boolean setPlaying(boolean enabled) {
         if (enabled){
-            JsonObjectRequest play = new JsonObjectRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/play", null,
+            SpotifyJsonRequest play = new SpotifyJsonRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/play", null,
                     response -> Log.d("Spotify", "Response is " + response.toString()),
                     error -> Log.d("Spotify", "Error is " + error.getMessage())){
-                @Override
-                public Map<String, String> getHeaders(){
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Accept", "application/json");
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Authorization", "Bearer " + AUTH_TOKEN);
-                    return headers;
-                }
+
             };
             HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(play);
 
         }else{
-            JsonObjectRequest pause = new JsonObjectRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/pause", null,
+            SpotifyJsonRequest pause = new SpotifyJsonRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/pause", null,
                     response -> Log.d("Spotify", "Response is " + response.toString()),
                     error -> Log.d("Spotify", "Error is " + error.getMessage())){
-                @Override
-                public Map<String, String> getHeaders(){
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Accept", "application/json");
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Authorization", "Bearer " + AUTH_TOKEN);
-                    return headers;
-                }
             };
             HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(pause);
         }
@@ -78,14 +83,13 @@ public class Spotify implements ControllablePlaybackDevice {
         return true;
     }
 
-
     @Override
     public void getPlaying(PlaybackListener pl) throws ActionNotSupported {
 
     }
 
     @Override
-    public boolean setVolume(float volume) throws ActionNotSupported {
+    public boolean setVolume(int volume) throws ActionNotSupported {
         return false;
     }
 
@@ -95,8 +99,7 @@ public class Spotify implements ControllablePlaybackDevice {
     }
 
     @Override
-    public String getArtLocation(PlaybackListener pl) {
-        return null;
+    public void getArtLocation(PlaybackListener pl) {
     }
 
     @Override
@@ -111,7 +114,7 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return isPlaying;
     }
 
     @Override
@@ -121,31 +124,41 @@ public class Spotify implements ControllablePlaybackDevice {
 
     @Override
     public String getName() {
-        return null;
+        return "Spotify Controller";
     }
 
     @Override
     public ControllableDeviceType getType() {
-        return null;
+        return ControllableDeviceType.SOUND;
     }
 
     @Override
     public UUID getID() {
-        return null;
+        return mUUID;
     }
 
     @Override
     public boolean quickAction() {
-        return false;
+        isPlaying = !isPlaying;
+        setPlaying(isPlaying);
+        return true;
     }
 
     @Override
     public boolean extendedAction() {
-        return false;
+        Intent soundControls = new Intent(mContext, MediaControlPanelActivity.class);
+        soundControls.putExtra(MediaControlPanelActivity.ID_EXTRA, this.getID());
+        mContext.startActivity(soundControls);
+
+        return true;
     }
 
     @Override
     public boolean isConnected() {
-        return false;
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
 }
