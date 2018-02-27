@@ -28,11 +28,6 @@ class App extends React.Component {
       this.setState({
         deviceInfo: devInfo
       });
-
-      //Test putting config
-      console.log(devInfo.info);
-      console.log(JSON.stringify(devInfo.info));
-      devInfo.saveInfo();
     }, this);
 
 		this.state = {
@@ -59,6 +54,7 @@ class App extends React.Component {
 			}
 			let deviceIndex = prevState.deviceInfo.info.data.devices.indexOf(device);
 			prevState.deviceInfo.info.data.devices.splice(deviceIndex, 1);
+      prevState.deviceInfo.saveInfo();
 			return {};
 		})
 	}
@@ -76,6 +72,7 @@ class App extends React.Component {
 					}
 					room.devices.push(device.uid);
 				}
+        prevState.deviceInfo.saveInfo();
 				return {}
 			});
 		}
@@ -84,8 +81,10 @@ class App extends React.Component {
 	deleteRoom(room) {
 		this.setState((prevState) => {
 			let roomIndex = prevState.deviceInfo.info.data.rooms.indexOf(room);
-			if(roomIndex !== -1)
+			if(roomIndex !== -1){
 				prevState.deviceInfo.info.data.rooms.splice(roomIndex, 1);
+        prevState.deviceInfo.saveInfo();
+      }
 			return {};
 		})
 	}
@@ -98,6 +97,7 @@ class App extends React.Component {
 		};
 		this.setState((prevState) => {
 			prevState.deviceInfo.info.data.rooms.push(newRoom);
+      prevState.deviceInfo.saveInfo();
 			return {}
 		});
 		return newRoom
@@ -108,6 +108,7 @@ class App extends React.Component {
 			this.setState((prevState) => {
 				room.name = name
 				room.devices = devices
+        prevState.deviceInfo.saveInfo();
 				return {}
 			});
 		}

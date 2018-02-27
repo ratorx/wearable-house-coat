@@ -5,10 +5,7 @@ class DeviceInfo {
       people:[],
       rooms:[],
     }};
-    this.updateInfo(function(){
-      console.log("Callback");
-      this.setState();
-    }, app);
+
     this.loaded = false;
     this.configLocation = "http://shell.srcf.net:8004/config";
 	}
