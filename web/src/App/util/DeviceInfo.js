@@ -33,6 +33,10 @@ class DeviceInfo {
       console.log("Put Config Failed: ", err);
     });
 	}
+
+	createUid() {
+		return "dkfjahgsdkjfhaslkdjfhalskjdhflaksjdhflajsdhflkajh";
+	}
 }
 
 export default DeviceInfo

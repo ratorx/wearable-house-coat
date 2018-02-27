@@ -1,11 +1,7 @@
-// Can mutate the references to each of the devices but requires a separate
-// onDeleteDevice event passed in props to remove the device from
-// a parent component's list of devices
-
 import React from 'react';
-import './Settings.css';
 import { PageHeader, ListGroup, ListGroupItem, Row, Col, FormControl, Button } from 'react-bootstrap';
 import ConfirmDelete from './ConfirmDelete.js'
+import './Settings.css';
 import editIcon from '../res/edit.png';
 import deleteIcon from '../res/delete.png';
 
@@ -13,34 +9,32 @@ class SetDevices extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			devices: this.props.devices,
-			rooms: this.props.rooms,
 			deleteDialog: {
 				shown: false,
 				device: null
 			},
 			editDevice: {
-				device: null, // Reference to original device, do not change unless confirmed
-				room: null, // Room during editing. Change the reference but not its value
-				name: null // Name during editing
+				device: null,
+				room: null,
+				name: null
 			}
-		}
+		};
 	}
 
 	showDeleteDialog(device) {
 		this.setState((prevState) => {
-			if(prevState.deleteDialog.shown)
-				return {};
-			return {
-				deleteDialog: {
-					shown: true,
-					device: device
+			if(!prevState.deleteDialog.shown) {
+				return {
+					deleteDialog: {
+						shown: true,
+						device: device
+					}
 				}
 			}
 		});
 	}
 
-	hideDeleteDialog() {
+	cancelDelete() {
 		this.setState((prevState) => {
 			return {
 				deleteDialog: {
@@ -48,93 +42,19 @@ class SetDevices extends React.Component {
 					device: null
 				}
 			}
-		})
+		});
 	}
 
 	deleteDevice() {
-		this.setState((prevState, props) => {
-			props.onDeleteDevice(prevState.deleteDialog.device);
-			prevState.deleteDialog = {
-				shown: false,
-				device: null
-			}
-			return prevState;
-		})
-	}
-
-	getDeviceRoom(device) {
-		for(let room of this.state.rooms)
-			for(let deviceUid of room.devices)
-				if(device.uid === deviceUid)
-					return room;
-		return undefined;
-	}
-
-	preFinishEditing(prevState) {
-		if(prevState.editDevice.device == null)
-			return;
-		prevState.editDevice.device.config.name = prevState.editDevice.name;
-
-		if(prevState.editDevice.room != null) {
-			let oldRoomIndex;
-			for (oldRoomIndex = 0; oldRoomIndex < prevState.rooms.length; oldRoomIndex++) {
-				if(prevState.rooms[oldRoomIndex].devices.includes(prevState.editDevice.device.uid)) {
-					let deviceIndexOldRoom = prevState.rooms[oldRoomIndex].devices.indexOf(prevState.editDevice.device.uid);
-					prevState.rooms[oldRoomIndex].devices.splice(deviceIndexOldRoom, 1);
-					break;
+		this.setState((prevState) => {
+			this.props.onDeleteDevice(prevState.deleteDialog.device);
+			return {
+				deleteDialog: {
+					shown: false,
+					device: null
 				}
 			}
-		}
-
-		let newRoomIndex;
-		for(newRoomIndex = 0; newRoomIndex < prevState.rooms.length; newRoomIndex++) {
-			if(prevState.rooms[newRoomIndex] === prevState.editDevice.room) {
-				prevState.rooms[newRoomIndex].devices.push(prevState.editDevice.device.uid);
-				break;
-			}
-		}
-	}
-
-	finishEditing() {
-		this.setState((prevState) => {
-			this.preFinishEditing(prevState);
-			prevState.editDevice = {
-				device: null,
-				rooms: null,
-				name: null
-			}
-			return prevState;
 		});
-	}
-
-	startEditing(device) {
-		this.setState((prevState) => {
-			this.preFinishEditing(prevState);
-			let editRoom = null;
-			for(let room of prevState.rooms) {
-				if(room.devices.includes(device.uid)) {
-					editRoom = room;
-					break;
-				}
-			}
-			prevState.editDevice = {
-				device: device,
-				room: editRoom,
-				name: device.config.name
-			};
-			return prevState;
-		});
-	}
-
-	cancelEditing() {
-		this.setState((prevState) => {
-			prevState.editDevice = {
-				device: null,
-				room: null,
-				name: null
-			}
-			return prevState;
-		})
 	}
 
 	editNameChange(e) {
@@ -151,8 +71,8 @@ class SetDevices extends React.Component {
 	}
 
 	editRoomChange(e) {
-		let uid = Number(e.target.value);
-		let newRoom = this.state.rooms.find((room) => room.uid === uid);
+		let uid = e.target.value;
+		let newRoom = this.props.rooms.find((room) => room.uid === uid);
 		if(typeof newRoom === "undefined")
 			newRoom = null;
 		this.setState((prevState) => {
@@ -166,25 +86,62 @@ class SetDevices extends React.Component {
 		})
 	}
 
-	componentWillReceiveProps(newProps) {
-		this.setState(() => {
+	startEditing(device) {
+		this.setState((prevState) => {
+			this.props.onSaveEdits(prevState.editDevice);
+			let editRoom = this.props.rooms.find(room => room.devices.includes(device.uid));
 			return {
-				devices: newProps.devices,
-				rooms: newProps.rooms
+				editDevice: {
+					device: device,
+					room: editRoom,
+					name: device.name
+				}
+			}
+		});
+	}
+
+	cancelEditing() {
+		this.setState((prevState) => {
+			return {
+				editDevice: {
+					device: null,
+					room: null,
+					name: null
+				}
+			}
+		})
+	}
+
+	finishEditing() {
+		this.setState((prevState) => {
+			this.props.onSaveEdits(prevState.editDevice);
+			return {
+				editDevice: {
+					device: null,
+					room: null,
+					name: null
+				}
 			}
 		})
 	}
 
 	componentWillUnmount() {
-		// setState does not execute inside componentWillUnmount
-		// simply update the references stored in the state
-		this.preFinishEditing(this.state);
+		this.props.onSaveEdits(this.state.editDevice);
 	}
 
 	render() {
 		return <div>
 			<PageHeader>Configure Devices</PageHeader>
-			{this.state.deleteDialog.shown ? <ConfirmDelete type="device" name={this.state.deleteDialog.device.config.name} onCancel={this.hideDeleteDialog.bind(this)} onDelete={this.deleteDevice.bind(this)}/> : <div/>}
+			{
+				this.state.deleteDialog.shown ?
+					<ConfirmDelete
+						type="device"
+						name={this.state.deleteDialog.device.name}
+						onCancel={this.cancelDelete.bind(this)}
+						onDelete={this.deleteDevice.bind(this)}
+					/>
+				:	null
+			}
 			<Row>
 				<Col xs={0} sm={2} lg={3}/>
 				<Col xs={12} sm={8} lg={6}>
@@ -201,7 +158,7 @@ class SetDevices extends React.Component {
 							</Row>
 						</ListGroupItem>
 						{
-							this.state.devices.map((device, i) =>
+							this.props.devices.map((device, i) =>
 								<ListGroupItem key={i} className="settings-entry">
 									<Row>
 										{
@@ -220,7 +177,7 @@ class SetDevices extends React.Component {
 																<FormControl componentClass="select" value={this.state.editDevice.room ? this.state.editDevice.room.uid : "empty"} onChange={this.editRoomChange.bind(this)}>
 																	<option value="empty" disabled>Select room</option>
 																	{
-																		this.state.rooms.map((room, i) => 
+																		this.props.rooms.map((room, i) => 
 																			<option value={room.uid} key={i}>{room.name}</option>
 																		)
 																	}
@@ -239,10 +196,10 @@ class SetDevices extends React.Component {
 												<div>
 													<Col xs={9}>
 														<Row>
-															<Col xs={6}>{device.config.name}</Col>
+															<Col xs={6}>{device.name}</Col>
 															<Col xs={6}>{
 																(() => {
-																	let room = this.getDeviceRoom(device);
+																	let room = this.props.rooms.find(room => room.devices.includes(device.uid))
 																	return room ? room.name : <em>No room</em>
 																}).call()
 															}</Col>

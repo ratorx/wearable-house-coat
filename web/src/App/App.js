@@ -1,55 +1,22 @@
 import React from 'react';
 import './App.css';
-import Overview from './components/Overview.js'
-import SetRooms from './components/SetRooms.js'
-import SetDevices from './components/SetDevices.js'
-import SetGroups from './components/SetGroups.js'
-import Help from './components/Help.js'
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import DeviceInfo from "./util/DeviceInfo.js"
+import Navigation from './components/Navigation.js';
+import Overview from './components/Overview.js';
+import SetRooms from './components/SetRooms.js';
+import SetDevices from './components/SetDevices.js';
+import Help from './components/Help.js';
+import DeviceInfo from "./util/DeviceInfo.js";
 
 class App extends React.Component {
 	pages = [
-		{
-			name: "Overview",
-			component: null,
-			onPageLoad: (page) => {
-				page.component = <Overview/>
-			}
-		},
-		{
-			name: "Setup",
+		{name: "Overview"},
+		{name: "Setup",
 			dropdown: [
-				{
-					name: "Rooms",
-					component: null,
-					onPageLoad: (page) => {
-						page.component = <SetRooms devices={this.state.deviceInfo.info.devices/*.filter(dev => dev.type !== "DeviceGroup")*/} rooms={this.state.deviceInfo.info.rooms}/>
-					}
-				},
-				{
-					name: "Devices",
-					component: null,
-					onPageLoad: (page) => {
-						page.component = <SetDevices devices={this.state.deviceInfo.info.devices.filter(dev => dev.type !== "DeviceGroup")} rooms={this.state.deviceInfo.info.rooms} onDeleteDevice={this.deleteDevice.bind(this)}/>
-					}
-				},
-				{
-					name: "Groups",
-					component: null,
-					onPageLoad: (page) => {
-						page.component = <SetGroups/>
-					}
-				}
+				{name: "Rooms"},
+				{name: "Devices"}
 			]
 		},
-		{
-			name: "Help",
-			component: null,
-			onPageLoad: (page) => {
-				page.component = <Help/>
-			}
-		}
+		{name: "Help"}
 	]
 
 	constructor(){
@@ -65,58 +32,122 @@ class App extends React.Component {
     */
     //End
 		this.state = {
-			currentPage: undefined,
-			deviceInfo: new DeviceInfo()
+			currentPage: this.pages[1].dropdown[0],
+			deviceInfo: new DeviceInfo(),
 		};
-		this.state.currentPage = this.pages[1].dropdown[0]
-		this.state.currentPage.onPageLoad(this.state.currentPage);
 	}
 
 	setCurrentPage(page) {
-		this.setState(() => {return {currentPage: page}});
-		page.onPageLoad(page);
-	}
-
-	deleteDevice(device){
 		this.setState((prevState) => {
-			let deviceIndex = prevState.deviceInfo.info.devices.indexOf(device);
-			prevState.deviceInfo.info.devices.splice(deviceIndex, 1);
-			prevState.currentPage.onPageLoad(prevState.currentPage);
-			return prevState;
+			return {
+				currentPage: page
+			}
 		})
 	}
 
+	deleteDevice(device) {
+		this.setState((prevState) => {
+			for(let room of prevState.deviceInfo.info.data.rooms) {
+				let roomDeviceIndex = room.devices.indexOf(device.uid);
+				if(roomDeviceIndex !== -1) {
+					room.devices.splice(roomDeviceIndex, 1);
+				}
+			}
+			let deviceIndex = prevState.deviceInfo.info.data.devices.indexOf(device);
+			prevState.deviceInfo.info.data.devices.splice(deviceIndex, 1);
+			return {};
+		})
+	}
+
+	saveDeviceEdits({device, name, room}) {
+		if(device !== null) {
+			this.setState((prevState) => {
+				device.name = name;
+
+				let oldRoom = prevState.deviceInfo.info.data.rooms.find(room => room.devices.includes(device.uid));
+				if(room !== oldRoom) {
+					if(oldRoom) {
+						let oldRoomDeviceIndex = oldRoom.devices.indexOf(device.uid);
+						oldRoom.devices.splice(oldRoomDeviceIndex, 1);
+					}
+					room.devices.push(device.uid);
+				}
+				return {}
+			});
+		}
+	}
+
+	deleteRoom(room) {
+		this.setState((prevState) => {
+			let roomIndex = prevState.deviceInfo.info.data.rooms.indexOf(room);
+			if(roomIndex !== -1)
+				prevState.deviceInfo.info.data.rooms.splice(roomIndex, 1);
+			return {};
+		})
+	}
+
+	addRoom() {
+		let newRoom = {
+			uid: this.state.deviceInfo.createUid(),
+			name: "",
+			devices: []
+		};
+		this.setState((prevState) => {
+			prevState.deviceInfo.info.data.rooms.push(newRoom);
+			return {}
+		});
+		return newRoom
+	}
+
+	saveRoomEdits({room, name, devices}) {
+		if(room){
+			this.setState((prevState) => {
+				room.name = name
+				room.devices = devices
+				return {}
+			});
+		}
+	}
+
 	render() {
+		let contentComponent;
+		switch(this.state.currentPage.name) {
+			case "Overview":
+				contentComponent = <Overview/>
+				break;
+			case "Rooms":
+				contentComponent = <SetRooms
+					devices={this.state.deviceInfo.info.data.devices}
+					rooms={this.state.deviceInfo.info.data.rooms}
+					onAddRoom={this.addRoom.bind(this)}
+					onDeleteRoom={this.deleteRoom.bind(this)}
+					onSaveEdits={this.saveRoomEdits.bind(this)}
+				/>
+				break;
+			case "Devices":
+				contentComponent = <SetDevices
+					devices={this.state.deviceInfo.info.data.devices}
+					rooms={this.state.deviceInfo.info.data.rooms}
+					onDeleteDevice={this.deleteDevice.bind(this)}
+					onSaveEdits={this.saveDeviceEdits.bind(this)}
+				/>
+				break;
+			case "Help":
+				contentComponent = <Help/>
+				break;
+			default:
+				contentComponent = null
+		}
+
 		return <div>
-			<Navbar fixedTop inverse collapseOnSelect className="navbar-left-no-margin navbar-styled">
-				<Navbar.Header>
-					<Navbar.Brand>
-						<a onClick={() => {this.setCurrentPage(this.pages[0])}}>Wearable House Coat</a>
-					</Navbar.Brand>
-					<Navbar.Toggle/>
-				</Navbar.Header>
-				<Navbar.Collapse>
-					<Nav>
-						{
-							this.pages.map((page, i) => {
-								if(typeof page.dropdown === "undefined") {
-									return <NavItem key={i} active={page.name === this.state.currentPage.name} onClick={() => {this.setCurrentPage(page)}}>{page.name}</NavItem>
-								} else {
-									return <NavDropdown key={i} title={page.name} id={"main-navbar-dropdown-" + page.name}>
-										{
-											page.dropdown.map((subpage, j) =>
-												<MenuItem key={i + "." + j} active={subpage.name === this.state.currentPage.name} onClick={() => {this.setCurrentPage(subpage)}}>{subpage.name}</MenuItem>
-											)
-										}
-									</NavDropdown>
-								}
-							})
-						}
-					</Nav>
-				</Navbar.Collapse>
-			</Navbar>
+			<Navigation
+				onBrandClick={() => {this.setCurrentPage.call(this, this.pages[0])}}
+				pages={this.pages}
+				activePage={this.state.currentPage}
+				onSelectPage={this.setCurrentPage.bind(this)}
+			/>
 			<div className="content">
-				{this.state.currentPage.component}
+				{contentComponent}
 			</div>
 		</div>
 	}

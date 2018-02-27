@@ -1,46 +1,44 @@
 import React from 'react';
-import './Settings.css';
 import { PageHeader, Row, Col, ListGroup, ListGroupItem, FormControl, Button } from 'react-bootstrap';
 import ConfirmDelete from './ConfirmDelete.js'
+import SortableDeviceList from "./SortableDevices.js"
+import { arrayMove } from 'react-sortable-hoc';
+import './Settings.css';
 import editIcon from '../res/edit.png';
 import deleteIcon from '../res/delete.png';
-import { arrayMove } from 'react-sortable-hoc';
-import SortableDeviceList from "./SortableDevices.js"
 
 class SetRooms extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			devices: props.devices,
-			rooms: props.rooms,
 			deleteDialog: {
 				shown: false,
 				room: null
 			},
 			editRoom: {
-				room: null, // Reference to original room, do not change unless confirmed
-				name: null, // Name during editinfg
-				devices: null, // List of devices during editing
-				newly_added: false // If the room is newly added to be removed when its editing is cancelled
+				room: null,
+				name: null,
+				devices: null,
+				newly_added: false
 			}
 		}
 	}
 
 	showDeleteDialog(room) {
 		this.setState((prevState) => {
-			if(prevState.deleteDialog.shown)
-				return {};
-			return {
-				deleteDialog: {
-					shown: true,
-					room: room,
+			if(!prevState.deleteDialog.shown) {
+				return {
+					deleteDialog: {
+						shown: true,
+						room: room
+					}
 				}
 			}
-		});
+		})
 	}
 
-	hideDeleteDialog() {
-		this.setState((prevState) => {
+	cancelDelete() {
+		this.setState(() => {
 			return {
 				deleteDialog: {
 					shown: false,
@@ -52,62 +50,59 @@ class SetRooms extends React.Component{
 
 	deleteRoom() {
 		this.setState((prevState) => {
-			let roomIndex = prevState.rooms.indexOf(prevState.deleteDialog.room);
-			prevState.rooms.splice(roomIndex, 1);
-			prevState.deleteDialog = {
-				shown: false,
-				room: null
-			};
-			return prevState;
+			this.props.onDeleteRoom(prevState.deleteDialog.room);
+			return {
+				deleteDialog: {
+					shown: false,
+					room: null
+				}
+			}
 		})
 	}
 
-	preFinishEditing(prevState) {
-		if(prevState.editRoom.room == null)
-			return;
-		prevState.editRoom.room.name = prevState.editRoom.name;
-		prevState.editRoom.room.devices = prevState.editRoom.devices;
-	}
-
-	finishEditing() {
-		this.setState((prevState) => {
-			this.preFinishEditing(prevState);
-			prevState.editRoom = {
-				room: null,
-				name: null,
-				devices: null,
-				newly_added: false
+	addRoom() {
+		this.setState(() => {
+			this.props.onSaveEdits(this.state.editRoom);
+			let newRoom = this.props.onAddRoom();
+			return {
+				editRoom: {
+					room: newRoom,
+					name: newRoom.name,
+					devices: newRoom.devices,
+					newly_added: true
+				}
 			}
-			return prevState;
 		})
 	}
 
 	startEditing(room) {
-		this.setState((prevState) => {
-			this.preFinishEditing(prevState);
-			prevState.editRoom = {
-				room: room,
-				name: room.name,
-				devices: room.devices.slice(), // Shallow copy
-				newly_added: false
+		this.setState(() => {
+			this.props.onSaveEdits(this.state.editRoom);
+			return {
+				editRoom: {
+					room: room,
+					name: room.name,
+					devices: room.devices.slice(), // Shallow copy
+					newly_added: false
+				}
 			}
-			return prevState;
 		})
 	}
 
 	cancelEditing() {
 		this.setState((prevState) => {
 			if(prevState.editRoom.newly_added) {
-				let roomIndex = prevState.rooms.indexOf(prevState.editRoom.room);
-				prevState.rooms.splice(roomIndex, 1);
+				let roomIndex = this.props.rooms.indexOf(prevState.editRoom.room);
+				this.props.rooms.splice(roomIndex, 1);
 			}
-			prevState.editRoom = {
-				room: null,
-				name: null,
-				devices: null,
-				newly_added: false
+			return {
+				editRoom: {
+					room: null,
+					name: null,
+					devices: null,
+					newly_added: false
+				}
 			}
-			return prevState;
 		})
 	}
 
@@ -127,41 +122,39 @@ class SetRooms extends React.Component{
 
 	editDeviceOrder({oldIndex, newIndex}) {
 		this.setState((prevState) => {
-			prevState.editRoom.devices = arrayMove(prevState.editRoom.devices, oldIndex, newIndex)
-			return prevState;
+			return {
+				editRoom: {
+					room: prevState.editRoom.room,
+					name: prevState.editRoom.name,
+					devices: arrayMove(prevState.editRoom.devices, oldIndex, newIndex),
+					newly_added: prevState.editRoom.newly_added
+				}
+			}
 		})
 	}
 
-	addRoom() {
-		this.setState((prevState, props) => {
-			this.preFinishEditing(prevState);
-			let newRoom = {
-				name: "",
-				uid: /*TODO*/Math.round(Math.random() * (1 << 62)),
-				devices: []
-			};
-			console.log(newRoom.uid);
-			prevState.rooms.push(newRoom);
-			prevState.editRoom = {
-				room: newRoom,
-				name: newRoom.name,
-				devices: newRoom.devices,
-				newly_added: true
+	finishEditing() {
+		this.setState((prevState) => {
+			this.props.onSaveEdits(prevState.editRoom);
+			return {
+				editRoom: {
+					room: null,
+					name: null,
+					devices: null,
+					newly_added: false
+				}
 			}
-			return prevState;
 		})
 	}
 
 	componentWillUnmount() {
-		// setState does not execute inside componentWillUnmount
-		// simply update the references stored in the state
-		this.preFinishEditing(this.state);
+		this.props.onSaveEdits(this.state.editRoom);
 	}
 
 	render(){
 		return <div>
 			<PageHeader>Configure Rooms</PageHeader>
-			{this.state.deleteDialog.shown ? <ConfirmDelete type="room" name={this.state.deleteDialog.room.name} onCancel={this.hideDeleteDialog.bind(this)} onDelete={this.deleteRoom.bind(this)}/> : <div/>}
+			{this.state.deleteDialog.shown ? <ConfirmDelete type="room" name={this.state.deleteDialog.room.name} onCancel={this.cancelDelete.bind(this)} onDelete={this.deleteRoom.bind(this)}/> : <div/>}
 			<Row>
 				<Col xs={0} sm={2} lg={3}/>
 				<Col xs={12} sm={8} lg={6}>
@@ -173,7 +166,7 @@ class SetRooms extends React.Component{
 							</Row>
 						</ListGroupItem>
 						{
-							this.state.rooms.map((room, i) =>
+						this.props.rooms.map((room, i) =>
 								<ListGroupItem key={i} className="settings-entry">
 									<Row>
 										{
@@ -196,7 +189,7 @@ class SetRooms extends React.Component{
 													</Row>
 													<Row>
 														<Col xsOffset={1} xs={10}>
-															<SortableDeviceList devices={this.state.editRoom.devices.map(uid => this.state.devices.find(device => device.uid === uid)).filter(d => d)} onSortEnd={this.editDeviceOrder.bind(this)} lockAxis="y"/>
+															<SortableDeviceList devices={this.state.editRoom.devices.map(uid => this.props.devices.find(device => device.uid === uid))} onSortEnd={this.editDeviceOrder.bind(this)} lockAxis="y"/>
 														</Col>
 													</Row>
 												</div>

@@ -9,7 +9,7 @@ const DragHandle = SortableHandle(() => <img className="handle" src={dragIcon} a
 const SortableDevice = SortableElement(({device}) =>
 	<ListGroupItem>
 		<DragHandle/>
-		{device.config.name}
+		{device.name}
 	</ListGroupItem>
 )
 
