@@ -75,13 +75,46 @@
                         android:layout_height="40dp"/>
 
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/albumArt"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="80px"
-                    android:layout_weight="1"
-                    android:src="@android:drawable/ic_delete" />
+                    android:layout_height="55dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp">
+
+                    <ImageView
+                        android:id="@+id/albumArt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="left"
+                        android:src="@android:drawable/ic_delete" />
+
+                    <LinearLayout
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/trackName"
+                            android:layout_width="90dp"
+                            android:layout_height="25dp"
+                            android:layout_gravity="center"
+                            android:ellipsize="marquee"
+                            android:textColor="@color/white"/>
+
+                        <TextView
+                            android:id="@+id/artistAlbumName"
+                            android:layout_width="90dp"
+                            android:layout_height="25dp"
+                            android:layout_gravity="center_horizontal"
+                            android:ellipsize="marquee"
+                            android:textColor="@color/white"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
 
                 <!-- Hide this if the playback doesn't have brightness -->
 
