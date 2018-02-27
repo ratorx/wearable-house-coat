@@ -76,27 +76,14 @@
 
                 </LinearLayout>
 
-                <!-- Hide this if the playback doesn't have brightness -->
-                <LinearLayout
+                <ImageView
+                    android:id="@+id/imageView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/brightnessControlLayout"
-                    android:paddingLeft="5dp">
+                    android:layout_height="80px"
+                    android:layout_weight="1"
+                    android:src="@android:drawable/ic_delete" />
 
-                    <!-- Brightness symbol here -->
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center_vertical"
-                        android:src = "@drawable/ic_brightness"/>
-
-                    <SeekBar
-                        android:id="@+id/brightnessBar"
-                        android:layout_width="match_parent"
-                        android:layout_gravity="bottom"
-                        android:layout_height="40dp" />
-
-                </LinearLayout>
+                <!-- Hide this if the playback doesn't have brightness -->
 
             </LinearLayout>
 
