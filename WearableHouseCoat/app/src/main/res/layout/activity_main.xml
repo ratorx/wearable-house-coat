@@ -48,26 +48,34 @@
 
             <!-- Room name -->
             <!-- TODO: check ellipsize works as intended (resize first, then ellipsis when minimum size reached.) -->
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/main_currentlocation"
-                android:layout_width="96dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="30dp"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:gravity="center"
-                android:text="@string/main_defaultlocation"
-                android:textAlignment="center"
-                android:textAllCaps="true"
-                android:textSize="18sp"
-                app:autoSizeTextType="uniform"/>
+        <ImageView
+            android:id="@+id/main_switchcurrentlocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@android:drawable/ic_menu_mylocation" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/ic_down"
-                android:contentDescription="@string/selectroom_content_description" />
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/main_currentlocation"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="0dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:text="@string/main_defaultlocation"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:textSize="18sp"
+            app:autoSizeTextType="uniform" />
+
+        <ImageView
+            android:id="@+id/main_changelocationview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/selectroom_content_description"
+            android:src="@drawable/ic_down" />
     </LinearLayout>
 
 
@@ -82,6 +90,7 @@
         android:visibility="gone">
 
         <Button
+            android:id="@+id/iamhere_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/prussian_blue"

@@ -62,6 +62,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private Context mContext;
     private UUID mUUID;
     private String mName;
+    private Integer mLightNumber = 0;
 
 
     private BridgeConnectionCallback bridgeConnectionCallback = new BridgeConnectionCallback() {
@@ -112,6 +113,9 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     public PhilipsHue(Context c, UUID id, JSONObject config) throws JSONException{
         this(c);
         mUUID = id;
+
+        //Get light number from config
+        mLightNumber = config.getInt("light");
     }
 
     public PhilipsHue(Context c) {
@@ -148,7 +152,6 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
                     }
                 });
-
             });
         }
 
@@ -162,8 +165,8 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
             List<LightPoint> lights = bs.getLights();
 
-            for (LightPoint light : lights) {
-                updateLight(light, SETTING_COLOR, color);
+            if(lights.size() > mLightNumber){
+                updateLight(lights.get(mLightNumber), SETTING_COLOR, color);
             }
         }
     }
@@ -175,13 +178,13 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
             List<LightPoint> lights = bs.getLights();
 
-            if (lights.size() > 0) {
+            if (lights.size() > mLightNumber) {
                 double[][] xys = new double[lights.size()][2];
                 for (int i = 0; i < lights.size(); i++) {
                     xys[i][0] = lights.get(i).getLightState().getColor().getXY().x;
                     xys[i][1] = lights.get(i).getLightState().getColor().getXY().y;
                 }
-                int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(0));
+                int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(mLightNumber));
                 return colors[0] | 0xFF000000;
             }
         }
@@ -194,9 +197,9 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             BridgeState bs = mbridge.getBridgeState();
             bs.refresh(BridgeStateCacheType.FULL_CONFIG, BridgeConnectionType.LOCAL);
             List<LightPoint> lights = bs.getLights();
-            if (lights.size() > 0) {
-                LightPoint testLight = lights.get(0);
-                return testLight.getLightState().getBrightness();
+            if (lights.size() > mLightNumber) {
+                LightPoint light = lights.get(mLightNumber);
+                return light.getLightState().getBrightness();
             }
         }
         return 0;
@@ -207,10 +210,10 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             BridgeState bs = mbridge.getBridgeState();
             List<LightPoint> lights = bs.getLights();
 
-            for (LightPoint light : lights){
-                updateLight(light, SETTING_BRIGHTNESS, val);
+            if(lights.size() > mLightNumber){
+                updateLight(lights.get(mLightNumber), SETTING_BRIGHTNESS, val);
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -223,10 +226,10 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             BridgeState bs = mbridge.getBridgeState();
             List<LightPoint> lights = bs.getLights();
 
-            for (LightPoint light : lights){
-                updateLight(light, SETTING_ON, 1);
+            if(lights.size() > mLightNumber){
+                updateLight(lights.get(mLightNumber), SETTING_ON, 1);
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -240,10 +243,10 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
             List<LightPoint> lights = bs.getLights();
 
-            for (LightPoint light : lights) {
-                updateLight(light, SETTING_ON, 0);
+            if(lights.size() > mLightNumber){
+                updateLight(lights.get(mLightNumber), SETTING_ON, 0);
+                return true;
             }
-            return true;
         }
 
         return false;
@@ -253,7 +256,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         final LightState lightState = light.getLightState();
         switch (option){
             case SETTING_ON:
-                lightState.setOn(val==1);
+                lightState.setOn(val!=0);
                 break;
 
             case SETTING_BRIGHTNESS:
@@ -291,8 +294,8 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
            BridgeState bs = mbridge.getBridgeState();
            List<LightPoint> lights = bs.getLights();
 
-           if(lights.size() > 0) {
-               return lights.get(0).getLightState().isOn();
+           if(lights.size() > mLightNumber) {
+               return lights.get(mLightNumber).getLightState().isOn();
            }else{
                return false;
            }
@@ -353,7 +356,14 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         if (mbridge==null){
             return false;
         }else{
-            return mbridge.isConnected();
+            if(mbridge.isConnected()) {
+                BridgeState bs = mbridge.getBridgeState();
+                List<LightPoint> lights = bs.getLights();
+
+                return lights.size() > mLightNumber;
+            }else{
+                return false;
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ public class Room extends Place {
     //Used for testing
     public Room(ConfigurationStore configStore, JSONObject roomData) throws JSONException{
         //Only use LSB - for now
-        super(new UUID(0L, roomData.getLong("uid")));
+        super(UUID.fromString(roomData.getString("uid")));
 
         mName = roomData.getString("name");
 
@@ -48,7 +48,7 @@ public class Room extends Place {
                 for (int i = 0; i < deviceList.length(); i++) {
                     try {
                         //Get device ID
-                        UUID deviceID = new UUID(0, deviceList.getLong(i));
+                        UUID deviceID = UUID.fromString(deviceList.getString(i));
 
                         //Add device to list
                         ControllableDevice device = config.getDevice(deviceID);

@@ -1,7 +1,9 @@
 package com.clquebec.wearablehousecoat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -9,6 +11,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +50,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private final static int ROOM_CHANGE_REQUEST = 0; //Request ID for room selector
     private final static int GOOGLE_SIGN_IN_REQUEST = 1; //Request Google Sign-in
+    private final static int LOCATION_PERMISSION_REQUEST = 2; //Request Location permission
     private final static int POLLDELAYMILLIS = 5000;
 
     private RecyclerView mToggleButtons;
@@ -57,6 +62,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private Building mBuilding;
     private Place mCurrentDisplayedRoom;
+    private Person mMe;
 
     //load HueSDK on startup
     static {
@@ -92,15 +98,21 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             mBuilding = config.getBuilding(this);
 
             //Initialise "me"
-            Person me = Person.getPerson(this, config.getMyUUID());
-            me.setLocationListener((user, oldLocation, newLocation) -> {
-                if (mCurrentDisplayedRoom.equals(oldLocation)) {
-                    setRoom(newLocation, false);
+            mMe = Person.getPerson(this, config.getMyUUID());
+            mMe.setLocationListener((user, oldLocation, newLocation) -> {
+                if(newLocation != null) {
+                    Log.d(TAG, "Location for me: " + newLocation.getName());
+                    if (mCurrentDisplayedRoom == null || mCurrentDisplayedRoom.equals(oldLocation)) {
+                        setRoom(newLocation, false);
+                    }
                 }
             });
 
             //Initialise location provider
-            mLocationProvider = new FINDLocationProvider(this, me);
+            mLocationProvider = new FINDLocationProvider(this, mMe);
+
+            //Get an initial update
+            mLocationProvider.update();
 
             // Set up location update
             //Use the 'best' method for location update available:
@@ -111,7 +123,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 mLocationUpdateHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mLocationProvider.refreshLocations();
                         mLocationProvider.update();
                         mLocationUpdateHandler.postDelayed(this, POLLDELAYMILLIS);
                     }
@@ -152,24 +163,45 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mIAmHereWrapper.setVisibility(View.GONE);
 
         //On click, calibrate location provider
-        findViewById(R.id.iamhere_wrapper)
-                .setOnClickListener(view -> mLocationProvider.calibrate(mCurrentDisplayedRoom));
+        findViewById(R.id.iamhere_button).setOnClickListener(view -> {
+            mLocationProvider.calibrate(mCurrentDisplayedRoom);
+            mIAmHereWrapper.setVisibility(View.GONE);
+        });
 
         // Enables Always-on
         setAmbientEnabled();
 
         //SECTION: Allow user to change location
-        View mChangeLocationView = findViewById(R.id.main_currentlocationlayout);
+        View mChangeLocationView = findViewById(R.id.main_changelocationview);
         mChangeLocationView.setOnClickListener(view -> {
             Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
 
-            //Get room names as strings
-            List<CharSequence> roomNames = mBuilding.getRooms().stream()
-                    .map(Room::getName).collect(Collectors.toList());
+            //Try and re-get the configuration store
+            if (mBuilding.getRooms().size() == 0) {
+                ConfigurationStore.getInstance(this).tryGetConfigFromServer(this);
+            }
 
-            //Pass room names as an extra
-            intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
-            MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+            //Get room names as strings
+            ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+                if (mBuilding.getRooms().size() == 0) {
+                    mBuilding = config.getBuilding(this);
+                }
+
+                List<CharSequence> roomNames = mBuilding.getRooms().stream()
+                        .map(Room::getName).collect(Collectors.toList());
+
+                //Pass room names as an extra
+                intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
+                MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+            });
+        });
+
+        View mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
+        mSetCurrentLocationView.setOnClickListener(view -> {
+            if(mMe != null) {
+                setRoom(mMe.getLocation(), false);
+                mLocationProvider.update();
+            }
         });
 
 
@@ -193,6 +225,16 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             //startActivityForResult(signInIntent, GOOGLE_SIGN_IN_REQUEST);
         }else{
             Log.d(TAG, "Signed in with "+mAccount.getEmail());
+            ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
+
+            //Check for Location permission, and request them if not granted
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        LOCATION_PERMISSION_REQUEST
+                );
+            }
         }
     }
     @Override
@@ -210,15 +252,35 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                     setRoom(chosenRoom);
                 }
             }
-        }else if(requestCode == GOOGLE_SIGN_IN_REQUEST){
+        }else if(requestCode == GOOGLE_SIGN_IN_REQUEST) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
-            try{
+            try {
                 mAccount = task.getResult(ApiException.class);
-            }catch(ApiException e){
+                ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
+
+                //Check for Location permission, and request them if not granted
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            LOCATION_PERMISSION_REQUEST
+                    );
+                }
+            } catch (ApiException e) {
                 Log.e(TAG, "signInResult:failed code=" + e.getStatusCode());
                 //TODO: Show an error / exit app.
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            //Permission granted
+        }else{
+            Log.e(TAG, "Location permission was not given");
+            //TODO: Show an error / exit app.
         }
     }
 
@@ -228,23 +290,26 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     public void setRoom(Place room, boolean showIAmHere) {
         mCurrentDisplayedRoom = room;
-        //Update the location text. This needs to be converted to upper case because of a bug
-        //in android with text upper case and resizing
-        mLocationNameView.setText(room.getName().toUpperCase());
 
-        mCurrentDisplayedRoom = room;
-        //This automatically populates and attaches devices to buttons.
-        mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
+        if(room != null) {
+            //Update the location text. This needs to be converted to upper case because of a bug
+            //in android with text upper case and resizing
+            mLocationNameView.setText(room.getName().toUpperCase());
 
-        // Show the "I am here" button for 4 seconds
-        if (showIAmHere) {
-            mIAmHereWrapper.setVisibility(View.VISIBLE);
-            Timer mHereTimer = new Timer();
-            mHereTimer.schedule(new TimerTask() {
-                public void run() {
-                    runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
-                }
-            }, 4000);
+            //This automatically populates and attaches devices to buttons.
+            mToggleButtons.swapAdapter(new DeviceTogglesAdapter(room), false);
+
+            // Show the "I am here" button for 4 seconds
+            if (showIAmHere) {
+                mIAmHereWrapper.setVisibility(View.VISIBLE);
+                Timer mHereTimer = new Timer();
+
+                mHereTimer.schedule(new TimerTask() {
+                    public void run() {
+                        runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
+                    }
+                }, 4000);
+            }
         }
     }
 
@@ -276,8 +341,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             //Compare with previous
             if(Math.abs(mag - mLastAccelSquare) > 20){
                 //Do a location refresh on every step
-                Log.d(TAG, "Refreshing locations");
-                mLocationProvider.refreshLocations();
                 mLocationProvider.update();
             }
 

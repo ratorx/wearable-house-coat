@@ -36,15 +36,15 @@ class DeviceInfo {
 				{
 					name: "Intel Lab",
 					uid: 2,
-					devices: [/*1, */4]
+					devices: [1, 2, 3, 4]
 				}, {
 					name: "The Street",
 					uid: 3,
-					devices: [2, 4]
+					devices: []//[2, 4]
 				}, {
 					name: "Cafe",
 					uid: 4,
-					devices: [3]
+					devices: []//[3]
 				}
 			]
 		}
