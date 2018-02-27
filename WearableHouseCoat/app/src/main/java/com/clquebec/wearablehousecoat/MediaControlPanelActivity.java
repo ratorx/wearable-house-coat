@@ -37,6 +37,11 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
     private boolean changingBrightness = false;
     private boolean currentlyPlaying = false;
 
+    private enum buttonMode{enabled,disabled,impossible}
+
+    private buttonMode prevMode = buttonMode.enabled;
+    private buttonMode nextMode = buttonMode.enabled;
+
     private static final int barMax = 255;
 
     @Override
@@ -63,7 +68,6 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                 if(prog == 0){
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_off);
                 }
-                // TODO:tweak these values for prettiness
                 else if(prog < 0.3){
                     mVolumeIcon.setImageResource(R.drawable.ic_volume_low);
                 }
@@ -90,14 +94,14 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                             try{
                                 mVolumeBar.setProgress(mPlaybackDevice.getVolume());
                             }catch (ActionNotSupported e) {
-                                Log.e(TAG, "Device does not support getting brightness");
+                                Log.e(TAG, "Device does not support getting volume");
                             }});
                     }
                 }, 500);
                 try {
                     mPlaybackDevice.setVolume(seekBar.getProgress());
                 }catch(ActionNotSupported e){
-                    Log.e(TAG, "Device does not support setting brightness");
+                    Log.e(TAG, "Device does not support setting volume");
                 }
             }
         });
@@ -174,15 +178,20 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                  Add functionality for enabling/disabling buttons based on availability
                  Means updating when a new item is added to the queue (could be done by
                  another user or device)
+                 Easiest way to enable this: update the OnClick once we know if the device is
+                 Listenable. Current method checks if we can skip
         */
         // Previous button
         mPreviousButton = findViewById(R.id.mediaLeft);
+        // Unless we know we're listenable, we can't disable the button.
         mPreviousButton.setOnClickListener((view) -> {
             try{
                 mPlaybackDevice.skipPrevious();
             }
-            catch(ActionNotSupported ans){
-                Log.e(TAG,"PB device does not support backwards skip");
+            catch(ActionNotSupported actionNotSupported){
+                prevMode = buttonMode.impossible;
+                mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
+                mPreviousButton.setOnClickListener((v)->{});
             }
         });
 
@@ -192,8 +201,10 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
             try{
                 mPlaybackDevice.skipNext();
             }
-            catch(ActionNotSupported ans){
-                Log.e(TAG, "PB device does not support forwards skip");
+            catch(ActionNotSupported actionNotSupported){
+                nextMode = buttonMode.impossible;
+                mNextButton.setImageResource(R.drawable.ic_next_disabled);
+                mNextButton.setOnClickListener((v)->{});
             }
         });
 
@@ -216,11 +227,63 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
 
             if(mPlaybackDevice instanceof ListenableDevice) {
                 ((ListenableDevice) device).addListener(this);
+                // If we know we can update the response, then we can disable the button safely
+                mNextButton.setOnClickListener((view) -> {
+                    if(nextMode == buttonMode.enabled){
+                        try{
+                            if(!mPlaybackDevice.skipNext()){
+                                nextMode = buttonMode.disabled;
+                                mNextButton.setImageResource(R.drawable.ic_next_disabled);
+                            }
+                            // If we've gone forward and the back button was disabled, we must
+                            // now have something to go back to.
+                            else if(prevMode == buttonMode.disabled){
+                                prevMode = buttonMode.enabled;
+                                mPreviousButton.setImageResource(R.drawable.ic_skip_prev);
+                            }
+                        }
+                        catch(ActionNotSupported ans){
+                            Log.e(TAG, "PB device does not support forwards skip");
+                            nextMode = buttonMode.impossible;
+                            mNextButton.setImageResource(R.drawable.ic_next_disabled);
+                            mNextButton.setOnClickListener((view2) -> {});
+                        }
+                    }
+                });
+
+                mPreviousButton.setOnClickListener((view) -> {
+                    // Unless the button's enabled, don't do anything
+                    if(prevMode == buttonMode.enabled){
+                        try{
+                            // If we can't currently skip to next, disable the button
+                            if(!mPlaybackDevice.skipPrevious()){
+                                prevMode = buttonMode.disabled;
+                                mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
+                            }
+                            // Otherwise, assume we can go forward after going back and
+                            // re-enable the forward button. Make sure it's not nuked!
+                            else if(nextMode == buttonMode.disabled){
+                                nextMode = buttonMode.enabled;
+                                mNextButton.setImageResource(R.drawable.ic_skip_next);
+                            }
+                        }
+                        catch(ActionNotSupported actionNotSupported){
+                            // If we can't support the skip, commence orbital bombardment
+                            Log.e(TAG, "PB device does not support backwards skip");
+                            prevMode = buttonMode.impossible;
+                            mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
+                            mPreviousButton.setOnClickListener((view2) -> {});
+                        }
+                    }
+                });
+
+
+            }
+            else{
+
             }
 
             // A messy way of checking if we have volume and brightness enabled.
-            // TODO: Make this clearer. We only want to hide the bars if we can't SET the values
-            // TODO: (Although it'd be odd to be able to get and not set).
             try {
                 mVolumeBar.setProgress(mPlaybackDevice.getVolume());
             }catch(ActionNotSupported e){
@@ -255,7 +318,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                 mBrightnessBar.setProgress(playbackDevice.getBrightness());
             }
             catch(ActionNotSupported ans){
-                Log.e(TAG, "Device does not support brightness");
+                Log.e(TAG, "PB Device does not support brightness");
             }
         }
         if(!changingVolume){
@@ -263,8 +326,16 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                 mVolumeBar.setProgress(playbackDevice.getVolume());
             }
             catch(ActionNotSupported ans){
-                Log.e(TAG, "Device does not support volume");
+                Log.e(TAG, "PB Device does not support volume");
             }
+        }
+        try{
+            if(playbackDevice.getNext()){
+
+            }
+        }
+        catch(ActionNotSupported actionNotSupported){
+            Log.e(TAG,"PB Device");
         }
     }
 }
