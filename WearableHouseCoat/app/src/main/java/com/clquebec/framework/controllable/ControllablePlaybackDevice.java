@@ -16,6 +16,26 @@ public interface ControllablePlaybackDevice extends ControllableDevice {
     //Gets the currently playing resource
     String getResource();
 
+    // Returns true if there's another item queued for playing (so the skip button can
+    // do something worthwhile).
+    boolean getNext() throws ActionNotSupported;
+
+    // Skips to the next item (song/video)
+    boolean skipNext() throws ActionNotSupported;
+
+    // Returns true if there's a previous item to return to.
+    boolean getPrevious() throws ActionNotSupported;
+
+    // Returns to the previous item
+    boolean skipPrevious() throws ActionNotSupported;
+
+    // Pauses/resumes playback
+    boolean setPlaying(boolean enabled);
+
+    //Gets whether the device is currently playing
+    boolean getPlaying() throws ActionNotSupported;
+
+    // Sets the volume
     boolean setVolume(float volume) throws ActionNotSupported;
 
     //Gets the volume

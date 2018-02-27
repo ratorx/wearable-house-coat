@@ -31,7 +31,8 @@
                         android:layout_height="50dp"
                         android:layout_width="0dp"
                         android:layout_weight="0.5"
-                        android:id="@+id/mediaLeft"/>
+                        android:id="@+id/mediaLeft"
+                        android:src="@drawable/ic_skip_prev"/>
 
                     <!-- Change the image source here depending on whether we're playing -->
                     <!-- or paused.  -->
@@ -39,12 +40,15 @@
                         android:layout_height="50dp"
                         android:layout_width="0dp"
                         android:layout_weight="0.7"
-                        android:id="@+id/mediaPlayPause"/>
+                        android:id="@+id/mediaPlayPause"
+                        android:src="@drawable/ic_play_button"/>
 
                     <ImageView
                         android:layout_height="50dp"
                         android:layout_width="0dp"
-                        android:layout_weight="0.5"/>
+                        android:layout_weight="0.5"
+                        android:id="@+id/mediaRight"
+                        android:src="@drawable/ic_skip_next"/>
 
                 </LinearLayout>
 
@@ -52,14 +56,17 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/volumeControlLayout">
+                    android:id="@+id/volumeControlLayout"
+                    android:paddingLeft="5dp">
 
                     <!-- Need to stick a little speaker symbol here. -->
                     <!-- Could go for a dynamic one, more waves = louder -->
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:layout_gravity="center_vertical"/>
+                        android:layout_gravity="center_vertical"
+                        android:id="@+id/volumeIcon"
+                        android:src="@drawable/ic_volume_high"/>
 
                     <SeekBar
                         android:id="@+id/volumeBar"
@@ -73,13 +80,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/brightnessControlLayout">
+                    android:id="@+id/brightnessControlLayout"
+                    android:paddingLeft="5dp">
 
                     <!-- Brightness symbol here -->
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:layout_gravity="center_vertical"/>
+                        android:layout_gravity="center_vertical"
+                        android:src = "@drawable/ic_brightness"/>
 
                     <SeekBar
                         android:id="@+id/brightnessBar"
