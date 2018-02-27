@@ -25,7 +25,7 @@ public interface ControllablePlaybackDevice extends ControllableDevice {
     boolean skipPrevious() throws ActionNotSupported;
 
     // Pauses/resumes playback
-    boolean togglePlaying();
+    boolean setPlaying(boolean enabled);
 
     //Gets whether the device is currently playing
     void getPlaying(PlaybackListener pl) throws ActionNotSupported;
