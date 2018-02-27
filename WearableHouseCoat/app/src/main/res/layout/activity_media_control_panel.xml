@@ -101,7 +101,8 @@
                             android:layout_height="25dp"
                             android:layout_gravity="center"
                             android:ellipsize="marquee"
-                            android:textColor="@color/white"/>
+                            android:textColor="@color/white"
+                            android:singleLine="true"/>
 
                         <TextView
                             android:id="@+id/artistAlbumName"
@@ -109,7 +110,8 @@
                             android:layout_height="25dp"
                             android:layout_gravity="center_horizontal"
                             android:ellipsize="marquee"
-                            android:textColor="@color/white"/>
+                            android:textColor="@color/white"
+                            android:singleLine="true"/>
 
                     </LinearLayout>
 
