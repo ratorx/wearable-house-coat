@@ -204,14 +204,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 mLocationProvider.update();
             }
         });
-
-
-        Spotify test = new Spotify(this);
-        try{
-            test.skipNext();
-        }catch (ActionNotSupported e){
-            Log.e("Spotify", "Uh oh");
-        }
+        
 
         // Enables Always-on
         setAmbientEnabled();
