@@ -2,9 +2,9 @@ package com.clquebec.wearablehousecoat;
 
 
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -12,35 +12,29 @@ import android.widget.SeekBar;
 import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.controllable.ControllablePlaybackDevice;
-import com.clquebec.framework.listenable.DeviceChangeListener;
-import com.clquebec.framework.listenable.ListenableDevice;
+import com.clquebec.framework.listenable.PlaybackListener;
 import com.clquebec.framework.storage.ConfigurationStore;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
-public class MediaControlPanelActivity extends WearableActivity implements DeviceChangeListener {
+public class MediaControlPanelActivity extends WearableActivity implements PlaybackListener {
     private final static String TAG = "MediaControlPanelActivity";
     public static final String ID_EXTRA = "DeviceID";
 
     private LinearLayout mVolumeWrapper;
-    private LinearLayout mBrightnessWrapper;
     private SeekBar mVolumeBar;
-    private SeekBar mBrightnessBar;
     private ImageView mPreviousButton;
     private ImageView mPlayPauseButton;
     private ImageView mNextButton;
     private ImageView mVolumeIcon;
+
     private ControllablePlaybackDevice mPlaybackDevice;
+
     private boolean changingVolume = false;
-    private boolean changingBrightness = false;
     private boolean currentlyPlaying = false;
-
-    private enum buttonMode{enabled,disabled,impossible}
-
-    private buttonMode prevMode = buttonMode.enabled;
-    private buttonMode nextMode = buttonMode.enabled;
+    private float currentVolume = 0;
 
     private static final int barMax = 255;
 
@@ -54,7 +48,6 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
         // Binding UI elements to useful variables
         mVolumeIcon = findViewById(R.id.volumeIcon);
         mVolumeWrapper = findViewById(R.id.volumeControlLayout);
-        mBrightnessWrapper = findViewById(R.id.brightnessControlLayout);
 
         // Volume slider
         mVolumeBar = findViewById(R.id.volumeBar);
@@ -92,12 +85,15 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                         runOnUiThread(() -> {
                             changingVolume = false;
                             try{
-                                mVolumeBar.setProgress(mPlaybackDevice.getVolume());
-                            }catch (ActionNotSupported e) {
-                                Log.e(TAG, "Device does not support getting volume");
-                            }});
+                                mPlaybackDevice.getVolume(MediaControlPanelActivity.this);
+                            }
+                            catch(ActionNotSupported actionNotSupported){
+                                Log.e(TAG,"Device does not support getting volume");
+                            }
+                        });
                     }
                 }, 500);
+
                 try {
                     mPlaybackDevice.setVolume(seekBar.getProgress());
                 }catch(ActionNotSupported e){
@@ -106,53 +102,10 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
             }
         });
 
-        // Brightness slider
-        mBrightnessBar = findViewById(R.id.brightnessBar);
-        mBrightnessBar.setMax(barMax);
-        mBrightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                changingBrightness = true;
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                Timer brightnessTimer = new Timer();
-                brightnessTimer.schedule(new TimerTask() {
-                    public void run() {
-                        runOnUiThread(() -> {
-                            changingBrightness = false;
-                            try{
-                                mBrightnessBar.setProgress(mPlaybackDevice.getBrightness());
-                            }catch (ActionNotSupported e) {
-                                Log.e(TAG, "Device does not support getting brightness");
-                            }});
-                    }
-                }, 500);
-                try {
-                    mPlaybackDevice.setBrightness(seekBar.getProgress());
-                }catch(ActionNotSupported e){
-                    Log.e(TAG, "Device does not support setting brightness");
-                }
-            }
-        });
-
         // Play/Pause button
         mPlayPauseButton = findViewById(R.id.mediaPlayPause);
-        try{
-            currentlyPlaying = mPlaybackDevice.getPlaying();
-            if(currentlyPlaying){
-                mPlayPauseButton.setImageResource(R.drawable.ic_pause_button);
-            }
-        }
-        catch(ActionNotSupported ans){
-            Log.e(TAG, "PB device does not support playing status check");
-        }
+        // TODO: Fix this to work with new update/get system.
+        /*
         mPlayPauseButton.setOnClickListener((view) -> {
             if(currentlyPlaying){
                 if(mPlaybackDevice.setPlaying(false)){
@@ -160,7 +113,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                     mPlayPauseButton.setImageResource(R.drawable.ic_play_button);
                 }
                 else{
-                    Log.e(TAG,"Failed to disable device playback");
+                    Log.d(TAG,"Failed to disable device playback");
                 }
             }
             else{
@@ -169,27 +122,19 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                     mPlayPauseButton.setImageResource(R.drawable.ic_pause_button);
                 }
                 else{
-                    Log.e(TAG,"Failed to enable device playback");
+                    Log.d(TAG,"Failed to enable device playback");
                 }
             }
-        });
+        });*/
 
-        /* TODO: Disable the buttons when unusable (use the "disabled" icon resources)
-                 Add functionality for enabling/disabling buttons based on availability
-                 Means updating when a new item is added to the queue (could be done by
-                 another user or device)
-                 Easiest way to enable this: update the OnClick once we know if the device is
-                 Listenable. Current method checks if we can skip
-        */
+
         // Previous button
         mPreviousButton = findViewById(R.id.mediaLeft);
-        // Unless we know we're listenable, we can't disable the button.
         mPreviousButton.setOnClickListener((view) -> {
             try{
                 mPlaybackDevice.skipPrevious();
             }
             catch(ActionNotSupported actionNotSupported){
-                prevMode = buttonMode.impossible;
                 mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
                 mPreviousButton.setOnClickListener((v)->{});
             }
@@ -202,7 +147,6 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
                 mPlaybackDevice.skipNext();
             }
             catch(ActionNotSupported actionNotSupported){
-                nextMode = buttonMode.impossible;
                 mNextButton.setImageResource(R.drawable.ic_next_disabled);
                 mNextButton.setOnClickListener((v)->{});
             }
@@ -225,117 +169,61 @@ public class MediaControlPanelActivity extends WearableActivity implements Devic
 
             mPlaybackDevice = (ControllablePlaybackDevice) device;
 
-            if(mPlaybackDevice instanceof ListenableDevice) {
+            /*if(mPlaybackDevice instanceof ListenableDevice) {
                 ((ListenableDevice) device).addListener(this);
-                // If we know we can update the response, then we can disable the button safely
-                mNextButton.setOnClickListener((view) -> {
-                    if(nextMode == buttonMode.enabled){
-                        try{
-                            if(!mPlaybackDevice.skipNext()){
-                                nextMode = buttonMode.disabled;
-                                mNextButton.setImageResource(R.drawable.ic_next_disabled);
-                            }
-                            // If we've gone forward and the back button was disabled, we must
-                            // now have something to go back to.
-                            else if(prevMode == buttonMode.disabled){
-                                prevMode = buttonMode.enabled;
-                                mPreviousButton.setImageResource(R.drawable.ic_skip_prev);
-                            }
-                        }
-                        catch(ActionNotSupported ans){
-                            Log.e(TAG, "PB device does not support forwards skip");
-                            nextMode = buttonMode.impossible;
-                            mNextButton.setImageResource(R.drawable.ic_next_disabled);
-                            mNextButton.setOnClickListener((view2) -> {});
-                        }
-                    }
-                });
-
-                mPreviousButton.setOnClickListener((view) -> {
-                    // Unless the button's enabled, don't do anything
-                    if(prevMode == buttonMode.enabled){
-                        try{
-                            // If we can't currently skip to next, disable the button
-                            if(!mPlaybackDevice.skipPrevious()){
-                                prevMode = buttonMode.disabled;
-                                mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
-                            }
-                            // Otherwise, assume we can go forward after going back and
-                            // re-enable the forward button. Make sure it's not nuked!
-                            else if(nextMode == buttonMode.disabled){
-                                nextMode = buttonMode.enabled;
-                                mNextButton.setImageResource(R.drawable.ic_skip_next);
-                            }
-                        }
-                        catch(ActionNotSupported actionNotSupported){
-                            // If we can't support the skip, commence orbital bombardment
-                            Log.e(TAG, "PB device does not support backwards skip");
-                            prevMode = buttonMode.impossible;
-                            mPreviousButton.setImageResource(R.drawable.ic_previous_disabled);
-                            mPreviousButton.setOnClickListener((view2) -> {});
-                        }
-                    }
-                });
-
-
             }
             else{
 
-            }
+            }*/
 
             // A messy way of checking if we have volume and brightness enabled.
-            try {
+            /*try {
                 mVolumeBar.setProgress(mPlaybackDevice.getVolume());
             }catch(ActionNotSupported e){
                 Log.e(TAG, "PB device does not support volume get");
                 mVolumeWrapper.setVisibility(View.GONE);
-            }
-
-            try {
-                mBrightnessBar.setProgress(mPlaybackDevice.getBrightness());
-            }catch(ActionNotSupported e){
-                Log.e(TAG, "PB device does not support brightness get");
-                mBrightnessWrapper.setVisibility(View.GONE);
-            }
+            }*/
         });
 
+        Timer updateScheduler = new Timer();
+        updateScheduler.scheduleAtFixedRate(new TimerTask(){
+            public void run(){
+                mPlaybackDevice.getResource(MediaControlPanelActivity.this);
+                mPlaybackDevice.getArtLocation(MediaControlPanelActivity.this);
+                try {
+                    mPlaybackDevice.getPlaying(MediaControlPanelActivity.this);
+                }
+                catch(ActionNotSupported actionNotSupported){
+                    Log.d(TAG,"PB Device does not support playing status");
+                }
+                try{
+                    mPlaybackDevice.getVolume(MediaControlPanelActivity.this);
+                }
+                catch(ActionNotSupported actionNotSupported){
+                    Log.d(TAG, "PB Device does not support getting volume");
+                }
+            }
+        },0,30000);
+
     }
 
     @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        //Unregister listener
-        if(mPlaybackDevice instanceof ListenableDevice){
-            ((ListenableDevice) mPlaybackDevice).removeListener(this);
-        }
+    public void updateResource(String resource) {
+
     }
 
     @Override
-    public void updateState(ListenableDevice device) {
-        ControllablePlaybackDevice playbackDevice = (ControllablePlaybackDevice) device;
-        if(!changingBrightness){
-            try{
-                mBrightnessBar.setProgress(playbackDevice.getBrightness());
-            }
-            catch(ActionNotSupported ans){
-                Log.e(TAG, "PB Device does not support brightness");
-            }
-        }
-        if(!changingVolume){
-            try{
-                mVolumeBar.setProgress(playbackDevice.getVolume());
-            }
-            catch(ActionNotSupported ans){
-                Log.e(TAG, "PB Device does not support volume");
-            }
-        }
-        try{
-            if(playbackDevice.getNext()){
+    public void updateIsPlaying(String resource) {
 
-            }
-        }
-        catch(ActionNotSupported actionNotSupported){
-            Log.e(TAG,"PB Device");
-        }
+    }
+
+    @Override
+    public void updateVolume(float volume) {
+
+    }
+
+    @Override
+    public void updateArtLocation(String location) {
+
     }
 }
