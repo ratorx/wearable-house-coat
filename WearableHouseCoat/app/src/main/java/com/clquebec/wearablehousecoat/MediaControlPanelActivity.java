@@ -205,7 +205,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
             public void run(){
                 updateAll();
             }
-        },0,10000);
+        },0,5000);
 
     }
 
