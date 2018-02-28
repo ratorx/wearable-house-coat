@@ -9,7 +9,11 @@
 * DO NOT COMMIT the API keys.
 
 ## Server setup
-* TODO
+* Go into indoorpos directoryr
+* Run `export GOPATH=/societies/clquebec/.go`
+* Run `go get -d` to install dependencies
+* Run `go build .` to compile into executable
+* To start server, run `./indoorpos`
 
 ## Website
 * Clone project.
