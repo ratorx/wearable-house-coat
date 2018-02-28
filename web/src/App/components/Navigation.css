@@ -93,3 +93,7 @@ img.user-pic {
 	border-color: #FFFFFF;
 	border-width: 1px;
 }
+
+.navbar-styled .dropdown .dropdown-menu>li.logged-in-user-dropdown>a  {
+	background-color: #00A6FB!important;
+}
