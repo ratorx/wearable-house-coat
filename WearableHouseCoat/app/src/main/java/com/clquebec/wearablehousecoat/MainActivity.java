@@ -40,6 +40,7 @@ import com.philips.lighting.hue.sdk.wrapper.Persistence;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
@@ -73,6 +74,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInAccount mAccount;
+    private View mSetCurrentLocationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,7 +197,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             });
         });
 
-        View mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
+        mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
         mSetCurrentLocationView.setOnClickListener(view -> {
             if(mMe != null) {
                 setRoom(mMe.getLocation(), false);
@@ -306,6 +308,17 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                         runOnUiThread(() -> mIAmHereWrapper.setVisibility(View.GONE));
                     }
                 }, 4000);
+            }
+
+            //Don't show Current Location Button if we're displaying the current room
+            if(mMe != null){
+                if(Objects.equals(mMe.getLocation(), mCurrentDisplayedRoom)){
+                    mSetCurrentLocationView.setVisibility(View.INVISIBLE);
+                }else{
+                    mSetCurrentLocationView.setVisibility(View.VISIBLE);
+                }
+            }else{
+                mSetCurrentLocationView.setVisibility(View.VISIBLE);
             }
         }
     }
