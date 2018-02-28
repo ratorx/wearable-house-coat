@@ -1,5 +1,7 @@
 import React from 'react';
 import './App.css';
+import { PageHeader } from 'react-bootstrap';
+import { GoogleAPI, GoogleLogin, GoogleLogout } from 'react-google-oauth';
 import Navigation from './components/Navigation.js';
 import Overview from './components/Overview.js';
 import SetRooms from './components/SetRooms.js';
@@ -31,8 +33,9 @@ class App extends React.Component {
 		}, this);
 
 		this.state = {
-			currentPage: this.pages[1].dropdown[0],
+			currentPage: this.pages[0],
 			deviceInfo: devInfo,
+			googleUser: null
 		};
 	}
 
@@ -114,47 +117,82 @@ class App extends React.Component {
 		}
 	}
 
-	render() {
-		let contentComponent;
-		switch(this.state.currentPage.name) {
-			case "Overview":
-				contentComponent = <Overview/>
-				break;
-			case "Rooms":
-				contentComponent = <SetRooms
-					devices={this.state.deviceInfo.info.data.devices}
-					rooms={this.state.deviceInfo.info.data.rooms}
-					onAddRoom={this.addRoom.bind(this)}
-					onDeleteRoom={this.deleteRoom.bind(this)}
-					onSaveEdits={this.saveRoomEdits.bind(this)}
-				/>
-				break;
-			case "Devices":
-				contentComponent = <SetDevices
-					devices={this.state.deviceInfo.info.data.devices}
-					rooms={this.state.deviceInfo.info.data.rooms}
-					onDeleteDevice={this.deleteDevice.bind(this)}
-					onSaveEdits={this.saveDeviceEdits.bind(this)}
-				/>
-				break;
-			case "Help":
-				contentComponent = <Help/>
-				break;
-			default:
-				contentComponent = null
-		}
+	onLoginSuccess(googleUser) {
+		console.log(googleUser)
+		this.setState(() => {
+			return {
+				googleUser: googleUser
+			}
+		})
+	}
 
-		return <div>
-			<Navigation
-				onBrandClick={() => {this.setCurrentPage.call(this, this.pages[0])}}
-				pages={this.pages}
-				activePage={this.state.currentPage}
-				onSelectPage={this.setCurrentPage.bind(this)}
-			/>
-			<div className="content">
-				{contentComponent}
-			</div>
-		</div>
+	onLogoutSuccess(t) {
+		this.setState(() => {
+			return {
+				googleUser: null
+			}
+		})
+	}
+
+	render() {
+		return <GoogleAPI clientId="695081174378-hn8bchfp0lque5htjpkv63noa28b5iee.apps.googleusercontent.com">
+		{
+			(this.state.googleUser !== null) ?
+				<div>
+					<Navigation
+						onBrandClick={() => {this.setCurrentPage.call(this, this.pages[0])}}
+						pages={this.pages}
+						activePage={this.state.currentPage}
+						onSelectPage={this.setCurrentPage.bind(this)}
+						googleUser={this.state.googleUser}
+						logOut={
+							<GoogleLogout
+								backgroundColor="#00A6FB"
+								text="Log out"
+								onLogoutSuccess={this.onLogoutSuccess.bind(this)}
+							/>
+						}
+					/>
+					<div className="content">
+						{
+							(this.state.currentPage.name === "Overview") ?
+								<Overview/>
+							: (this.state.currentPage.name === "Rooms") ?
+								<SetRooms
+									devices={this.state.deviceInfo.info.data.devices}
+									rooms={this.state.deviceInfo.info.data.rooms}
+									onAddRoom={this.addRoom.bind(this)}
+									onDeleteRoom={this.deleteRoom.bind(this)}
+									onSaveEdits={this.saveRoomEdits.bind(this)}
+								/>
+							: (this.state.currentPage.name === "Devices") ?
+								<SetDevices
+									devices={this.state.deviceInfo.info.data.devices}
+									rooms={this.state.deviceInfo.info.data.rooms}
+									onDeleteDevice={this.deleteDevice.bind(this)}
+									onSaveEdits={this.saveDeviceEdits.bind(this)}
+								/>
+							: (this.state.currentPage.name === "Help") ?
+								<Help/>
+							: null
+						}
+					</div>
+				</div>
+			:
+				<div className="content">
+					<Navigation pages={[]}/>
+					<PageHeader>Log in</PageHeader>
+					<div className="col-center">
+						<GoogleLogin
+							backgroundColor="#00A6FB"
+							text="Google Login"
+							width="auto"
+							onLoginSuccess={this.onLoginSuccess.bind(this)}
+						/>
+					</div>
+				</div>
+		}
+		</GoogleAPI>
 	}
 }
 

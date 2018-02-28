@@ -1,0 +1,11 @@
+img.user-pic {
+	max-height: 16px;
+	padding: 0px;
+	margin: 0px;
+	margin-right: 10px;
+}
+
+.logged-in-user {
+	padding: 0px;
+	margin: 0px;
+}

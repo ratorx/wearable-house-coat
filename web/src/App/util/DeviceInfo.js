@@ -1,17 +1,15 @@
 class DeviceInfo {
 	constructor(app) {
-		this.info = {data:{
-      devices:[],
-      people:[],
-      rooms:[],
-    }};
-
-    this.loaded = false;
-    this.configLocation = "http://shell.srcf.net:8004/config";
+		this.info = null;
+		this.loaded = false;
+		this.configLocation = "http://shell.srcf.net:8003/config";
 	}
 
 	updateInfo(callback, app) {
-    fetch(this.configLocation).then(response => {
+    fetch(this.configLocation, {
+    	method: "POST",
+    	
+    }).then(response => {
       if(response.status === 200){
         response.json().then(data => {
           this.info = data;
