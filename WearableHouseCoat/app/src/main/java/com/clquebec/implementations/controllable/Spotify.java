@@ -22,7 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -36,6 +38,25 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     private UUID mUUID;
     private List<DeviceChangeListener> listeners = new ArrayList<>();
     private String mName = "Spotify";
+
+    public class SpotifyJsonRequest extends JsonObjectRequest {
+        public SpotifyJsonRequest(int method, String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+            super(method, url, jsonRequest, listener, errorListener);
+        }
+
+        public SpotifyJsonRequest(String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+            super(url, jsonRequest, listener, errorListener);
+        }
+
+        @Override
+        public Map<String, String> getHeaders(){
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Accept", "application/json");
+            headers.put("Content-Type", "application/json");
+            headers.put("Authorization", "Bearer " + Spotify.AUTH_TOKEN);
+            return headers;
+        }
+    }
 
 
     public Spotify(Context c, UUID id, JSONObject config){

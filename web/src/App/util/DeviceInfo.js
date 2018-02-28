@@ -7,7 +7,7 @@ class DeviceInfo {
     }};
 
     this.loaded = false;
-    this.configLocation = "http://shell.srcf.net:8004/config";
+    this.configLocation = "http://shell.srcf.net:8003/config";
 	}
 
 	updateInfo(callback, app) {
