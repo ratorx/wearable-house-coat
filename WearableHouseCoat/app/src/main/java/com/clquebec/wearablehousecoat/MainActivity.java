@@ -202,7 +202,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 mLocationProvider.update();
             }
         });
-        
+
 
         // Enables Always-on
         setAmbientEnabled();

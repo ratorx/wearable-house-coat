@@ -32,8 +32,8 @@ import java.util.UUID;
  */
 
 public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
-    public static final String AUTH_TOKEN = "BQBwhPQ3pzHqNe7CwH-PRlObSWbPXnrijWDV0IuRxDhjXYP54MB9Ju2gh_IuGOz3Rm1Pbv7SNU_mKW-Z7Grh6HoKPxl_SpaqKqHSaGnUqvpLiuqAqvHLpnS9JOa8zQeel6ERdm8rQLZph_jmWjh8m2lW5A";
     private static final String TAG = "Spotify";
+    public static final String AUTH_TOKEN = "BQAdqgyFDpIpOvkKmvvYPzk3n_7rnNDgMStXpyWmPHdUQ5cmaqHZfQcV7c0pj8qENAdx4raaHuozAdVoQ9tpzkWxCk8xFAOlYnL50eemZuqndFBD3rv5aEv6bxzKJWv_ypTvvo7zXeYWDyEGwHqjdXf2oQ";
     private boolean isPlaying = false;
     private Context mContext;
     private UUID mUUID;
