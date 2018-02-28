@@ -7,9 +7,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.widget.AppCompatButton;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 
 import com.clquebec.framework.controllable.ControllableDevice;
@@ -18,6 +21,8 @@ import com.clquebec.framework.listenable.DeviceChangeListener;
 import com.clquebec.framework.listenable.ListenableDevice;
 import com.clquebec.implementations.controllable.PhilipsHue;
 import com.clquebec.wearablehousecoat.R;
+
+import static android.content.Context.VIBRATOR_SERVICE;
 
 /**
  * WearableHouseCoat
@@ -57,6 +62,8 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     private Drawable mDeviceIcon = null;
     private Drawable mDeviceIconOff = null;
 
+    private Vibrator vib;
+
     //Fields for painting - these are members so they are cached between draws
     private int mSize; /* The side length of the view */
     private float mRadius;
@@ -67,12 +74,16 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
         super(context);
 
         init(context, null);
+
+        vib =(Vibrator) context.getSystemService(VIBRATOR_SERVICE);
     }
 
     public DeviceControlButton(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init(context, attrs);
+
+        vib =(Vibrator) context.getSystemService(VIBRATOR_SERVICE);
     }
 
     private void init(Context context, AttributeSet attrs) {
@@ -270,6 +281,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     public void onClick(View view) {
         //Call quickAction in the attached device
         if (mDevice != null && mDevice.isConnected()) {
+            vib.vibrate(20);
             mDevice.quickAction();
         }
     }
@@ -278,6 +290,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     public boolean onLongClick(View view) {
         //Call extendedAction in the attached device
         if (mDevice != null && mDevice.isConnected()) {
+            vib.vibrate(50);
             mDevice.extendedAction();
             return true;
         }
