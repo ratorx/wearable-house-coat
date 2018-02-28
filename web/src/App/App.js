@@ -26,9 +26,9 @@ class App extends React.Component {
 
 		let devInfo = new DeviceInfo(this);
 		console.log(devInfo.info);
-		devInfo.updateInfo((() => 
-			this.setState({ 
-				deviceInfo: devInfo 
+		devInfo.updateInfo((() =>
+			this.setState({
+				deviceInfo: devInfo
 			})).bind(this)
 		);
 
@@ -156,7 +156,9 @@ class App extends React.Component {
 					<div className="content">
 						{
 							(this.state.currentPage.name === "Overview") ?
-								<Overview/>
+								<Overview
+									name={this.state.googleUser.w3.ig}
+								/>
 							: (this.state.currentPage.name === "Rooms") ?
 								<SetRooms
 									devices={this.state.deviceInfo.info.data.devices}

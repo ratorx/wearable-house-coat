@@ -5,7 +5,7 @@ import Lorem from './Lorem.js';
 const Overview = (props) => {
 	return <div>
 		<PageHeader>Overview</PageHeader>
-		<Lorem/>
+		<p>Hello, {props.name}</p>
 	</div>
 }
 
