@@ -8,7 +8,7 @@ const Navigation = (props) =>
 			<Navbar.Brand>
 				<a onClick={props.onBrandClick}>Wearable House Coat</a>
 			</Navbar.Brand>
-			<Navbar.Toggle/>
+			{props.pages.length !== 0 ? <Navbar.Toggle/> : null}
 		</Navbar.Header>
 		<Navbar.Collapse>
 			<Nav>
