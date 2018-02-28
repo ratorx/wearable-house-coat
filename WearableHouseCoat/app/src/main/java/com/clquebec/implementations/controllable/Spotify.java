@@ -22,7 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -30,29 +32,52 @@ import java.util.UUID;
  */
 
 public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
-    public static final String AUTH_TOKEN = "BQBwhPQ3pzHqNe7CwH-PRlObSWbPXnrijWDV0IuRxDhjXYP54MB9Ju2gh_IuGOz3Rm1Pbv7SNU_mKW-Z7Grh6HoKPxl_SpaqKqHSaGnUqvpLiuqAqvHLpnS9JOa8zQeel6ERdm8rQLZph_jmWjh8m2lW5A";
+    private static final String TAG = "Spotify";
+    public static final String AUTH_TOKEN = "BQAdqgyFDpIpOvkKmvvYPzk3n_7rnNDgMStXpyWmPHdUQ5cmaqHZfQcV7c0pj8qENAdx4raaHuozAdVoQ9tpzkWxCk8xFAOlYnL50eemZuqndFBD3rv5aEv6bxzKJWv_ypTvvo7zXeYWDyEGwHqjdXf2oQ";
     private boolean isPlaying = false;
     private Context mContext;
     private UUID mUUID;
     private List<DeviceChangeListener> listeners = new ArrayList<>();
     private String mName = "Spotify";
+    private String mAuthToken = AUTH_TOKEN;
+
+    public class SpotifyJsonRequest extends JsonObjectRequest {
+        public SpotifyJsonRequest(int method, String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+            super(method, url, jsonRequest, listener, errorListener);
+        }
+
+        public SpotifyJsonRequest(String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+            super(url, jsonRequest, listener, errorListener);
+        }
+
+        @Override
+        public Map<String, String> getHeaders(){
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Accept", "application/json");
+            headers.put("Content-Type", "application/json");
+            headers.put("Authorization", "Bearer " + mAuthToken);
+            return headers;
+        }
+    }
 
 
-    public Spotify(Context c, UUID id, JSONObject config){
+    public Spotify(Context c, UUID id, JSONObject config) throws JSONException{
         mContext = c;
         mUUID = id;
         try{
             getPlaying(null);
         }catch (ActionNotSupported e) {
-            Log.e("Spotify", e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
+
+        //Get auth token if available
+        mAuthToken = config.getString("authkey");
     }
 
     public void getAll(PlaybackListener pl) {
         sendSpotifyRequest(JsonObjectRequest.Method.GET,
-                "https://api.spotify.com/v1/me/player",
                 response -> {
-                    Log.d("Spotify", "Response is " + response.toString());
+                    Log.d(TAG, "Response is " + response.toString());
                     String track = "";
                     String artist = "";
                     String album = "";
@@ -67,7 +92,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
                         volume = response.getJSONObject("device").getInt("volume_percent");
                         url = response.getJSONObject("item").getJSONObject("album").getJSONArray("images").getJSONObject(2).getString("url");
                     } catch (JSONException e){
-                        Log.e("Spotify", e.getMessage());
+                        Log.e(TAG, e.getMessage());
                     }
                     isPlaying=playing;
                     updateListeners();
@@ -85,9 +110,8 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     @Override
     public void getResource(PlaybackListener pl) {
         sendSpotifyRequest(JsonObjectRequest.Method.GET,
-                "https://api.spotify.com/v1/me/player",
                 response -> {
-                    Log.d("Spotify", "Response is " + response.toString());
+                    Log.d(TAG, "Response is " + response.toString());
                     String track = "";
                     String artist = "";
                     String album = "";
@@ -96,7 +120,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
                         album = response.getJSONObject("item").getJSONObject("album").getString("name");
                         artist = response.getJSONObject("item").getJSONObject("album").getJSONArray("artists").getJSONObject(0).getString("name");
                     } catch (JSONException e){
-                        Log.e("Spotify", e.getMessage());
+                        Log.e(TAG, e.getMessage());
                     }
                     if (pl != null) {
                         pl.updateResource(new Track(track, artist, album));
@@ -135,14 +159,13 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     @Override
     public void getPlaying(PlaybackListener pl) throws ActionNotSupported {
        sendSpotifyRequest(JsonObjectRequest.Method.GET,
-                "https://api.spotify.com/v1/me/player",
-                response -> {
-                    Log.d("Spotify", "Response is " + response.toString());
+               response -> {
+                    Log.d(TAG, "Response is " + response.toString());
                     boolean playing = false;
                     try{
                         playing = response.getBoolean("is_playing");
                     } catch (JSONException e){
-                        Log.e("Spotify", e.getMessage());
+                        Log.e(TAG, e.getMessage());
                     }
                     isPlaying=playing;
                     updateListeners();
@@ -165,14 +188,13 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     @Override
     public void getVolume(PlaybackListener pl) throws ActionNotSupported {
         sendSpotifyRequest(JsonObjectRequest.Method.GET,
-                "https://api.spotify.com/v1/me/player",
                 response -> {
-                    Log.d("Spotify", "Response is " + response.toString());
+                    Log.d(TAG, "Response is " + response.toString());
                     int volume = 0;
                     try{
                         volume = response.getJSONObject("device").getInt("volume_percent");
                     } catch (JSONException e){
-                        Log.e("Spotify", e.getMessage());
+                        Log.e(TAG, e.getMessage());
                     }
                     if (pl != null) {
                         pl.updateVolume(volume);
@@ -185,15 +207,14 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     @Override
     public void getArtLocation(PlaybackListener pl) {
         sendSpotifyRequest(JsonObjectRequest.Method.GET,
-                "https://api.spotify.com/v1/me/player",
                 response -> {
-                    Log.d("Spotify", "Response is " + response.toString());
+                    Log.d(TAG, "Response is " + response.toString());
                     String url = "";
                     try{
                         url = response.getJSONObject("item").getJSONObject("album").getJSONArray("images").getJSONObject(2).getString("url");
-                        Log.d("Spotify", url);
+                        Log.d(TAG, url);
                     } catch (JSONException e){
-                        Log.e("Spotify", e.getMessage());
+                        Log.e(TAG, e.getMessage());
                     }
                     if (pl != null) {
                         pl.updateArtLocation(url);
@@ -278,16 +299,16 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
         }
     }
 
-    private void sendSpotifyRequest(int method, String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+    private void sendSpotifyRequest(int method, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         if (listener==null){
-            listener = response -> Log.d("Spotify", "Response is " + response.toString());
+            listener = response -> Log.d(TAG, "Response is " + response.toString());
         }
         if (errorListener==null){
-            errorListener = error -> Log.d("Spotify", "Error is " + error.getMessage());
+            errorListener = error -> Log.d(TAG, "Error is " + error.getMessage());
         }
 
         SpotifyJsonRequest request = new SpotifyJsonRequest(method,
-                url, null,
+                "https://api.spotify.com/v1/me/player", null,
                 listener,
                 errorListener){
         };

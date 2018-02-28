@@ -58,6 +58,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private static Bridge mbridge = null;
     private static Map<DeviceChangeListener, PhilipsHue> listeners = new HashMap<>();
     private static BridgeConnection connection;
+    private static boolean requiresAuthentication = false;
 
     private Context mContext;
     private UUID mUUID;
@@ -73,6 +74,16 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             if (connectionEvent == ConnectionEvent.DISCONNECTED
                     || connectionEvent == ConnectionEvent.CONNECTION_LOST
                     || connectionEvent == ConnectionEvent.CONNECTION_RESTORED){
+                for (DeviceChangeListener l : listeners.keySet()){
+                    l.updateState(listeners.get(l));
+                }
+            }else if (connectionEvent==ConnectionEvent.LINK_BUTTON_NOT_PRESSED){
+                requiresAuthentication = true;
+                for (DeviceChangeListener l : listeners.keySet()){
+                    l.updateState(listeners.get(l));
+                }
+            }else if (connectionEvent==ConnectionEvent.AUTHENTICATED){
+                requiresAuthentication = false;
                 for (DeviceChangeListener l : listeners.keySet()){
                     l.updateState(listeners.get(l));
                 }
@@ -185,7 +196,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                     xys[i][1] = lights.get(i).getLightState().getColor().getXY().y;
                 }
                 int[] colors = HueColor.bulkConvertToRGBColors(xys, lights.get(mLightNumber));
-                return colors[0] | 0xFF000000;
+                return colors[mLightNumber] | 0xFF000000;
             }
         }
         return 0;
@@ -365,5 +376,9 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                 return false;
             }
         }
+    }
+
+    public boolean getRequiresAuthentication() {
+        return requiresAuthentication;
     }
 }

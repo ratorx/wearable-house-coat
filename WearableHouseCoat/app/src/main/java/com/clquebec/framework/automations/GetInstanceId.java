@@ -14,7 +14,6 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 public class GetInstanceId extends FirebaseInstanceIdService {
     private static String TAG = "GetInstanceId";
-    private static String SERVER = "http:/zeus.ree.to:8003/adduser";
 
     @Override
     public void onTokenRefresh() {
