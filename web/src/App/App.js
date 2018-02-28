@@ -29,7 +29,7 @@ class App extends React.Component {
 		devInfo.updateInfo((() => 
 			this.setState({ 
 				deviceInfo: devInfo 
-			})).bind(this)
+			}))
 		);
 
 		this.state = {
