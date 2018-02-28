@@ -56,6 +56,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private static final int SETTING_ON = 2;
 
     private static Bridge mbridge = null;
+    private static BridgeDiscovery mbridgeDiscovery = null;
     private static Map<DeviceChangeListener, PhilipsHue> listeners = new HashMap<>();
     private static BridgeConnection connection;
     private static boolean requiresAuthentication = false;
@@ -135,8 +136,8 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         if (mbridge == null){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
-                BridgeDiscovery bridgeDiscovery = new BridgeDiscovery();
-                bridgeDiscovery.search(new BridgeDiscoveryCallback() {
+                mbridgeDiscovery = new BridgeDiscovery();
+                mbridgeDiscovery.search(new BridgeDiscoveryCallback() {
                     @Override
                     public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
                         if (list.size() == 0){
@@ -350,7 +351,41 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
     @Override
     public boolean quickAction() {
-        return isEnabled() ? disable() : enable();
+        if (mbridge == null){
+            //Load in parameters from configuration store
+            ConfigurationStore.getInstance(mContext).onConfigAvailable(config -> {
+                mbridgeDiscovery = new BridgeDiscovery();
+                mbridgeDiscovery.search(new BridgeDiscoveryCallback() {
+                    @Override
+                    public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
+                        if (list.size() == 0){
+                            Log.e(TAG, "No bridge found");
+                            //TODO: Decide what to do here.
+                        }else if (list.size() > 1){
+                            Log.e(TAG, "Multiple bridges found. WHC does not support multiple bridges");
+                            //TODO: Pick one?
+                        }else{
+                            BridgeDiscoveryResult bdr = list.get(0);
+                            String ip = bdr.getIP();
+                            Log.d(TAG, "One bridge found. Connecting to bridge...");
+                            mbridge = new BridgeBuilder("Wearable House Control", config.getMyUUID().toString())
+                                    .setIpAddress(ip)
+                                    .setConnectionType(BridgeConnectionType.LOCAL)
+                                    .setBridgeConnectionCallback(bridgeConnectionCallback)
+                                    .addBridgeStateUpdatedCallback(bridgeStateUpdatedCallback)
+                                    .build();
+
+                            connection = mbridge.getBridgeConnection(BridgeConnectionType.LOCAL);
+                            connection.getConnectionOptions().enableFastConnectionMode(mbridge.getIdentifier());
+                            connection.connect();
+                        }
+
+                    }
+                });
+            }); return true;
+        } else {
+            return isEnabled() ? disable() : enable();
+        }
     }
 
     @Override
