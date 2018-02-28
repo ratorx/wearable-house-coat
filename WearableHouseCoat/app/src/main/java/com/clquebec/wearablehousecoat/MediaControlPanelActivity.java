@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,7 +57,6 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         setContentView(R.layout.activity_media_control_panel);
 
         setAmbientEnabled();
-
         // Binding UI elements to useful variables
         mVolumeIcon = findViewById(R.id.volumeIcon);
         mVolumeWrapper = findViewById(R.id.volumeControlLayout);
@@ -208,6 +208,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         },0,5000);
 
     }
+
 
     private void updateAll() {
         if (mPlaybackDevice instanceof Spotify) {
