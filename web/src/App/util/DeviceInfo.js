@@ -6,10 +6,7 @@ class DeviceInfo {
 	}
 
 	updateInfo(callback, app) {
-    fetch(this.configLocation, {
-    	method: "POST",
-    	
-    }).then(response => {
+    fetch(this.configLocation).then(response => {
       if(response.status === 200){
         response.json().then(data => {
           this.info = data;
