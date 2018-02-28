@@ -7,7 +7,7 @@ class DeviceInfo {
     }};
 
     this.loaded = false;
-    this.configLocation = "http://shell.srcf.net:8004/config";
+    this.configLocation = "http://shell.srcf.net:8003/config";
 	}
 
 	updateInfo(callback, app) {
@@ -58,7 +58,8 @@ class DeviceInfo {
 	}
 
 	createUid() {
-		return "dkfjahgsdkjfhaslkdjfhalskjdhflaksjdhflajsdhflkajh";
+		let s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
+		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	}
 }
 
