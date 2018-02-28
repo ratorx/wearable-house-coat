@@ -26,10 +26,17 @@ class App extends React.Component {
 
 		let devInfo = new DeviceInfo(this);
 		console.log(devInfo.info);
+<<<<<<< HEAD
 		devInfo.updateInfo((() =>
 			this.setState({
 				deviceInfo: devInfo
 			})).bind(this)
+=======
+		devInfo.updateInfo((() => 
+			this.setState({ 
+				deviceInfo: devInfo 
+			}))
+>>>>>>> 6563744dc7f87601a5fcd73d6df73d01c8677637
 		);
 
 		this.state = {

@@ -34,7 +34,7 @@ const Navigation = (props) =>
 						<NavDropdown id="sign-out"
 							title={<span><img className="user-pic"src={props.googleUser.w3.Paa} alt="user-pic"/>{props.googleUser.w3.ig}</span>}
 						>
-							<MenuItem>{props.logOut}</MenuItem>
+							<MenuItem className="logged-in-user-dropdown">{props.logOut}</MenuItem>
 						</NavDropdown>
 					</Nav>
 				: null
