@@ -26,11 +26,11 @@ class App extends React.Component {
 
 		let devInfo = new DeviceInfo(this);
 		console.log(devInfo.info);
-		devInfo.updateInfo(function(){
-			this.setState({
-				deviceInfo: devInfo
-			});
-		}, this);
+		devInfo.updateInfo((() => 
+			this.setState({ 
+				deviceInfo: devInfo 
+			})).bind(this)
+		);
 
 		this.state = {
 			currentPage: this.pages[0],

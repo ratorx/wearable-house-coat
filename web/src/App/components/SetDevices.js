@@ -86,6 +86,20 @@ class SetDevices extends React.Component {
 		})
 	}
 
+	editAdvanceChange(e){
+		try{
+			let devConfig = JSON.parse(e.target.value);
+			e.target.style.color = "black";
+			this.setState((prevState) => {
+				prevState.editDevice.device.config = devConfig;
+				return {};
+			});
+		}catch(error){
+			console.log(error);
+			e.target.style.color = "red";
+		}
+	}
+
 	startEditing(device) {
 		this.setState((prevState) => {
 			this.props.onSaveEdits(prevState.editDevice);
@@ -94,7 +108,8 @@ class SetDevices extends React.Component {
 				editDevice: {
 					device: device,
 					room: editRoom,
-					name: device.name
+					name: device.name,
+					advanced : false
 				}
 			}
 		});
@@ -106,10 +121,18 @@ class SetDevices extends React.Component {
 				editDevice: {
 					device: null,
 					room: null,
-					name: null
+					name: null,
+					advanced : false
 				}
 			}
 		})
+	}
+
+	advancedEdit() {
+		this.setState((prevState) => {
+			prevState.editDevice.advanced = true;
+			return {};
+		});
 	}
 
 	finishEditing() {
@@ -119,7 +142,8 @@ class SetDevices extends React.Component {
 				editDevice: {
 					device: null,
 					room: null,
-					name: null
+					name: null,
+					advanced : false
 				}
 			}
 		})
@@ -162,35 +186,50 @@ class SetDevices extends React.Component {
 								<ListGroupItem key={i} className="settings-entry">
 									<Row>
 										{
-											(this.state.editDevice.device === device) ?
+											this.state.editDevice.device === device ?
 												<div>
-													<Col xs={9}>
-														<Row>
-															<Col xs={6}>
-																<FormControl
-																	type="text"
-																	value={this.state.editDevice.name}
-																	onChange={this.editNameChange.bind(this)}
-																/>
-															</Col>
-															<Col xs={6}>
-																<FormControl componentClass="select" value={this.state.editDevice.room ? this.state.editDevice.room.uid : "empty"} onChange={this.editRoomChange.bind(this)}>
-																	<option value="empty" disabled>Select room</option>
-																	{
-																		this.props.rooms.map((room, i) => 
-																			<option value={room.uid} key={i}>{room.name}</option>
-																		)
-																	}
-																</FormControl>
-															</Col>
-														</Row>
-													</Col>
-													<Col xs={3}>
-														<Row>
-															<Col xs={6} onClick={this.finishEditing.bind(this)} className="col-center"><Button bsSize="small" bsStyle="success">Done</Button></Col>
-															<Col xs={6} onClick={this.cancelEditing.bind(this)} className="col-center"><Button bsSize="small" bsStyle="warning">Cancel</Button></Col>
-														</Row>
-													</Col>
+													<div>
+														<Col xs={8}>
+															<Row>
+																<Col xs={6}>
+																	<FormControl
+																		type="text"
+																		value={this.state.editDevice.name}
+																		onChange={this.editNameChange.bind(this)}
+																	/>
+																</Col>
+																<Col xs={6}>
+																	<FormControl componentClass="select" value={this.state.editDevice.room ? this.state.editDevice.room.uid : "empty"} onChange={this.editRoomChange.bind(this)}>
+																		<option value="empty" disabled>Select room</option>
+																		{
+																			this.props.rooms.map((room, i) => 
+																				<option value={room.uid} key={i}>{room.name}</option>
+																			)
+																		}
+																	</FormControl>
+																</Col>
+															</Row>
+														</Col>
+														<Col xs={4}>
+															<Row>
+																<Col xs={4} onClick={this.finishEditing.bind(this)} className="col-center"><Button bsSize="small" bsStyle="success">Done</Button></Col>
+																<Col xs={4} onClick={this.advancedEdit.bind(this)} className="col-center"><Button bsSize="small" bsStyle="info">Advanced</Button></Col>
+																<Col xs={4} onClick={this.cancelEditing.bind(this)} className="col-center"><Button bsSize="small" bsStyle="warning">Cancel</Button></Col>
+															</Row>
+														</Col>
+													</div>
+													<div>
+														{
+															this.state.editDevice.advanced ?
+																<div style={{ padding: 10 }}>
+																	<textarea style={{ width: "100%", display: "block", marginTop: 30}} onChange={this.editAdvanceChange.bind(this)} 
+																		defaultValue={ JSON.stringify(this.state.editDevice.device.config) } >
+																	</textarea>		 
+																</div>
+															:
+																""
+														}
+													</div>
 												</div>
 											:
 												<div>
@@ -212,6 +251,9 @@ class SetDevices extends React.Component {
 														</Row>
 													</Col>
 												</div>
+										}
+										{
+
 										}
 									</Row>
 								</ListGroupItem>
