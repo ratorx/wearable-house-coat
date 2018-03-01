@@ -57,7 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/volumeControlLayout"
-                    android:paddingLeft="5dp">
+                    android:paddingStart="5dp">
 
                     <!-- Need to stick a little speaker symbol here. -->
                     <!-- Could go for a dynamic one, more waves = louder -->
@@ -93,11 +93,12 @@
                     <LinearLayout
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:paddingStart="5dp">
 
                         <TextView
                             android:id="@+id/trackName"
-                            android:layout_width="95dp"
+                            android:layout_width="85dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center_vertical"
                             android:ellipsize="marquee"
@@ -110,7 +111,7 @@
 
                         <TextView
                             android:id="@+id/artistAlbumName"
-                            android:layout_width="95dp"
+                            android:layout_width="85dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center_vertical"
                             android:ellipsize="end"

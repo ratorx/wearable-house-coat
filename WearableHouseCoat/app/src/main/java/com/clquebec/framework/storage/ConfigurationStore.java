@@ -255,7 +255,6 @@ public class ConfigurationStore {
 
     public void setMyEmail(String email){
         mUserEmail = email;
-        tryAndSendFBIdToServer();
 
         if(mData != null){
             //Try and find "me"
@@ -263,15 +262,16 @@ public class ConfigurationStore {
                 Person p = Person.getPerson(this, personID);
                 if(Objects.equals(mUserEmail, p.getEmail())){
                     mUUID = personID;
+                    tryAndSendFBIdToServer();
                 }
             }
         }
     }
 
     private void tryAndSendFBIdToServer(){
-        if(mUserEmail != null && mFBInstanceId != null){
-            Log.d(TAG, "Sending FBID to server with email: "+mUserEmail+" ID: "+mFBInstanceId);
-            String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUserEmail;
+        if(mUUID != null && mFBInstanceId != null){
+            Log.d(TAG, "Sending FBID to server with ID: "+mUUID+" FBid: "+mFBInstanceId);
+            String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUUID.toString();
             mQueue.addToRequestQueue(new StringRequest(Request.Method.GET, url,
                     response -> Log.d(TAG, response),
                     error -> Log.e(TAG, error.getMessage())

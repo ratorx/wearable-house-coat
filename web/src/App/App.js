@@ -6,6 +6,7 @@ import Navigation from './components/Navigation.js';
 import Overview from './components/Overview.js';
 import SetRooms from './components/SetRooms.js';
 import SetDevices from './components/SetDevices.js';
+import Automations from './components/Automations.js';
 import Help from './components/Help.js';
 import DeviceInfo from "./util/DeviceInfo.js";
 
@@ -15,7 +16,8 @@ class App extends React.Component {
 		{name: "Setup",
 			dropdown: [
 				{name: "Rooms"},
-				{name: "Devices"}
+				{name: "Devices"},
+				{name: "Automations"}
 			]
 		},
 		{name: "Help"}
@@ -176,6 +178,8 @@ class App extends React.Component {
 								/>
 							: (this.state.currentPage.name === "Help") ?
 								<Help/>
+							: (this.state.currentPage.name === "Automations") ?
+								<Automations/>
 							: null
 						}
 					</div>

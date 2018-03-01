@@ -10,11 +10,11 @@ package com.clquebec.framework.controllable;
 
 public interface ControllableLightDevice extends ControllableDevice {
     //Allows setting of colour
-    void setLightColor(int color) throws ActionNotSupported;
+    void setLightColor(Integer color) throws ActionNotSupported;
 
     int getLightColor() throws ActionNotSupported;
 
-    boolean setBrightness(int brightness) throws ActionNotSupported;
+    boolean setBrightness(Integer brightness) throws ActionNotSupported;
 
     int getBrightness() throws ActionNotSupported;
 }

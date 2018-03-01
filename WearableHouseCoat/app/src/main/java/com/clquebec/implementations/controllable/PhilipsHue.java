@@ -170,7 +170,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     }
 
     @Override
-    public void setLightColor(int color) throws ActionNotSupported {
+    public void setLightColor(Integer color) throws ActionNotSupported {
         if (mbridge != null) {
             Log.d(TAG, "Setting the colour of PhilipsHue");
             BridgeState bs = mbridge.getBridgeState();
@@ -217,7 +217,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         return 0;
     }
 
-    public boolean setBrightness(int val) {
+    public boolean setBrightness(Integer val) {
         if (mbridge != null){
             BridgeState bs = mbridge.getBridgeState();
             List<LightPoint> lights = bs.getLights();
