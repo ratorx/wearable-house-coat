@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -49,6 +50,8 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
     private boolean currentlyPlaying = false;
     private int currentVolume = 0;
 
+    private Vibrator vib;
+
     private static final int barMax = 100;
 
     @Override
@@ -57,6 +60,9 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         setContentView(R.layout.activity_media_control_panel);
 
         setAmbientEnabled();
+
+        vib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+
         // Binding UI elements to useful variables
         mVolumeIcon = findViewById(R.id.volumeIcon);
         mVolumeWrapper = findViewById(R.id.volumeControlLayout);
@@ -125,6 +131,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         mPlayPauseButton = findViewById(R.id.mediaPlayPause);
 
         mPlayPauseButton.setOnClickListener((view) -> {
+            vib.vibrate(20);
             if(currentlyPlaying){
                 if(mPlaybackDevice.setPlaying(false)){
                     currentlyPlaying = false;
@@ -149,6 +156,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         // Previous button
         mPreviousButton = findViewById(R.id.mediaLeft);
         mPreviousButton.setOnClickListener((view) -> {
+            vib.vibrate(20);
             try{
                 mPlaybackDevice.skipPrevious();
                 updateAll();
@@ -163,6 +171,7 @@ public class MediaControlPanelActivity extends WearableActivity implements Playb
         // Next button
         mNextButton = findViewById(R.id.mediaRight);
         mNextButton.setOnClickListener((view) -> {
+            vib.vibrate(20);
             try{
                 mPlaybackDevice.skipNext();
                 updateAll();
