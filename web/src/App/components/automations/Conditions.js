@@ -20,7 +20,7 @@ class Conditions extends React.Component {
 	}
 
 	saveChanges(state) {
-		let locations = new Object();
+		let locations = {};
 		state.conditions.forEach(([user, room]) => {
 			if(user && room)
 				locations[user.uid] = room.name.toLowerCase()

@@ -194,7 +194,9 @@ class App extends React.Component {
 									devices={this.state.deviceInfo.info.data.devices}
 								/>
 							: (this.state.currentPage.name === "Help") ?
-								<Help/>
+								<Help
+									name={this.state.googleUser.w3.ig}
+								/>
 							: null
 						}
 					</div>
