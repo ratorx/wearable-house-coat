@@ -145,7 +145,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     }
 
     @Override
-    public boolean setPlaying(boolean enabled) {
+    public boolean setPlaying(Boolean enabled) {
         if (enabled){
             sendSpotifyRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/play");
 
@@ -178,7 +178,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     }
 
     @Override
-    public boolean setVolume(int volume) throws ActionNotSupported {
+    public boolean setVolume(Integer volume) throws ActionNotSupported {
         sendSpotifyRequest(JsonObjectRequest.Method.PUT, "https://api.spotify.com/v1/me/player/volume" +
                 "?volume_percent=" + volume);
 
