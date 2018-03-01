@@ -52,7 +52,7 @@ public class IFTTTLight implements ControllableLightDevice {
     }
 
     @Override
-    public void setLightColor(int color) throws ActionNotSupported {
+    public void setLightColor(Integer color) throws ActionNotSupported {
         if (mName != null && mCurrentState) {
             List<String> params = new ArrayList<>();
             params.add(mName);
@@ -69,7 +69,7 @@ public class IFTTTLight implements ControllableLightDevice {
     }
 
     @Override
-    public boolean setBrightness(int brightness) throws ActionNotSupported {
+    public boolean setBrightness(Integer brightness) throws ActionNotSupported {
         return false;
     }
 

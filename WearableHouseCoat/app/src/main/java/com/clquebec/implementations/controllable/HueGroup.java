@@ -63,7 +63,7 @@ public class HueGroup implements ControllableLightDevice, ListenableDevice {
     }
 
     @Override
-    public void setLightColor(int color) throws ActionNotSupported {
+    public void setLightColor(Integer color) throws ActionNotSupported {
         for(PhilipsHue p : mPhilipsHues){
             p.setLightColor(color);
         }
@@ -76,7 +76,7 @@ public class HueGroup implements ControllableLightDevice, ListenableDevice {
     }
 
     @Override
-    public boolean setBrightness(int brightness) throws ActionNotSupported {
+    public boolean setBrightness(Integer brightness) throws ActionNotSupported {
         boolean success = true;
         for(PhilipsHue p : mPhilipsHues){
             success = success && p.setBrightness(brightness);

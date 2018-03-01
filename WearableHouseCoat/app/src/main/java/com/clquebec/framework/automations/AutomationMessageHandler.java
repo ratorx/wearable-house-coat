@@ -73,6 +73,7 @@ public class AutomationMessageHandler extends FirebaseMessagingService {
                                     methodName,
                                     parameterTypes.toArray(new Class<?>[parameterTypes.size()])
                             ).invoke(device, parameters.toArray(new Object[parameters.size()]));
+
                         }catch(JSONException e){
                             Log.e(TAG, "Problem unmarshalling action: "+e.getMessage());
                         }
