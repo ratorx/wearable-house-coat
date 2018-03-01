@@ -24,7 +24,7 @@ const Help = (props) => {
 		<p>Some networks <em>really</em> don't like to be extended. You will need to find an alternative connection.</p>
 		<br/>
 		<h4>"I have an excellent idea for the project."</h4>
-		<p>Let us know by emailing us at <a href="mailto:clquebec-admins@srcf.net?subject=Wearable%20House%20%Coat idea!">clquebec-admins@srcf.net</a></p>
+		<p>Let us know by emailing us at <a href="mailto:clquebec-admins@srcf.net?subject=Wearable%20House%20Coat idea!">clquebec-admins@srcf.net</a></p>
 		<br/>
 		<h4>"I hit the ship, but they used a decoy"</h4>
 		<p>Try using some weird poisonous space centipedes, that should work.</p>
