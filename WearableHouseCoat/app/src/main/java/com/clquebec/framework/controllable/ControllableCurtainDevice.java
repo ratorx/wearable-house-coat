@@ -11,5 +11,5 @@ public interface ControllableCurtainDevice extends ControllableDevice {
 
     void close();
 
-    void openFraction(float fraction) throws ActionNotSupported;
+    void openFraction(Float fraction) throws ActionNotSupported;
 }

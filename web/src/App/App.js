@@ -168,6 +168,8 @@ class App extends React.Component {
 							(this.state.currentPage.name === "Overview") ?
 								<Overview
 									name={this.state.googleUser.w3.ig}
+									devices={this.state.deviceInfo.info.data.devices}
+									rooms={this.state.deviceInfo.info.data.rooms}
 								/>
 							: (this.state.currentPage.name === "Rooms") ?
 								<SetRooms

@@ -63,6 +63,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private Building mBuilding;
     private Place mCurrentDisplayedRoom;
     private Person mMe;
+    private long mLastLocationUpdate;
 
     //load HueSDK on startup
     static {
@@ -342,19 +343,22 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            //Calculate magnitude
-            float mag = 0;
-            for(float axis : sensorEvent.values){
-                mag += axis*axis;
-            }
+            if(System.nanoTime() - mLastLocationUpdate > 1000) {
+                mLastLocationUpdate = System.nanoTime();
+                //Calculate magnitude
+                float mag = 0;
+                for (float axis : sensorEvent.values) {
+                    mag += axis * axis;
+                }
 
-            //Compare with previous
-            if(Math.abs(mag - mLastAccelSquare) > 20){
-                //Do a location refresh on every step
-                mLocationProvider.update();
-            }
+                //Compare with previous
+                if (Math.abs(mag - mLastAccelSquare) > 20) {
+                    //Do a location refresh on every step
+                    mLocationProvider.update();
+                }
 
-            mLastAccelSquare = mag;
+                mLastAccelSquare = mag;
+            }
         }
     }
 

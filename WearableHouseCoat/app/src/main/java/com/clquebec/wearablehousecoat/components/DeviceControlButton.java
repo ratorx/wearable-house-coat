@@ -39,7 +39,7 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     public static final int DEFAULT_BACKGROUND = Color.WHITE;
     public static final int DEFAULT_BACKGROUND_OFF = Color.argb(255, 0, 53, 84); //Prussian Blue
     public static final int DEFAULT_BACKGROUND_DISCONNECTED = Color.argb(255, 255, 0, 0);
-    public static final int DEFAULT_BACKGROUND_AUTHENTICATE = Color.argb(255, 255, 0, 0);
+    public static final int DEFAULT_BACKGROUND_AUTHENTICATE = Color.argb(255, 0, 255, 0);
     private static final float DEFAULT_PADDING = 5;
     private static final ControllableDeviceType DEFAULT_TYPE = ControllableDeviceType.LIGHT;
     private static final int DEFAULT_SIZE = 100;

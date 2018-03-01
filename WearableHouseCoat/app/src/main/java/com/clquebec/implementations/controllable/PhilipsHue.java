@@ -110,7 +110,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
                 HeartbeatManager hbm = connection.getHeartbeatManager();
                 if (hbm != null) {
                     Log.d(TAG, "Starting heartbeats...");
-                    hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 1000);
+                    hbm.startHeartbeat(BridgeStateCacheType.LIGHTS_AND_GROUPS, 5000);
                 }
             } else if (bridgeStateUpdatedEvent == BridgeStateUpdatedEvent.LIGHTS_AND_GROUPS){
                 //TODO: Only call listeners on PhilipsHue lights that have actually changed
@@ -170,7 +170,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     }
 
     @Override
-    public void setLightColor(int color) throws ActionNotSupported {
+    public void setLightColor(Integer color) throws ActionNotSupported {
         if (mbridge != null) {
             Log.d(TAG, "Setting the colour of PhilipsHue");
             BridgeState bs = mbridge.getBridgeState();
@@ -217,7 +217,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         return 0;
     }
 
-    public boolean setBrightness(int val) {
+    public boolean setBrightness(Integer val) {
         if (mbridge != null){
             BridgeState bs = mbridge.getBridgeState();
             List<LightPoint> lights = bs.getLights();
@@ -268,13 +268,16 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         final LightState lightState = light.getLightState();
         switch (option){
             case SETTING_ON:
+                Log.d(TAG, "Setting on");
                 lightState.setOn(val!=0);
                 break;
 
             case SETTING_BRIGHTNESS:
+                Log.d(TAG, "Setting brightness");
                 lightState.setBrightness(val);
                 break;
             case SETTING_COLOR:
+                Log.d(TAG, "Setting colour");
                 int r = Color.red(val);
                 int g = Color.green(val);
                 int b = Color.blue(val);
@@ -351,7 +354,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
     @Override
     public boolean quickAction() {
-        if (mbridge == null){
+        if (mbridge == null || !mbridge.isConnected()){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(mContext).onConfigAvailable(config -> {
                 mbridgeDiscovery = new BridgeDiscovery();
@@ -399,18 +402,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     }
 
     public boolean isConnected() {
-        if (mbridge==null){
-            return false;
-        }else{
-            if(mbridge.isConnected()) {
-                BridgeState bs = mbridge.getBridgeState();
-                List<LightPoint> lights = bs.getLights();
-
-                return lights.size() > mLightNumber;
-            }else{
-                return false;
-            }
-        }
+        return (mbridge!=null && mbridge.isConnected());
     }
 
     public boolean getRequiresAuthentication() {

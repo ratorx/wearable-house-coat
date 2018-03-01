@@ -11,7 +11,7 @@ package com.clquebec.framework.controllable;
 public interface ControllableHeatDevice extends ControllableDevice {
 
     //Set temperature to given value, returns success
-    boolean setTemperature(float heat);
+    boolean setTemperature(Float heat);
 
     //Get current temperature
     float getTemperature();
