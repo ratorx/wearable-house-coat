@@ -243,6 +243,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             }
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ROOM_CHANGE_REQUEST) {
