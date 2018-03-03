@@ -2,6 +2,7 @@ package com.clquebec.wearablehousecoat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +35,8 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
     private ControllableLightDevice mLightDevice;
 
+    private Vibrator vib;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +44,8 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
 
         // Enables Always-on
         setAmbientEnabled();
+
+        vib = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         mColourPreview = findViewById(R.id.colourPreview);
         mBrightnessBar = findViewById(R.id.brightnessBar);
@@ -70,7 +75,7 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
                                 Log.e(TAG, "Device does not support getting brightness");
                             }});
                     }
-                }, 1000);
+                }, 500);
                 try {
                     mLightDevice.setBrightness(seekBar.getProgress());
                 }catch(ActionNotSupported e){
@@ -80,6 +85,7 @@ public class LightControlPanelActivity extends WearableActivity implements Devic
         });
         mColourPreview.setOnClickListener(view -> {
             Intent intent = new ColorPickActivity.IntentBuilder().oldColor(((Integer) mColourPreview.getTag())).build(LightControlPanelActivity.this);
+            vib.vibrate(20);
             startActivityForResult(intent, REQUEST_PICK_COLOR);
         });
 

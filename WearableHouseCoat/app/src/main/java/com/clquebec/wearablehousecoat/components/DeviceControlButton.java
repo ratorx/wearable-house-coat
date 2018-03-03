@@ -280,8 +280,9 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public void onClick(View view) {
         //Call quickAction in the attached device
+        vib.vibrate(20);
         if (mDevice != null && mDevice.isConnected()) {
-            vib.vibrate(20);
+
             mDevice.quickAction();
         }
     }
@@ -289,8 +290,9 @@ public class DeviceControlButton extends AppCompatButton implements View.OnClick
     @Override
     public boolean onLongClick(View view) {
         //Call extendedAction in the attached device
+        vib.vibrate(50);
         if (mDevice != null && mDevice.isConnected()) {
-            vib.vibrate(50);
+
             mDevice.extendedAction();
             return true;
         }
