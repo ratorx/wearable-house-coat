@@ -1,7 +1,6 @@
 import React from 'react';
 import { Panel, FormControl } from 'react-bootstrap';
 import PhilipsHue from './PhilipsHue.js';
-import HueGroup from './HueGroup.js';
 import Spotify from './Spotify.js';
 import IFTTTLight from './IFTTTLight.js';
 
@@ -67,13 +66,11 @@ class Actions extends React.Component {
 						<Panel.Body>
 							{
 								action.device ? (
-									(action.device.type === "PhilipsHue") ?
+									(action.device.type === "PhilipsHue" || action.device.type === "HueGroup") ?
 										<PhilipsHue
 											action={action}
 											onChange={this.onActionChange.bind(this, i)}
 										/>
-									: (action.device.type === "HueGroup") ?
-										<HueGroup/>
 									: (action.device.type === "Spotify") ?
 										<Spotify/>
 									: (action.device.type === "IFTTTLight") ?
