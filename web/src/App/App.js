@@ -42,7 +42,7 @@ class App extends React.Component {
 		});
 
 		this.state = {
-			currentPage: this.pages[1].dropdown[2],
+			currentPage: this.pages[0],
 			deviceInfo: devInfo,
 			autoInfo: autoInfo,
 			googleUser: null

@@ -5,6 +5,7 @@
   "dependencies": {
     "react": "^16.2.0",
     "react-bootstrap": "^0.32.1",
+    "react-color": "^2.14.0",
     "react-dom": "^16.2.0",
     "react-google-oauth": "^1.0.0",
     "react-scripts": "^1.1.1",

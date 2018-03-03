@@ -7,7 +7,7 @@ class Conditions extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			conditions: Object.entries(props.automation.Locations).map(([user_uid, room_lowercase_name]) => {
+			conditions: Object.entries(props.conditions).map(([user_uid, room_lowercase_name]) => {
 				let user = props.users.find(usr => usr.uid === user_uid);
 				let room = props.rooms.find(rm => rm.name.toLowerCase() === room_lowercase_name);
 				return [user, room];
@@ -128,7 +128,7 @@ class Conditions extends React.Component {
 									}
 								</FormControl>
 							</Col>
-							<Col xs={1}>at</Col>
+							<Col xs={1}>in</Col>
 							<Col xs={5}>
 								<FormControl componentClass="select" value={userroom[1] ? userroom[1].uid : "empty"} onChange={this.onRoomChange.bind(this, i)}>
 									<option value="empty" disabled>Select room</option>

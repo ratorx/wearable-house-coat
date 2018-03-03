@@ -1,0 +1,23 @@
+.color-display {
+	width: 100px;
+	height: 100px;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border-radius: 50%;
+}
+
+.color-picker {
+	width: 80%!important;
+	margin: auto;
+}
+
+.bright-picker {
+	width: 80%!important;
+	margin: auto;
+	margin-top: 10px;
+}
+
+.bright-picker > div > .hue-horizontal {
+	background: linear-gradient(to right, #000, #fff)!important;
+}

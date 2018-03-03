@@ -1,7 +1,8 @@
 import React from 'react';
-import { PageHeader, ListGroup, ListGroupItem, Row, Col } from 'react-bootstrap';
+import { PageHeader, Row, Col, Well, Panel } from 'react-bootstrap';
 import ConfirmDelete from './ConfirmDelete.js';
 import Conditions from './automations/Conditions.js';
+import Actions from './automations/Actions.js';
 import './Settings.css';
 
 class Automations extends React.Component {
@@ -34,6 +35,14 @@ class Automations extends React.Component {
 		automation.Locations = loc;
 	}
 
+	setEnterActions(automation, actions) {
+		automation.Actions = actions
+	}
+
+	setLeaveActions(automation, actions) {
+		automation.LeaveActions = actions
+	}
+
 	render() {
 		return <div>
 			<PageHeader>Automations</PageHeader>
@@ -52,29 +61,39 @@ class Automations extends React.Component {
 				<Col xs={12} sm={8} lg={6}>
 					{
 						this.props.automations.map((automation, i) =>
-							<ListGroup key={i} className="settings-entry">
-								<ListGroupItem>
-									<Row>
-										<Col xs={1}><strong>IF</strong></Col>
-										<Col xs={11}>
-											<Conditions
-												automation={automation}
-												users={this.props.users}
-												rooms={this.props.rooms}
-												setLocations={this.setLocations.bind(this, automation)}
-											/>
-										</Col>
-									</Row>
-								</ListGroupItem>
-								<ListGroupItem>
-									<Row>
-										<Col xs={1}><strong>THEN</strong></Col>
-										<Col xs={11}>
-											Placeholder
-										</Col>
-									</Row>
-								</ListGroupItem>
-							</ListGroup>
+							<Well bsSize="large" key={i} className="settings-entry">
+								<Panel>
+									<Panel.Heading><strong>If</strong></Panel.Heading>
+									<Panel.Body>
+										<Conditions
+											conditions={automation.Locations}
+											users={this.props.users}
+											rooms={this.props.rooms}
+											setLocations={this.setLocations.bind(this, automation)}
+										/>
+									</Panel.Body>
+								</Panel>
+								<Panel>
+									<Panel.Heading><strong>On entry</strong></Panel.Heading>
+									<Panel.Body>
+										<Actions
+											devices={this.props.devices}
+											actions={automation.Actions}
+											setActions={this.setEnterActions.bind(this, automation)}
+										/>
+									</Panel.Body>
+								</Panel>
+								<Panel>
+									<Panel.Heading><strong>On leave</strong></Panel.Heading>
+									<Panel.Body>
+										<Actions
+											devices={this.props.devices}
+											actions={automation.LeaveActions}
+											setActions={this.setLeaveActions.bind(this, automation)}
+										/>
+									</Panel.Body>
+								</Panel>
+							</Well>
 						)
 					}
 				</Col>
