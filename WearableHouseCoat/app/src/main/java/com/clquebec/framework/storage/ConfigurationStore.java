@@ -1,6 +1,8 @@
 package com.clquebec.framework.storage;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -12,6 +14,7 @@ import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.Room;
 import com.clquebec.framework.people.Person;
+import com.clquebec.wearablehousecoat.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -91,6 +94,12 @@ public class ConfigurationStore {
                         setData(c, new JSONObject(Keys.ConfigJSON));
                     }catch(JSONException e){
                         Log.e(TAG, "Error creating default config, "+e.getMessage());
+
+                        //Show confirmation
+                        Intent intent = new Intent(c, ConfirmationActivity.class);
+                        intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.FAILURE_ANIMATION);
+                        intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, c.getString(R.string.msg_config_unavailable));
+                        c.startActivity(intent);
                     }
                 }
         );
@@ -272,9 +281,13 @@ public class ConfigurationStore {
         if(mUUID != null && mFBInstanceId != null){
             Log.d(TAG, "Sending FBID to server with ID: "+mUUID+" FBid: "+mFBInstanceId);
             String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUUID.toString();
+            Log.d(TAG, url);
             mQueue.addToRequestQueue(new StringRequest(Request.Method.GET, url,
                     response -> Log.d(TAG, response),
-                    error -> Log.e(TAG, error.getMessage())
+                    error -> {
+                        Log.e(TAG, "Error sending instance ID to server, trying again");
+                        tryAndSendFBIdToServer();
+                    }
             ));
         }
     }

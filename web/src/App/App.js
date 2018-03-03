@@ -8,7 +8,8 @@ import SetRooms from './components/SetRooms.js';
 import SetDevices from './components/SetDevices.js';
 import Automations from './components/Automations.js';
 import Help from './components/Help.js';
-import DeviceInfo from "./util/DeviceInfo.js";
+import DeviceInfo from './util/DeviceInfo.js';
+import AutomationsInfo from './util/AutomationsInfo.js';
 
 class App extends React.Component {
 	pages = [
@@ -26,17 +27,24 @@ class App extends React.Component {
 	constructor(){
 		super();
 
-		let devInfo = new DeviceInfo(this);
-		console.log(devInfo.info);
-		devInfo.updateInfo((() =>
+		let devInfo = new DeviceInfo();
+		devInfo.updateInfo(() => {
 			this.setState({
 				deviceInfo: devInfo
-			}))
-		);
+			})
+		});
+
+		let autoInfo = new AutomationsInfo();
+		autoInfo.updateInfo(() => {
+			this.setState({
+				autoInfo: autoInfo
+			})
+		});
 
 		this.state = {
-			currentPage: this.pages[0],
+			currentPage: this.pages[1].dropdown[2],
 			deviceInfo: devInfo,
+			autoInfo: autoInfo,
 			googleUser: null
 		};
 	}
@@ -178,10 +186,17 @@ class App extends React.Component {
 									onDeleteDevice={this.deleteDevice.bind(this)}
 									onSaveEdits={this.saveDeviceEdits.bind(this)}
 								/>
-							: (this.state.currentPage.name === "Help") ?
-								<Help/>
 							: (this.state.currentPage.name === "Automations") ?
-								<Automations/>
+								<Automations
+									automations={this.state.autoInfo.info}
+									users={this.state.deviceInfo.info.data.people}
+									rooms={this.state.deviceInfo.info.data.rooms}
+									devices={this.state.deviceInfo.info.data.devices}
+								/>
+							: (this.state.currentPage.name === "Help") ?
+								<Help
+									name={this.state.googleUser.w3.ig}
+								/>
 							: null
 						}
 					</div>

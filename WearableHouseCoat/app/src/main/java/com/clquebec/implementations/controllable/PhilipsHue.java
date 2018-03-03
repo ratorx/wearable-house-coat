@@ -55,6 +55,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     private static final int SETTING_COLOR = 1;
     private static final int SETTING_ON = 2;
 
+    private static boolean findingBridge = false;
     private static Bridge mbridge = null;
     private static BridgeDiscovery mbridgeDiscovery = null;
     private static Map<DeviceChangeListener, PhilipsHue> listeners = new HashMap<>();
@@ -133,7 +134,8 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     public PhilipsHue(Context c) {
         mContext = c;
         //TODO: Allow addressing of specific Hue lights via JSON config
-        if (mbridge == null){
+        if (mbridge == null && !findingBridge){
+            findingBridge = true;
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
                 mbridgeDiscovery = new BridgeDiscovery();

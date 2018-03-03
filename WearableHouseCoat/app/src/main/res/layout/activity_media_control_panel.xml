@@ -84,8 +84,8 @@
 
                     <ImageView
                         android:id="@+id/albumArt"
-                        android:layout_width="50dp"
-                        android:layout_height="wrap_content"
+                        android:layout_width="45dp"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:layout_gravity="start"
                         android:src="@android:drawable/ic_delete" />
@@ -98,7 +98,7 @@
 
                         <TextView
                             android:id="@+id/trackName"
-                            android:layout_width="85dp"
+                            android:layout_width="90dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center_vertical"
                             android:ellipsize="marquee"
@@ -111,7 +111,7 @@
 
                         <TextView
                             android:id="@+id/artistAlbumName"
-                            android:layout_width="85dp"
+                            android:layout_width="90dp"
                             android:layout_height="20dp"
                             android:layout_gravity="center_vertical"
                             android:ellipsize="end"

@@ -1,5 +1,5 @@
 class DeviceInfo {
-	constructor(app) {
+	constructor() {
 		this.info = null;
 		this.loaded = false;
 		this.configLocation = "http://shell.srcf.net:8003/config";

@@ -57,6 +57,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="android.support.wearable.activity.ConfirmationActivity">
+        </activity>
+
         <service android:name="com.clquebec.framework.automations.GetInstanceId">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />

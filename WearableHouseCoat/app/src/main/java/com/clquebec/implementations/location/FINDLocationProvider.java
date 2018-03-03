@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.support.annotation.Nullable;
+import android.support.wearable.activity.ConfirmationActivity;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -19,6 +20,7 @@ import com.clquebec.framework.location.LocationChangeListener;
 import com.clquebec.framework.location.Place;
 import com.clquebec.framework.people.Person;
 import com.clquebec.framework.storage.ConfigurationStore;
+import com.clquebec.wearablehousecoat.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,6 +76,10 @@ public class FINDLocationProvider implements IndoorLocationProvider {
     @Override
     public Place getLocation(Person p) {
         return mLocationMap.getOrDefault(p, null);
+    }
+
+    public void setMe(Person p){
+        mPerson = p;
     }
 
     @Override
@@ -242,7 +248,15 @@ public class FINDLocationProvider implements IndoorLocationProvider {
 
             Log.d(TAG, jsonObject.toString());
             JsonObjectRequest trackRequest = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    response -> Log.d(TAG, "Succesfully calibrated"),
+                    response -> {
+                        Log.d(TAG, "Succesfully calibrated");
+
+                        //Show confirmation
+                        Intent intent = new Intent(mContext, ConfirmationActivity.class);
+                        intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
+                        intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, mContext.getString(R.string.msg_calibrated));
+                        mContext.startActivity(intent);
+                    },
                     error -> Log.e(TAG, error.getMessage()));
 
             mQueue.addToRequestQueue(trackRequest);

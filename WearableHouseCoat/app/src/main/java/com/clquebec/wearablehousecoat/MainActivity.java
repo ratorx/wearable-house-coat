@@ -83,6 +83,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         Persistence.setStorageLocation(getFilesDir().getAbsolutePath(), "HueWear");
         setContentView(R.layout.activity_main);
 
+        mLocationNameView = findViewById(R.id.main_currentlocation);
+
         //SECTION: Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -93,6 +95,28 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         //SECTION: Initialize Building
         mBuilding = new Building(this, "Loading"); //Placeholder building
+        //END SECTION
+
+        //SECTION: Initialize toggle button grid
+        mToggleButtons = findViewById(R.id.main_togglebuttons);
+        mContainerView = findViewById(R.id.main_container);
+
+        //Set grid to have width 2
+        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
+
+        //Attach the adapter which automatically fills with controls for current Place
+        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(null);
+        mToggleButtons.setAdapter(mToggleAdapter); //Attach
+        //END SECTION
+
+        //SECTION: Show current locations
+        mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
+        mSetCurrentLocationView.setOnClickListener(view -> {
+            if(mMe != null) {
+                setRoom(mMe.getLocation(), false);
+                mLocationProvider.update();
+            }
+        });
         //END SECTION
 
         //SECTION: Load in from config store
@@ -144,23 +168,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         });
         //END SECTION
 
-        //SECTION: Initialize toggle button grid
-        mToggleButtons = findViewById(R.id.main_togglebuttons);
-        mContainerView = findViewById(R.id.main_container);
-
-        //Set grid to have width 2
-        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
-
-        //Attach the adapter which automatically fills with controls for current Place
-        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(null);
-        mToggleButtons.setAdapter(mToggleAdapter); //Attach
-        //END SECTION
-
-        //SECTION: Initialize locations and location provider
-        mLocationNameView = findViewById(R.id.main_currentlocation);
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
-        //END SECTION
 
+        //SECTION: I am here button
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
 
@@ -169,9 +179,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             mLocationProvider.calibrate(mCurrentDisplayedRoom);
             mIAmHereWrapper.setVisibility(View.GONE);
         });
-
-        // Enables Always-on
-        setAmbientEnabled();
+        //END SECTION
 
         //SECTION: Allow user to change location
         View mChangeLocationView = findViewById(R.id.main_changelocationview);
@@ -197,15 +205,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
             });
         });
-
-        mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
-        mSetCurrentLocationView.setOnClickListener(view -> {
-            if(mMe != null) {
-                setRoom(mMe.getLocation(), false);
-                mLocationProvider.update();
-            }
-        });
-
 
         // Enables Always-on
         setAmbientEnabled();
@@ -237,6 +236,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             }
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ROOM_CHANGE_REQUEST) {
@@ -257,7 +257,15 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             try {
                 mAccount = task.getResult(ApiException.class);
-                ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
+
+                ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+                    //Set email
+                    config.setMyEmail(mAccount.getEmail());
+
+                    //Reset "me"
+                    mMe = Person.getPerson(this, config.getMyUUID());
+                    mLocationProvider.setMe(mMe);
+                });
 
                 //Check for Location permission, and request them if not granted
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -345,6 +353,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
             if(System.nanoTime() - mLastLocationUpdate > 1000) {
                 mLastLocationUpdate = System.nanoTime();
+
                 //Calculate magnitude
                 float mag = 0;
                 for (float axis : sensorEvent.values) {
