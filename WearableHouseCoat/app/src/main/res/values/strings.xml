@@ -12,5 +12,6 @@
     <string name="colourPreviewContentDescription">A preview of the light\'s colour</string>
     <string name="selectroom_content_description">A down-arrow which shows room selection on click.</string>
     <string name="iamhere_text">I am here!</string>
+    <string name="msg_calibrated">Calibrated</string>
 
 </resources>

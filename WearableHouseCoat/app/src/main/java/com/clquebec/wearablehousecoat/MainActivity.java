@@ -17,6 +17,7 @@ import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
+import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -97,6 +98,28 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         mBuilding = new Building(this, "Loading"); //Placeholder building
         //END SECTION
 
+        //SECTION: Initialize toggle button grid
+        mToggleButtons = findViewById(R.id.main_togglebuttons);
+        mContainerView = findViewById(R.id.main_container);
+
+        //Set grid to have width 2
+        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
+
+        //Attach the adapter which automatically fills with controls for current Place
+        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(null);
+        mToggleButtons.setAdapter(mToggleAdapter); //Attach
+        //END SECTION
+
+        //SECTION: Show current locations
+        mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
+        mSetCurrentLocationView.setOnClickListener(view -> {
+            if(mMe != null) {
+                setRoom(mMe.getLocation(), false);
+                mLocationProvider.update();
+            }
+        });
+        //END SECTION
+
         //SECTION: Load in from config store
         ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
             mBuilding = config.getBuilding(this);
@@ -146,22 +169,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         });
         //END SECTION
 
-        //SECTION: Initialize toggle button grid
-        mToggleButtons = findViewById(R.id.main_togglebuttons);
-        mContainerView = findViewById(R.id.main_container);
-
-        //Set grid to have width 2
-        mToggleButtons.setLayoutManager(new GridLayoutManager(this, 2));
-
-        //Attach the adapter which automatically fills with controls for current Place
-        DeviceTogglesAdapter mToggleAdapter = new DeviceTogglesAdapter(null);
-        mToggleButtons.setAdapter(mToggleAdapter); //Attach
-        //END SECTION
-
-        //SECTION: Initialize locations and location provider
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
-        //END SECTION
 
+        //SECTION: I am here button
         mIAmHereWrapper = findViewById(R.id.iamhere_wrapper);
         mIAmHereWrapper.setVisibility(View.GONE);
 
@@ -169,10 +179,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         findViewById(R.id.iamhere_button).setOnClickListener(view -> {
             mLocationProvider.calibrate(mCurrentDisplayedRoom);
             mIAmHereWrapper.setVisibility(View.GONE);
-        });
 
-        // Enables Always-on
-        setAmbientEnabled();
+            //Show confirmation
+            Intent intent = new Intent(this, ConfirmationActivity.class);
+            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
+            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, getString(R.string.msg_calibrated));
+            startActivity(intent);
+        });
+        //END SECTION
 
         //SECTION: Allow user to change location
         View mChangeLocationView = findViewById(R.id.main_changelocationview);
@@ -198,15 +212,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
             });
         });
-
-        mSetCurrentLocationView = findViewById(R.id.main_switchcurrentlocation);
-        mSetCurrentLocationView.setOnClickListener(view -> {
-            if(mMe != null) {
-                setRoom(mMe.getLocation(), false);
-                mLocationProvider.update();
-            }
-        });
-
 
         // Enables Always-on
         setAmbientEnabled();
