@@ -272,9 +272,13 @@ public class ConfigurationStore {
         if(mUUID != null && mFBInstanceId != null){
             Log.d(TAG, "Sending FBID to server with ID: "+mUUID+" FBid: "+mFBInstanceId);
             String url = getServer() + "adduser?fbid="+mFBInstanceId+"&user="+mUUID.toString();
+            Log.d(TAG, url);
             mQueue.addToRequestQueue(new StringRequest(Request.Method.GET, url,
                     response -> Log.d(TAG, response),
-                    error -> Log.e(TAG, error.getMessage())
+                    error -> {
+                        Log.e(TAG, "Error sending instance ID to server, trying again");
+                        tryAndSendFBIdToServer();
+                    }
             ));
         }
     }
