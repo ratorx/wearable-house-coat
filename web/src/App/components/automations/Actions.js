@@ -66,15 +66,13 @@ class Actions extends React.Component {
 						<Panel.Body>
 							{
 								action.device ? (
-									(action.device.type === "PhilipsHue" || action.device.type === "HueGroup") ?
+									(action.device.type === "PhilipsHue" || action.device.type === "HueGroup" || action.device.type === "IFTTTLight") ?
 										<PhilipsHue
 											action={action}
 											onChange={this.onActionChange.bind(this, i)}
 										/>
 									: (action.device.type === "Spotify") ?
 										<Spotify/>
-									: (action.device.type === "IFTTTLight") ?
-										<IFTTTLight/>
 									: null
 								) : null
 							}	
