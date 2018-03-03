@@ -86,6 +86,7 @@ class Conditions extends React.Component {
 		this.setState((prevState) => {
 			let conditionIndex = prevState.conditions.indexOf(prevState.deleteDialog.condition);
 			prevState.conditions.splice(conditionIndex, 1);
+			this.saveChanges(prevState);
 			return {
 				deleteDialog: {
 					shown: false,
@@ -152,7 +153,7 @@ class Conditions extends React.Component {
 			<Row>
 				<Col xs={12}>
 					<Button onClick={this.addCondition.bind(this)}>
-						Add
+						New Condition
 					</Button>
 				</Col>
 			</Row>

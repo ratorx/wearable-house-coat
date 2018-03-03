@@ -68,7 +68,6 @@ class Spotify extends React.Component{
 				: (this.props.action.method === "setVolume") ?
 					<div>
 						{/*unintuitive hack to preserve consistency of sliders: restyled Hue picker*/}
-						{console.log(this.props.action.arguments[0])}
 						<HuePicker
 							className="volume-picker"
 							color={{h: this.props.action.arguments[0] * 360 / 100, s: 1, l: 0.5}}

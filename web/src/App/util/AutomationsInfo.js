@@ -1,49 +1,4 @@
 class AutomationsInfo {
-	// static get actions() {
-	// 	return [
-	// 		"IFTTTLight": {
-
-	// 		},
-	// 		"PhilipsHue": {
-	// 			methods: [
-	// 				{
-	// 					name: "setLightColor",
-	// 					display_name: "Set Colour",
-	// 					parameters: ""
-	// 				}
-	// 			]
-	// 		},
-	// 		"Spotify": {
-	// 			methods: [
-	// 				{
-	// 					name: "setPlaying",
-	// 					display_name: "Set playing",
-	// 					parameters: [
-	// 						{
-	// 							type: "java.lang.Boolean",
-	// 							component: "dropdown",
-
-	// 						}
-	// 					]
-	// 					arguments: [
-	// 						{
-	// 							display: "playing",
-	// 							value: "true"
-	// 						},
-	// 						{
-	// 							display: "paused",
-	// 							value: "false"
-	// 						}
-	// 					]
-	// 				}
-	// 			]
-	// 		},
-	// 		"HueGroup": {
-
-	// 		}
-	// 	]
-	// }
-
 	constructor() {
 		this.info = [
 			{
