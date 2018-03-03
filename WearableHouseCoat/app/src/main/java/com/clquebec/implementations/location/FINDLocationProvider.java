@@ -76,6 +76,10 @@ public class FINDLocationProvider implements IndoorLocationProvider {
         return mLocationMap.getOrDefault(p, null);
     }
 
+    public void setMe(Person p){
+        mPerson = p;
+    }
+
     @Override
     public void refreshLocations() {
         String url = mServerLocation + "location?group=" + GROUPID;

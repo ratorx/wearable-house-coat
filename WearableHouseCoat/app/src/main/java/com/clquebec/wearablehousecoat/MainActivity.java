@@ -258,7 +258,15 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
             try {
                 mAccount = task.getResult(ApiException.class);
-                ConfigurationStore.getInstance(this).setMyEmail(mAccount.getEmail());
+
+                ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+                    //Set email
+                    config.setMyEmail(mAccount.getEmail());
+
+                    //Reset "me"
+                    mMe = Person.getPerson(this, config.getMyUUID());
+                    mLocationProvider.setMe(mMe);
+                });
 
                 //Check for Location permission, and request them if not granted
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
