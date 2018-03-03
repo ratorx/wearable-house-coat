@@ -92,7 +92,7 @@ class PhilipsHue extends React.Component {
 						{/*unintuitive hack to preserve consistency of sliders: restyled Hue picker*/}
 						<HuePicker
 							className="bright-picker"
-							color={{h: this.props.action.arguments[0] * 360 / 255, s: 1, l: 0.5}}
+							color={{h: this.props.action.arguments[0] * 360 / 256, s: 1, l: 0.5}}
 							onChange={this.onChangeBrightness.bind(this)}
 						/>
 					</div>

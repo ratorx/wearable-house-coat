@@ -71,7 +71,10 @@ class Actions extends React.Component {
 											onChange={this.onActionChange.bind(this, i)}
 										/>
 									: (action.device.type === "Spotify") ?
-										<Spotify/>
+										<Spotify
+											action={action}
+											onChange={this.onActionChange.bind(this, i)}
+										/>
 									: null
 								) : null
 							}	

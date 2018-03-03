@@ -1,0 +1,10 @@
+.volume-picker {
+	width: 80%!important;
+	margin: auto;
+	margin-top: 10px;
+}
+
+.volume-picker > div > .hue-horizontal {
+	background: #fff;
+	border: 1px solid black;
+}

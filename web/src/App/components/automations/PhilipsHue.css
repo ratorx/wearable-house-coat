@@ -20,4 +20,5 @@
 
 .bright-picker > div > .hue-horizontal {
 	background: linear-gradient(to right, #000, #fff)!important;
+	border: 1px solid black;
 }
