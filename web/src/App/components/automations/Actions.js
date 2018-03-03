@@ -2,7 +2,6 @@ import React from 'react';
 import { Panel, FormControl } from 'react-bootstrap';
 import PhilipsHue from './PhilipsHue.js';
 import Spotify from './Spotify.js';
-import IFTTTLight from './IFTTTLight.js';
 
 class Actions extends React.Component {
 	constructor(props) {
