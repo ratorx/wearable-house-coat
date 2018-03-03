@@ -17,7 +17,6 @@ import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.wear.widget.BoxInsetLayout;
-import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -179,12 +178,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         findViewById(R.id.iamhere_button).setOnClickListener(view -> {
             mLocationProvider.calibrate(mCurrentDisplayedRoom);
             mIAmHereWrapper.setVisibility(View.GONE);
-
-            //Show confirmation
-            Intent intent = new Intent(this, ConfirmationActivity.class);
-            intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
-            intent.putExtra(ConfirmationActivity.EXTRA_MESSAGE, getString(R.string.msg_calibrated));
-            startActivity(intent);
         });
         //END SECTION
 
