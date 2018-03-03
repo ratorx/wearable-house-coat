@@ -14,5 +14,6 @@
     <string name="iamhere_text">I am here!</string>
     <string name="msg_calibrated">Calibrated</string>
     <string name="msg_config_unavailable">Configuration Unavailable</string>
+    <string name="text_loading_rooms">Loading rooms</string>
 
 </resources>

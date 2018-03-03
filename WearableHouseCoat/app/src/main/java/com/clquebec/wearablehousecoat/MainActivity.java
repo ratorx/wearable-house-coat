@@ -201,9 +201,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                         .map(Room::getName).collect(Collectors.toList());
 
                 //Pass room names as an extra
-                intent.putExtra(RoomSelectionActivity.INTENT_ROOMS_EXTRA, new ArrayList<>(roomNames));
-                MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+                RoomSelectionActivity.setRoomList(new ArrayList<>(roomNames));
+
             });
+            MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
         });
 
         // Enables Always-on
