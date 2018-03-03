@@ -83,6 +83,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         Persistence.setStorageLocation(getFilesDir().getAbsolutePath(), "HueWear");
         setContentView(R.layout.activity_main);
 
+        mLocationNameView = findViewById(R.id.main_currentlocation);
+
         //SECTION: Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -157,7 +159,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //END SECTION
 
         //SECTION: Initialize locations and location provider
-        mLocationNameView = findViewById(R.id.main_currentlocation);
         TextViewCompat.setAutoSizeTextTypeWithDefaults(mLocationNameView, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
         //END SECTION
 
@@ -345,6 +346,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
             if(System.nanoTime() - mLastLocationUpdate > 1000) {
                 mLastLocationUpdate = System.nanoTime();
+
                 //Calculate magnitude
                 float mag = 0;
                 for (float axis : sensorEvent.values) {
