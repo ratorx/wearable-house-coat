@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Base64;
 import android.util.Log;
 
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.clquebec.environment.Keys;
 import com.clquebec.framework.HTTPRequestQueue;
 import com.clquebec.framework.controllable.ActionNotSupported;
 import com.clquebec.framework.controllable.ControllableDeviceType;
@@ -33,13 +35,17 @@ import java.util.UUID;
 
 public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     private static final String TAG = "Spotify";
-    public static final String AUTH_TOKEN = "BQAdqgyFDpIpOvkKmvvYPzk3n_7rnNDgMStXpyWmPHdUQ5cmaqHZfQcV7c0pj8qENAdx4raaHuozAdVoQ9tpzkWxCk8xFAOlYnL50eemZuqndFBD3rv5aEv6bxzKJWv_ypTvvo7zXeYWDyEGwHqjdXf2oQ";
+    public static final String redirect_uri= "blah";
     private boolean isPlaying = false;
     private Context mContext;
     private UUID mUUID;
     private List<DeviceChangeListener> listeners = new ArrayList<>();
     private String mName = "Spotify";
-    private String mAuthToken = AUTH_TOKEN;
+
+    private String mAuthCode;
+    private String mAccessToken = null;
+    private String mRefreshToken = null;
+    private long mExpiryTime;
 
     public class SpotifyJsonRequest extends JsonObjectRequest {
         public SpotifyJsonRequest(int method, String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
@@ -55,7 +61,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
             Map<String, String> headers = new HashMap<>();
             headers.put("Accept", "application/json");
             headers.put("Content-Type", "application/json");
-            headers.put("Authorization", "Bearer " + mAuthToken);
+            headers.put("Authorization", "Bearer " + mAccessToken);
             return headers;
         }
     }
@@ -71,7 +77,9 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
         }
 
         //Get auth token if available
-        mAuthToken = config.getString("authkey");
+        mAuthCode = config.getString("authkey");
+
+        getInitialTokens();
     }
 
     public void getAll(PlaybackListener pl) {
@@ -318,7 +326,8 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     private void sendSpotifyRequest(int method, String url) {
         Response.Listener<JSONObject> listener = response -> Log.d("Spotify", "Response is " + response.toString());
 
-        Response.ErrorListener errorListener = error -> Log.d("Spotify", "Error is " + error.getMessage());
+        Response.ErrorListener errorListener = error -> Log.e("Spotify", "Error code: "
+                + error.networkResponse.statusCode);
 
         SpotifyJsonRequest request = new SpotifyJsonRequest(method,
                 url, null,
@@ -327,4 +336,54 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
         };
         HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(request);
     }
+
+    private String getEncodedClientCredentials() {
+        byte[] bytesDecoded = (Keys.SPOTIFY_CLIENTID + ":" + Keys.SPOTIFY_CLIENT_SECRET).getBytes();
+        byte[] bytesEncoded = Base64.encode(bytesDecoded, Base64.DEFAULT);
+
+        return new String(bytesEncoded);
+    }
+
+    private void getInitialTokens(){
+        String clientCredentials = getEncodedClientCredentials();
+
+        Response.Listener<JSONObject> listener = (response -> {
+            Log.d(TAG, "Response is " + response.toString());
+            try {
+                mAccessToken = response.getString("access_token");
+                mRefreshToken = response.getString("refresh_token");
+                mExpiryTime = (System.currentTimeMillis() / 1000) + (long)
+                        (response.getInt("expires_in") * 0.9);
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+
+        Response.ErrorListener errorListener = error -> Log.e(TAG, "Error code: " +
+                error.networkResponse.statusCode);
+
+        JSONObject authorisationBody = new JSONObject();
+        try {
+            authorisationBody.put("grant_type", "authorization_code");
+            authorisationBody.put("code", mAuthCode);
+            authorisationBody.put("redirect_uri", redirect_uri);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST,
+                "https://accounts.spotify.com/api/token", authorisationBody, listener, errorListener){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Basic " + clientCredentials);
+                return headers;
+            }
+        };
+
+        HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(jsonObjectRequest);
+    }
+
 }
