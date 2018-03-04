@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageHeader, Row, Col, Well, Panel } from 'react-bootstrap';
+import { PageHeader, Row, Col, Well, Panel, Button } from 'react-bootstrap';
 import ConfirmDelete from './ConfirmDelete.js';
 import Conditions from './automations/Conditions.js';
 import Actions from './automations/Actions.js';
@@ -28,7 +28,26 @@ class Automations extends React.Component {
 	}
 
 	deleteAutomation() {
-		console.log("TODO TODO TODO TODO-TODO-TODO-TODO-TODOOOOOOOOO TODODODODO");
+		this.setState((prevState) => {
+			this.props.onDeleteAutomation(prevState.deleteDialog.automation)
+			return {
+				deleteDialog: {
+					shown: false,
+					automation: null
+				}
+			}
+		})
+	}
+
+	showDeleteDialog(automation) {
+		this.setState(() => {
+			return {
+				deleteDialog: {
+					shown: true,
+					automation: automation
+				}
+			}
+		})
 	}
 
 	setLocations(automation, loc) {
@@ -57,8 +76,7 @@ class Automations extends React.Component {
 				:	null
 			}
 			<Row>
-				<Col xs={0} sm={2} lg={3}/>
-				<Col xs={12} sm={8} lg={6}>
+				<Col xs={12} smOffset={2} sm={8} lgOffset={3} lg={6}>
 					{
 						this.props.automations.map((automation, i) =>
 							<Well bsSize="large" key={i} className="settings-entry">
@@ -93,11 +111,24 @@ class Automations extends React.Component {
 										/>
 									</Panel.Body>
 								</Panel>
+								<Row>
+									<Col xs={12} className="col-right">
+										<Button bsStyle="danger" onClick={this.showDeleteDialog.bind(this, automation)}>
+											Delete Automation
+										</Button>
+									</Col>
+								</Row>
 							</Well>
 						)
 					}
 				</Col>
-				<Col xs={0} sm={2} lg={3}/>
+			</Row>
+			<Row>
+				<Col xs={12} smOffset={2} sm={8} lgOffset={3} lg={6}>
+					<Button onClick={this.props.onAddAutomation}>
+						New Automation
+					</Button>
+				</Col>
 			</Row>
 		</div>
 	}

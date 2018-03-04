@@ -127,6 +127,27 @@ class App extends React.Component {
 		}
 	}
 
+	deleteAutomation(automation) {
+		this.setState((prevState) => {
+			let automationIndex = prevState.autoInfo.info.indexOf(automation);
+			prevState.autoInfo.info.splice(automationIndex, 1);
+			return {}
+		})
+	}
+
+	addAutomation() {
+		this.setState((prevState) => {
+			let user = prevState.deviceInfo.info.data.people.find(usr => usr.email === prevState.googleUser.w3.U3)
+			prevState.autoInfo.info.push({
+				Me: user ? user.uid : "",
+				Locations: [],
+				Actions: [],
+				LeaveActions: []
+			})
+			return {}
+		})
+	}
+
 	onLoginSuccess(googleUser) {
 		console.log(googleUser)
 		this.setState(() => {
@@ -192,6 +213,8 @@ class App extends React.Component {
 									users={this.state.deviceInfo.info.data.people}
 									rooms={this.state.deviceInfo.info.data.rooms}
 									devices={this.state.deviceInfo.info.data.devices}
+									onDeleteAutomation={this.deleteAutomation.bind(this)}
+									onAddAutomation={this.addAutomation.bind(this)}
 								/>
 							: (this.state.currentPage.name === "Help") ?
 								<Help
