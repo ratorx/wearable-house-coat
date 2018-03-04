@@ -109,12 +109,20 @@ class Actions extends React.Component {
 		return <div>
 			{
 				this.state.deleteDialog.shown ?
-					<ConfirmDelete
-						type="action for device"
-						name={this.state.deleteDialog.action.device.name}
-						onCancel={this.cancelDelete.bind(this)}
-						onDelete={this.deleteAction.bind(this)}
-					/>
+					this.state.deleteDialog.action.device ?
+						<ConfirmDelete
+							type="action for device"
+							name={this.state.deleteDialog.action.device.name}
+							onCancel={this.cancelDelete.bind(this)}
+							onDelete={this.deleteAction.bind(this)}
+						/>
+					:
+						<ConfirmDelete
+							type="this action"
+							name=""
+							onCancel={this.cancelDelete.bind(this)}
+							onDelete={this.deleteAction.bind(this)}
+						/>	
 				:	null
 			}
 			{
