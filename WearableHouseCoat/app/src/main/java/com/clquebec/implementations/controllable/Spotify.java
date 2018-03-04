@@ -83,7 +83,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
     }
 
     public void getAll(PlaybackListener pl) {
-        sendSpotifyRequest(JsonObjectRequest.Method.GET,
+        sendSpotifyRequest(JsonObjectRequest.Method.GET, "https://api.spotify.com/v1/me/player",
                 response -> {
                     Log.d(TAG, "Response is " + response.toString());
                     String track = "";
@@ -117,7 +117,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
 
     @Override
     public void getResource(PlaybackListener pl) {
-        sendSpotifyRequest(JsonObjectRequest.Method.GET,
+        sendSpotifyRequest(JsonObjectRequest.Method.GET, "https://api.spotify.com/v1/me/player",
                 response -> {
                     Log.d(TAG, "Response is " + response.toString());
                     String track = "";
@@ -166,7 +166,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
 
     @Override
     public void getPlaying(PlaybackListener pl) throws ActionNotSupported {
-       sendSpotifyRequest(JsonObjectRequest.Method.GET,
+       sendSpotifyRequest(JsonObjectRequest.Method.GET, "https://api.spotify.com/v1/me/player",
                response -> {
                     Log.d(TAG, "Response is " + response.toString());
                     boolean playing = false;
@@ -195,7 +195,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
 
     @Override
     public void getVolume(PlaybackListener pl) throws ActionNotSupported {
-        sendSpotifyRequest(JsonObjectRequest.Method.GET,
+        sendSpotifyRequest(JsonObjectRequest.Method.GET, "https://api.spotify.com/v1/me/player",
                 response -> {
                     Log.d(TAG, "Response is " + response.toString());
                     int volume = 0;
@@ -214,7 +214,7 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
 
     @Override
     public void getArtLocation(PlaybackListener pl) {
-        sendSpotifyRequest(JsonObjectRequest.Method.GET,
+        sendSpotifyRequest(JsonObjectRequest.Method.GET, "https://api.spotify.com/v1/me/player",
                 response -> {
                     Log.d(TAG, "Response is " + response.toString());
                     String url = "";
@@ -307,34 +307,49 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
         }
     }
 
-    private void sendSpotifyRequest(int method, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
-        if (listener==null){
-            listener = response -> Log.d(TAG, "Response is " + response.toString());
-        }
-        if (errorListener==null){
-            errorListener = error -> Log.d(TAG, "Error is " + error.getMessage());
+    private void sendSpotifyRequest(int method, String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        long currentTime = System.currentTimeMillis() / 1000;
+
+        if (currentTime < mExpiryTime){
+            if (listener==null){
+                listener = response -> Log.d(TAG, "Response is " + response.toString());
+            }
+            if (errorListener==null){
+                errorListener = error -> Log.d(TAG, "Error is " + error.getMessage());
+            }
+
+            SpotifyJsonRequest request = new SpotifyJsonRequest(method,
+                    url, null,
+                    listener,
+                    errorListener){
+            };
+            HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(request);
+        }else{
+            refreshTokens(method, url,listener, errorListener);
         }
 
-        SpotifyJsonRequest request = new SpotifyJsonRequest(method,
-                "https://api.spotify.com/v1/me/player", null,
-                listener,
-                errorListener){
-        };
-        HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(request);
+
     }
 
     private void sendSpotifyRequest(int method, String url) {
-        Response.Listener<JSONObject> listener = response -> Log.d("Spotify", "Response is " + response.toString());
+        long currentTime = System.currentTimeMillis() / 1000;
 
-        Response.ErrorListener errorListener = error -> Log.e("Spotify", "Error code: "
-                + error.networkResponse.statusCode);
+        if (currentTime < mExpiryTime){
+            Response.Listener<JSONObject> listener = response -> Log.d("Spotify", "Response is " + response.toString());
 
-        SpotifyJsonRequest request = new SpotifyJsonRequest(method,
-                url, null,
-                listener,
-                errorListener){
-        };
-        HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(request);
+            Response.ErrorListener errorListener = error -> Log.e("Spotify", "Error code: "
+                    + error.networkResponse.statusCode);
+
+            SpotifyJsonRequest request = new SpotifyJsonRequest(method,
+                    url, null,
+                    listener,
+                    errorListener){
+            };
+            HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(request);
+        }else{
+            refreshTokens(method, url, null, null);
+        }
+
     }
 
     private String getEncodedClientCredentials() {
@@ -369,6 +384,46 @@ public class Spotify implements ControllablePlaybackDevice, ListenableDevice {
             authorisationBody.put("grant_type", "authorization_code");
             authorisationBody.put("code", mAuthCode);
             authorisationBody.put("redirect_uri", redirect_uri);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(JsonObjectRequest.Method.POST,
+                "https://accounts.spotify.com/api/token", authorisationBody, listener, errorListener){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Basic " + clientCredentials);
+                return headers;
+            }
+        };
+
+        HTTPRequestQueue.getRequestQueue(mContext).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void refreshTokens(int requestMethod, String requestUrl, Response.Listener<JSONObject> requestListener,  Response.ErrorListener requestErrorListener){
+        String clientCredentials = getEncodedClientCredentials();
+
+        Response.Listener<JSONObject> listener = (response -> {
+            Log.d(TAG, "Response is " + response.toString());
+            try {
+                mAccessToken = response.getString("access_token");
+                mExpiryTime = (System.currentTimeMillis() / 1000) + (long)
+                        (response.getInt("expires_in") * 0.9);
+
+                sendSpotifyRequest(requestMethod, requestUrl, requestListener, requestErrorListener);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        });
+
+        Response.ErrorListener errorListener = error -> Log.e(TAG, "Error code: " +
+                error.networkResponse.statusCode);
+
+        JSONObject authorisationBody = new JSONObject();
+        try {
+            authorisationBody.put("grant_type", "refresh_token");
+            authorisationBody.put("refresh_token", mRefreshToken);
         } catch (JSONException e) {
             e.printStackTrace();
         }
