@@ -15,7 +15,7 @@ class Spotify extends React.Component{
 				method: "setVolume",
 				display_name: "Set Volume",
 				parameters: ["java.lang.Integer"],
-				default_arguments: [0]
+				default_arguments: ["0"]
 			}
 		]
 	}
@@ -31,7 +31,8 @@ class Spotify extends React.Component{
 		});
 	}
 
-	onChangePlaying(val) {
+	onChangePlaying(e) {
+		let val = e.target.value
 		this.props.onChange({
 			device: this.props.action.device,
 			method: "setPlaying",
@@ -45,7 +46,7 @@ class Spotify extends React.Component{
 			device: this.props.action.device,
 			method: "setVolume",
 			parameters: ["java.lang.Integer"],
-			arguments: [Math.round(clr.hsl.h * 99 / 360)]
+			arguments: [(Math.round(clr.hsl.h * 99 / 360)).toString()]
 		})
 	}
 

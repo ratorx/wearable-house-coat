@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import { PageHeader } from 'react-bootstrap';
+import { PageHeader, Alert, Row, Col } from 'react-bootstrap';
 import { GoogleAPI, GoogleLogin, GoogleLogout } from 'react-google-oauth';
 import Navigation from './components/Navigation.js';
 import Overview from './components/Overview.js';
@@ -27,26 +27,26 @@ class App extends React.Component {
 	constructor(){
 		super();
 
-		let devInfo = new DeviceInfo();
-		devInfo.updateInfo(() => {
-			this.setState({
-				deviceInfo: devInfo
-			})
-		});
-
-		let autoInfo = new AutomationsInfo();
-		autoInfo.updateInfo(() => {
-			this.setState({
-				autoInfo: autoInfo
-			})
-		});
-
 		this.state = {
 			currentPage: this.pages[0],
-			deviceInfo: devInfo,
-			autoInfo: autoInfo,
+			deviceInfo: new DeviceInfo(),
+			autoInfo: new AutomationsInfo(),
+			curUserID: "",
 			googleUser: null
 		};
+	}
+
+	loadConfigAuto() {
+		this.state.deviceInfo.updateInfo(() => {
+			let user = this.state.deviceInfo.info.data.people.find(usr => usr.email === this.state.googleUser.w3.U3)
+			this.state.autoInfo.updateInfo(user.uid, () => {
+				this.setState(() => {
+					return {
+						curUserID: user.uid
+					}
+				})
+			})
+		})
 	}
 
 	setCurrentPage(page) {
@@ -127,30 +127,34 @@ class App extends React.Component {
 		}
 	}
 
+	saveAutomations() {
+		this.state.autoInfo.saveInfo(this.state.curUserID);
+	}
+
 	deleteAutomation(automation) {
 		this.setState((prevState) => {
 			let automationIndex = prevState.autoInfo.info.indexOf(automation);
 			prevState.autoInfo.info.splice(automationIndex, 1);
 			return {}
-		})
+		}, this.saveAutomations)
 	}
 
 	addAutomation() {
 		this.setState((prevState) => {
-			let user = prevState.deviceInfo.info.data.people.find(usr => usr.email === prevState.googleUser.w3.U3)
 			prevState.autoInfo.info.push({
-				Me: user ? user.uid : "",
-				Locations: [],
+				Me: this.state.curUserID,
+				Locations: {},
 				Actions: [],
 				LeaveActions: []
 			})
 			return {}
-		})
+		}, this.saveAutomations)
 	}
 
 	onLoginSuccess(googleUser) {
 		console.log(googleUser)
 		this.setState(() => {
+			this.loadConfigAuto();
 			return {
 				googleUser: googleUser
 			}
@@ -160,7 +164,10 @@ class App extends React.Component {
 	onLogoutSuccess(t) {
 		this.setState(() => {
 			return {
-				googleUser: null
+				googleUser: null,
+				deviceInfo: new DeviceInfo(),
+				autoInfo: new AutomationsInfo(),
+				currentPage: this.pages[0]
 			}
 		})
 	}
@@ -169,61 +176,75 @@ class App extends React.Component {
 		return <GoogleAPI clientId="695081174378-hn8bchfp0lque5htjpkv63noa28b5iee.apps.googleusercontent.com">
 		{
 			(this.state.googleUser !== null) ?
-				<div>
-					<Navigation
-						onBrandClick={() => {this.setCurrentPage.call(this, this.pages[0])}}
-						pages={this.pages}
-						activePage={this.state.currentPage}
-						onSelectPage={this.setCurrentPage.bind(this)}
-						googleUser={this.state.googleUser}
-						logOut={
-							<GoogleLogout
-								backgroundColor="#00A6FB"
-								text="Log out"
-								onLogoutSuccess={this.onLogoutSuccess.bind(this)}
-							/>
-						}
-					/>
-					<div className="content">
-						{
-							(this.state.currentPage.name === "Overview") ?
-								<Overview
-									name={this.state.googleUser.w3.ig}
-									devices={this.state.deviceInfo.info.data.devices}
-									rooms={this.state.deviceInfo.info.data.rooms}
+				(this.state.deviceInfo.loaded && this.state.autoInfo.loaded) ?
+					<div>
+						<Navigation
+							onBrandClick={() => {this.setCurrentPage.call(this, this.pages[0])}}
+							pages={this.pages}
+							activePage={this.state.currentPage}
+							onSelectPage={this.setCurrentPage.bind(this)}
+							googleUser={this.state.googleUser}
+							logOut={
+								<GoogleLogout
+									backgroundColor="#00A6FB"
+									text="Log out"
+									onLogoutSuccess={this.onLogoutSuccess.bind(this)}
 								/>
-							: (this.state.currentPage.name === "Rooms") ?
-								<SetRooms
-									devices={this.state.deviceInfo.info.data.devices}
-									rooms={this.state.deviceInfo.info.data.rooms}
-									onAddRoom={this.addRoom.bind(this)}
-									onDeleteRoom={this.deleteRoom.bind(this)}
-									onSaveEdits={this.saveRoomEdits.bind(this)}
-								/>
-							: (this.state.currentPage.name === "Devices") ?
-								<SetDevices
-									devices={this.state.deviceInfo.info.data.devices}
-									rooms={this.state.deviceInfo.info.data.rooms}
-									onDeleteDevice={this.deleteDevice.bind(this)}
-									onSaveEdits={this.saveDeviceEdits.bind(this)}
-								/>
-							: (this.state.currentPage.name === "Automations") ?
-								<Automations
-									automations={this.state.autoInfo.info}
-									users={this.state.deviceInfo.info.data.people}
-									rooms={this.state.deviceInfo.info.data.rooms}
-									devices={this.state.deviceInfo.info.data.devices}
-									onDeleteAutomation={this.deleteAutomation.bind(this)}
-									onAddAutomation={this.addAutomation.bind(this)}
-								/>
-							: (this.state.currentPage.name === "Help") ?
-								<Help
-									name={this.state.googleUser.w3.ig}
-								/>
-							: null
-						}
+							}
+						/>
+						<div className="content">
+							{
+								(this.state.currentPage.name === "Overview") ?
+									<Overview
+										name={this.state.googleUser.w3.ig}
+										devices={this.state.deviceInfo.info.data.devices}
+										rooms={this.state.deviceInfo.info.data.rooms}
+									/>
+								: (this.state.currentPage.name === "Rooms") ?
+									<SetRooms
+										devices={this.state.deviceInfo.info.data.devices}
+										rooms={this.state.deviceInfo.info.data.rooms}
+										onAddRoom={this.addRoom.bind(this)}
+										onDeleteRoom={this.deleteRoom.bind(this)}
+										onSaveEdits={this.saveRoomEdits.bind(this)}
+									/>
+								: (this.state.currentPage.name === "Devices") ?
+									<SetDevices
+										devices={this.state.deviceInfo.info.data.devices}
+										rooms={this.state.deviceInfo.info.data.rooms}
+										onDeleteDevice={this.deleteDevice.bind(this)}
+										onSaveEdits={this.saveDeviceEdits.bind(this)}
+									/>
+								: (this.state.currentPage.name === "Automations") ?
+									<Automations
+										automations={this.state.autoInfo.info}
+										users={this.state.deviceInfo.info.data.people}
+										rooms={this.state.deviceInfo.info.data.rooms}
+										devices={this.state.deviceInfo.info.data.devices}
+										onDeleteAutomation={this.deleteAutomation.bind(this)}
+										onAddAutomation={this.addAutomation.bind(this)}
+										onUpdateAutomation={this.saveAutomations.bind(this)}
+									/>
+								: (this.state.currentPage.name === "Help") ?
+									<Help
+										name={this.state.googleUser.w3.ig}
+									/>
+								: null
+							}
+						</div>
 					</div>
-				</div>
+				:
+					<div className="content">
+						<Navigation pages={[]}/>
+						<Row>
+							<Col xs={12} smOffset={2} sm={8} lgOffset={3} lg={6}>
+								<Alert bsStyle="danger">
+									<h4>Unable to load configuration</h4>
+									Either the server is unreachable or the user is not found.
+								</Alert>
+							</Col>
+						</Row>
+					</div>
 			:
 				<div className="content">
 					<Navigation pages={[]}/>

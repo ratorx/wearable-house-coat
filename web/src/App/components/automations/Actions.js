@@ -97,7 +97,7 @@ class Actions extends React.Component {
 			prevState.actions.push({
 				device: null,
 				method: null,
-				parameters: null,
+				parameters: [null],
 				arguments: null
 			})
 			// Do not call saveChanges. It will be called if any changes are made
