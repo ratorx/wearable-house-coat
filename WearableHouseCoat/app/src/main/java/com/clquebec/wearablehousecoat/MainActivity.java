@@ -184,27 +184,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //SECTION: Allow user to change location
         View mChangeLocationView = findViewById(R.id.main_changelocationview);
         mChangeLocationView.setOnClickListener(view -> {
-            Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
+            changeLocation();
+        });
 
-            //Try and re-get the configuration store
-            if (mBuilding.getRooms().size() == 0) {
-                ConfigurationStore.getInstance(this).tryGetConfigFromServer(this);
-            }
-
-            //Get room names as strings
-            ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
-                if (mBuilding.getRooms().size() == 0) {
-                    mBuilding = config.getBuilding(this);
-                }
-
-                List<CharSequence> roomNames = mBuilding.getRooms().stream()
-                        .map(Room::getName).collect(Collectors.toList());
-
-                //Pass room names as an extra
-                RoomSelectionActivity.setRoomList(new ArrayList<>(roomNames));
-
-            });
-            MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+        mLocationNameView.setOnClickListener(view -> {
+            changeLocation();
         });
 
         // Enables Always-on
@@ -375,5 +359,29 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         //Do nothing
+    }
+
+    private void changeLocation(){
+        Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
+
+        //Try and re-get the configuration store
+        if (mBuilding.getRooms().size() == 0) {
+            ConfigurationStore.getInstance(this).tryGetConfigFromServer(this);
+        }
+
+        //Get room names as strings
+        ConfigurationStore.getInstance(this).onConfigAvailable(config -> {
+            if (mBuilding.getRooms().size() == 0) {
+                mBuilding = config.getBuilding(this);
+            }
+
+            List<CharSequence> roomNames = mBuilding.getRooms().stream()
+                    .map(Room::getName).collect(Collectors.toList());
+
+            //Pass room names as an extra
+            RoomSelectionActivity.setRoomList(new ArrayList<>(roomNames));
+
+        });
+        MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
     }
 }
