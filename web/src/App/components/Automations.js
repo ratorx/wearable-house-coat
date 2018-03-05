@@ -52,14 +52,17 @@ class Automations extends React.Component {
 
 	setLocations(automation, loc) {
 		automation.Locations = loc;
+		this.props.onUpdateAutomation()
 	}
 
 	setEnterActions(automation, actions) {
 		automation.Actions = actions
+		this.props.onUpdateAutomation()
 	}
 
 	setLeaveActions(automation, actions) {
 		automation.LeaveActions = actions
+		this.props.onUpdateAutomation()
 	}
 
 	render() {

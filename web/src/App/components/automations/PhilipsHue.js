@@ -10,12 +10,12 @@ class PhilipsHue extends React.Component {
 				method: "setLightColor",
 				display_name: "Set Colour",
 				parameters: ["java.lang.Integer"],
-				default_arguments: [0]
+				default_arguments: [(0xFF << 16).toString()]
 			}, {
 				method: "setBrightness",
 				display_name: "Set Brightness",
 				parameters: ["java.lang.Integer"],
-				default_arguments: [0]
+				default_arguments: ["0"]
 			}, {
 				method: "enable",
 				display_name: "Turn On",
@@ -30,6 +30,13 @@ class PhilipsHue extends React.Component {
 		]
 	}
 
+	constructor(props) {
+		super(props);
+		this.state = {
+			color: (props.action.method === "setLightColor") ? this.colorFromInt(parseInt(props.action.arguments[0], 10)) : null
+		}
+	}
+
 	onChangeMethod(e) {
 		let newMethod = e.target.value;
 		let method = PhilipsHue.methods.find(m => m.method === newMethod)
@@ -39,6 +46,12 @@ class PhilipsHue extends React.Component {
 			parameters: method.parameters.slice(),
 			arguments: method.default_arguments.slice()
 		});
+		if(newMethod === "setLightColor")
+			this.setState(() => {
+				return {
+					color: this.colorFromInt(parseInt(method.default_arguments[0], 10))
+				}
+			})
 	}
 
 	colorFromInt(clr) {
@@ -46,24 +59,36 @@ class PhilipsHue extends React.Component {
 			r: (clr >> 16) & 0xFF,
 			g: (clr >> 8) & 0xFF,
 			b: clr & 0xFF
-		}
+		};
+	}
+
+	colorToHexString(clr) {
+		return "#" + clr.r.toString(16).padStart(2, "0") + clr.g.toString(16).padStart(2, "0") + clr.b.toString(16).padStart(2, "0");
 	}
 
 	onChangeColour(clr) {
+		this.setState(() => {
+			return {
+				color: clr.rgb
+			}
+		})
+	}
+
+	onChangeColourComplete(clr) {
 		this.props.onChange({
 			device: this.props.action.device,
 			method: "setLightColor",
 			parameters: ["java.lang.Integer"],
-			arguments: [((clr.rgb.r & 0xFF) << 16) | ((clr.rgb.g & 0xFF) << 8) | (clr.rgb.b & 0xFF)]
+			arguments: [(((clr.rgb.r & 0xFF) << 16) | ((clr.rgb.g & 0xFF) << 8) | (clr.rgb.b & 0xFF)).toString()]
 		})
 	}
 
-	onChangeBrightness(clr) {
+	onChangeBrightnessComplete(clr) {
 		this.props.onChange({
 			device: this.props.action.device,
 			method: "setBrightness",
 			parameters: ["java.lang.Integer"],
-			arguments: [Math.round(clr.hsl.h * 255 / 360)]
+			arguments: [(Math.round(clr.hsl.h * 255 / 360)).toString()]
 		})
 	}
 
@@ -80,10 +105,11 @@ class PhilipsHue extends React.Component {
 			{
 				(this.props.action.method === "setLightColor") ?
 					<div>
-						<div className="color-display" style={{backgroundColor: "#" + this.props.action.arguments[0].toString(16).padStart(6, "0")}}/>
+						<div className="color-display" style={{backgroundColor: this.colorToHexString(this.state.color)}}/>
 						<HuePicker
 							className="color-picker"
-							color={this.colorFromInt(this.props.action.arguments[0])}
+							color={this.state.color}
+							onChangeComplete={this.onChangeColourComplete.bind(this)}
 							onChange={this.onChangeColour.bind(this)}
 						/>
 					</div>
@@ -93,7 +119,7 @@ class PhilipsHue extends React.Component {
 						<HuePicker
 							className="bright-picker"
 							color={{h: this.props.action.arguments[0] * 360 / 256, s: 1, l: 0.5}}
-							onChange={this.onChangeBrightness.bind(this)}
+							onChangeComplete={this.onChangeBrightnessComplete.bind(this)}
 						/>
 					</div>
 				: (this.props.action.method === "enable") ?
