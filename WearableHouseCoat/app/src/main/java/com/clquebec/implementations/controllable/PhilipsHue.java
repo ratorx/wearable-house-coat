@@ -404,7 +404,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
     }
 
     public boolean isConnected() {
-        return (mbridge!=null && mbridge.isConnected());
+        return (mbridge!=null && mbridge.isConnected() && mbridge.getBridgeState().getLightPoints().get(mLightNumber).getLightState().isReachable());
     }
 
     public boolean getRequiresAuthentication() {
