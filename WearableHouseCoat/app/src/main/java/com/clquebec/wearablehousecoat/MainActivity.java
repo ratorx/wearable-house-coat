@@ -23,11 +23,13 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.clquebec.framework.controllable.ControllableDevice;
 import com.clquebec.framework.location.Building;
 import com.clquebec.framework.location.Place;
 import com.clquebec.framework.location.Room;
 import com.clquebec.framework.people.Person;
 import com.clquebec.framework.storage.ConfigurationStore;
+import com.clquebec.implementations.controllable.PhilipsHue;
 import com.clquebec.implementations.location.FINDLocationProvider;
 import com.clquebec.wearablehousecoat.components.DeviceTogglesAdapter;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -184,11 +186,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //SECTION: Allow user to change location
         View mChangeLocationView = findViewById(R.id.main_changelocationview);
         mChangeLocationView.setOnClickListener(view -> {
-            changeLocation();
+            manualChangeLocation();
         });
 
         mLocationNameView.setOnClickListener(view -> {
-            changeLocation();
+            manualChangeLocation();
         });
 
         // Enables Always-on
@@ -235,6 +237,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                             .filter(room -> room.getName().equals(name)).toArray()[0];
 
                     setRoom(chosenRoom);
+
+
                 }
             }
         }else if(requestCode == GOOGLE_SIGN_IN_REQUEST) {
@@ -287,6 +291,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if(room != null) {
             //Update the location text. This needs to be converted to upper case because of a bug
             //in android with text upper case and resizing
+            List<ControllableDevice> devicesInRoom = room.getDevices();
+
+            for (ControllableDevice c : devicesInRoom){
+                if (c instanceof PhilipsHue){
+                    ((PhilipsHue) c).refreshConnection();
+                    break;
+                }
+            }
             mLocationNameView.setText(room.getName().toUpperCase());
 
             //This automatically populates and attaches devices to buttons.
@@ -361,7 +373,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         //Do nothing
     }
 
-    private void changeLocation(){
+    private void manualChangeLocation(){
         Intent intent = new Intent(MainActivity.this, RoomSelectionActivity.class);
 
         //Try and re-get the configuration store
@@ -383,5 +395,20 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         });
         MainActivity.this.startActivityForResult(intent, ROOM_CHANGE_REQUEST);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if (mCurrentDisplayedRoom != null){
+            List<ControllableDevice> devicesInRoom = mCurrentDisplayedRoom.getDevices();
+
+            for (ControllableDevice c : devicesInRoom){
+                if (c instanceof PhilipsHue){
+                    ((PhilipsHue) c).refreshConnection();
+                    break;
+                }
+            }
+        }
     }
 }

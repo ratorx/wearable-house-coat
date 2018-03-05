@@ -135,13 +135,15 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
         mContext = c;
         //TODO: Allow addressing of specific Hue lights via JSON config
         if (mbridge == null && !findingBridge){
-            findingBridge = true;
+
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
                 mbridgeDiscovery = new BridgeDiscovery();
+                findingBridge = true;
                 mbridgeDiscovery.search(new BridgeDiscoveryCallback() {
                     @Override
                     public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
+                        findingBridge = false;
                         if (list.size() == 0){
                             Log.e(TAG, "No bridge found");
                             //TODO: Decide what to do here.
@@ -356,13 +358,37 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
     @Override
     public boolean quickAction() {
-        if (mbridge == null || !mbridge.isConnected()){
+        return isEnabled() ? disable() : enable();
+    }
+
+    @Override
+    public boolean extendedAction() {
+        Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
+        lightControls.putExtra("DeviceType", "HueLight"); //Deprecated - test without this
+        lightControls.putExtra(LightControlPanelActivity.ID_EXTRA, this.getID());
+        mContext.startActivity(lightControls);
+
+        return true;
+    }
+
+    public boolean isConnected() {
+        return (mbridge!=null && mbridge.isConnected() && mbridge.getBridgeState().getLightPoints().get(mLightNumber).getLightState().isReachable());
+    }
+
+    public boolean getRequiresAuthentication() {
+        return requiresAuthentication;
+    }
+
+    public void refreshConnection() {
+        if ((mbridge == null || !mbridge.isConnected()) && !findingBridge){
             //Load in parameters from configuration store
             ConfigurationStore.getInstance(mContext).onConfigAvailable(config -> {
                 mbridgeDiscovery = new BridgeDiscovery();
+                findingBridge = true;
                 mbridgeDiscovery.search(new BridgeDiscoveryCallback() {
                     @Override
                     public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
+                        findingBridge = false;
                         if (list.size() == 0){
                             Log.e(TAG, "No bridge found");
                             //TODO: Decide what to do here.
@@ -387,27 +413,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
                     }
                 });
-            }); return true;
-        } else {
-            return isEnabled() ? disable() : enable();
+            });
         }
-    }
-
-    @Override
-    public boolean extendedAction() {
-        Intent lightControls = new Intent(mContext, LightControlPanelActivity.class);
-        lightControls.putExtra("DeviceType", "HueLight"); //Deprecated - test without this
-        lightControls.putExtra(LightControlPanelActivity.ID_EXTRA, this.getID());
-        mContext.startActivity(lightControls);
-
-        return true;
-    }
-
-    public boolean isConnected() {
-        return (mbridge!=null && mbridge.isConnected() && mbridge.getBridgeState().getLightPoints().get(mLightNumber).getLightState().isReachable());
-    }
-
-    public boolean getRequiresAuthentication() {
-        return requiresAuthentication;
     }
 }
