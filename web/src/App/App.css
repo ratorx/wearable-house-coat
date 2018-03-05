@@ -18,3 +18,7 @@
 .col-right {
 	text-align: right;
 }
+
+.modal-dialog {
+	color: #333333;
+}
