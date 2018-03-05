@@ -7,7 +7,7 @@ import './Sortable.css'
 const DragHandle = SortableHandle(() => <img className="handle" src={dragIcon} alt="drag handle"/>);
 
 const SortableDevice = SortableElement(({device}) =>
-	<ListGroupItem>
+	<ListGroupItem className="sortable-device">
 		<DragHandle/>
 		{device.name}
 	</ListGroupItem>

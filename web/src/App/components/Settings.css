@@ -1,3 +1,11 @@
 .settings-entry img {
 	height: 15px;
 }
+
+.settings-entry {
+	background-color: #00A6FB;
+}
+
+.settings-header {
+	background-color: #0582CA;
+}
