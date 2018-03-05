@@ -9,3 +9,7 @@
 .settings-header {
 	background-color: #0582CA;
 }
+
+.well.settings-entry {
+	color: #333333;
+}
