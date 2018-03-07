@@ -159,7 +159,7 @@ class SetRooms extends React.Component{
 				<Col xs={0} sm={2} lg={3}/>
 				<Col xs={12} sm={8} lg={6}>
 					<ListGroup>
-						<ListGroupItem>
+						<ListGroupItem className="settings-header">
 							<Row>
 								<Col xs={9}><strong>Room</strong></Col>
 								<Col xs={3} className="col-center"><Button onClick={this.addRoom.bind(this)}>New</Button></Col>

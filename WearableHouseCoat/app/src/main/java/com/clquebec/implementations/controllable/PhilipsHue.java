@@ -358,6 +358,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
 
     @Override
     public boolean quickAction() {
+        refreshConnection();
         return isEnabled() ? disable() : enable();
     }
 

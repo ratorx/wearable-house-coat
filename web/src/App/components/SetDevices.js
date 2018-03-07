@@ -170,7 +170,7 @@ class SetDevices extends React.Component {
 				<Col xs={0} sm={2} lg={3}/>
 				<Col xs={12} sm={8} lg={6}>
 					<ListGroup>
-						<ListGroupItem>
+						<ListGroupItem className="settings-header">
 							<Row>
 								<Col xs={9}>
 									<Row>
@@ -218,18 +218,16 @@ class SetDevices extends React.Component {
 															</Row>
 														</Col>
 													</div>
-													<div>
-														{
-															this.state.editDevice.advanced ?
-																<div style={{ padding: 10 }}>
-																	<textarea style={{ width: "100%", display: "block", marginTop: 30}} onChange={this.editAdvanceChange.bind(this)} 
-																		defaultValue={ JSON.stringify(this.state.editDevice.device.config) } >
-																	</textarea>		 
-																</div>
-															:
-																""
-														}
-													</div>
+													{
+														this.state.editDevice.advanced ?
+															<div style={{ padding: 10 }}>
+																<textarea className="advanced-device-config" style={{ width: "100%", display: "block", marginTop: 30}} onChange={this.editAdvanceChange.bind(this)} 
+																	defaultValue={ JSON.stringify(this.state.editDevice.device.config) } >
+																</textarea>		 
+															</div>
+														:
+															null
+													}
 												</div>
 											:
 												<div>

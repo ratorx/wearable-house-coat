@@ -3,9 +3,19 @@ body {
 	padding: 0;
 	padding-top: 60px;
 	font-family: sans-serif;
+	background-color: #051923;
+	color: #ffffff
 }
 
 body .content {
 	max-width: 100%;
 	overflow-x: hidden;
+}
+
+a {
+	color: #ffc000;
+}
+
+a:hover {
+	color: #ffff00;
 }
