@@ -140,7 +140,7 @@ public class PhilipsHue implements ControllableLightDevice, ListenableDevice {
             ConfigurationStore.getInstance(c).onConfigAvailable(config -> {
                 mbridgeDiscovery = new BridgeDiscovery();
                 findingBridge = true;
-                mbridgeDiscovery.search(new BridgeDiscoveryCallback() {
+                mbridgeDiscovery.search(BridgeDiscovery.BridgeDiscoveryOption.ALL, new BridgeDiscoveryCallback() {
                     @Override
                     public void onFinished(List<BridgeDiscoveryResult> list, ReturnCode returnCode) {
                         findingBridge = false;

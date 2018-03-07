@@ -8,60 +8,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:695081174378:android:22b3d102953f91b5",
-        "android_client_info": {
-          "package_name": "clquebec.com.wearablehousecoat"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "695081174378-hn8bchfp0lque5htjpkv63noa28b5iee.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "695081174378-oh21hcn6q91t67krpo971jbvec5botib.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "clquebec.com.wearablehousecoat",
-            "certificate_hash": "cd4ca35c2ee26ea972c9a0d386d8a02875f6cf76"
-          }
-        },
-        {
-          "client_id": "695081174378-4v8bml8lqh1dfds3hn4gn3563rf52pj3.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA8ZreRraK8SZaM2juh87HEdBLrhvKi_rg"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "695081174378-hn8bchfp0lque5htjpkv63noa28b5iee.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:695081174378:android:442368c8fb21abc0",
         "android_client_info": {
           "package_name": "com.clquebec.wearablehousecoat"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "695081174378-bd5so685blvnqql7rj62a84ap6dg7vao.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.clquebec.wearablehousecoat",
+            "certificate_hash": "2f8be68e43ef0902b7c1a81fac020a3f12d3ba9e"
+          }
+        },
+        {
+          "client_id": "695081174378-5od1rlglmlbmv3ucu3c0ch9kaa8arik8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.clquebec.wearablehousecoat",
+            "certificate_hash": "8441fe2f294310c7e919403dec8e67652b606db0"
+          }
+        },
         {
           "client_id": "695081174378-ot836gfv1fi51s36enhf0v03cckvti8f.apps.googleusercontent.com",
           "client_type": 1,
